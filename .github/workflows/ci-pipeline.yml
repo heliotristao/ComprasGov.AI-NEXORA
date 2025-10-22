@@ -15,9 +15,13 @@ jobs:
         with:
           node-version: '20.x'
           cache: 'npm'
+          cache-dependency-path: 'src/package-lock.json'
       - name: Install dependencies
+        working-directory: ./src
         run: npm ci
       - name: Lint code
+        working-directory: ./src
         run: npm run lint
       - name: Build project
+        working-directory: ./src
         run: npm run build
