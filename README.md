@@ -26,3 +26,4 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **[Data] - Tarefa INFRA-001:** Criado script Terraform para a VPC base.
 * **[Data] - Tarefa INFRA-002:** Criado script Terraform para as sub-redes públicas e privadas.
 * **[Data Atual] - Tarefa INFRA-003:** Criado script Terraform para provisionar o Internet Gateway e o NAT Gateway da rede.
+* **[Data Atual] - Tarefa INFRA-004:** Criado script Terraform para configurar as tabelas de roteamento das sub-redes públicas e privadas.
