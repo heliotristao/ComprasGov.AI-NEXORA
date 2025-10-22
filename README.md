@@ -32,3 +32,4 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **[Data Atual] - Tarefa BACKEND-001:** Criada a estrutura de boilerplate inicial para o microsserviço 'governance-service'.
 * **[Data Atual] - Tarefa BACKEND-002:** Criados os manifestos Kubernetes (Deployment, Service, Ingress) para o 'governance-service'.
 * **[Data Atual] - Tarefa FRONTEND-001:** Criada a página de Login com formulário e hook de autenticação inicial.
+* **[2025-10-22] - Tarefa FRONTEND-002:** Criado o layout principal da aplicação e a página inicial do Dashboard.
