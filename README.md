@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-22] - Tarefa BACKEND-006:** Implementado o endpoint de criação de novos planejamentos no 'planning-service'.
 * **[2025-10-22] - Tarefa CD-002:** Criado o pipeline de Implantação Contínua no GitHub Actions para o 'planning-service'.
 * **[2025-10-22] - Tarefa CI-004:** Criado o repositório no Amazon ECR para o 'planning-service' via Terraform.
 * **[2025-10-22] - Tarefa CI-003:** Criado o pipeline de Integração Contínua no GitHub Actions para o 'planning-service'.
