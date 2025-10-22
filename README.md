@@ -18,7 +18,11 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
-* **[Data Atual] - Tarefa SETUP-002:** Repositório populado com estrutura de diretórios e arquivos de governança.
-* **[Data Atual] - Tarefa INFRA-001:** Criado script Terraform inicial para provisionamento da VPC base do projeto na AWS.
-* **2025-10-21 - Tarefa EXTRA-001:** Instaladas e configuradas as dependências essenciais do frontend, incluindo Zustand, TanStack Query e Shadcn/ui.
-* **2025-10-21 - Tarefa INFRA-002:** Criado script Terraform para provisionar as sub-redes públicas e privadas da VPC.
+* **[Data] - Tarefa SETUP-002:** Repositório populado com estrutura de diretórios e arquivos de governança.
+* **[Data] - Tarefa GOV-003:** Aprimoradas as diretrizes de engenharia com foco em segurança, qualidade e performance.
+* **[Data] - Tarefa FIX-002:** Corrigido o pipeline de CI para operar no diretório /src.
+* **[Data] - Tarefa RECOVERY-001:** Re-inicializada a estrutura do projeto Next.js no diretório /src.
+* **[Data] - Tarefa EXTRA-001:** Instaladas as dependências essenciais do frontend (Zustand, TanStack Query, Shadcn/ui).
+* **[Data] - Tarefa INFRA-001:** Criado script Terraform para a VPC base.
+* **[Data] - Tarefa INFRA-002:** Criado script Terraform para as sub-redes públicas e privadas.
+* **[Data Atual] - Tarefa INFRA-003:** Criado script Terraform para provisionar o Internet Gateway e o NAT Gateway da rede.
