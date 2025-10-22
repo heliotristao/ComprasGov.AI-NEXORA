@@ -1,4 +1,7 @@
 import { useMutation } from "@tanstack/react-query"
+import { useRouter } from "next/navigation"
+
+import { useAuthStore } from "@/stores/authStore"
 
 interface LoginCredentials {
   email: string
@@ -32,7 +35,24 @@ async function requestLogin(credentials: LoginCredentials): Promise<LoginRespons
 }
 
 export function useAuth() {
+  const router = useRouter()
+  const login = useAuthStore((state) => state.login)
+
   return useMutation({
     mutationFn: requestLogin,
+    onSuccess: (data) => {
+      const token = data?.access_token
+
+      if (!token) {
+        console.error("Token JWT não encontrado na resposta da API.")
+        return
+      }
+
+      login(token)
+      router.push("/dashboard")
+    },
+    onError: (error) => {
+      console.error("Erro ao autenticar usuário:", error)
+    },
   })
 }
