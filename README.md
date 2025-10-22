@@ -39,3 +39,4 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **2025-10-22 - Tarefa FRONTEND-002:** Criado o layout principal da aplicação e a página inicial do Dashboard.
 * **2025-10-22 - Tarefa EXTRA-003:** Corrigidas as datas de todo o histórico de alterações anterior.
 * **[2025-10-22] - Tarefa FRONTEND-004:** Implementado o mecanismo de proteção de rotas para a área autenticada.
+* **[2025-10-22] - Tarefa FIX-003:** Corrigida a versão inválida do FastAPI no 'governance-service' para restaurar o pipeline de CI.
