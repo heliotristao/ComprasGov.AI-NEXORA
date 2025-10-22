@@ -30,3 +30,4 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **[Data Atual] - Tarefa INFRA-005:** Criado script Terraform para as IAM Roles do cluster EKS (Control Plane e Node Group).
 * **[Data Atual] - Tarefa INFRA-006:** Criado script Terraform para provisionar o cluster EKS e o Node Group inicial.
 * **[Data Atual] - Tarefa BACKEND-001:** Criada a estrutura de boilerplate inicial para o microsserviço 'governance-service'.
+* **[Data Atual] - Tarefa BACKEND-002:** Criados os manifestos Kubernetes (Deployment, Service, Ingress) para o 'governance-service'.
