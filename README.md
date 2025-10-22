@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **2025-10-22 - Tarefa CI-001:** Criado o pipeline de Integração Contínua no GitHub Actions para o 'governance-service'.
 * **2025-10-22 - Tarefa SETUP-002:** Repositório populado com estrutura de diretórios e arquivos de governança.
 * **2025-10-22 - Tarefa GOV-003:** Aprimoradas as diretrizes de engenharia com foco em segurança, qualidade e performance.
 * **2025-10-22 - Tarefa FIX-002:** Corrigido o pipeline de CI para operar no diretório /src.
