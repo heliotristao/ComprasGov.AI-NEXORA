@@ -1,9 +1,18 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import type { ReactNode } from "react"
-import { useState } from "react"
+import { useMemo, useState } from "react"
+
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useAuthStore } from "@/stores/authStore"
 import { cn } from "@/lib/utils"
 
 const navigationItems = [
@@ -17,7 +26,29 @@ export default function AppLayout({
 }: Readonly<{
   children: ReactNode
 }>) {
+  const router = useRouter()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const logout = useAuthStore((state) => state.logout)
+  const user = useAuthStore((state) => state.user)
+
+  const { name: userName, email: userEmail } = useMemo(() => {
+    if (user && typeof user === "object") {
+      const name = "name" in user ? String(user.name) : "Usuário"
+      const email = "email" in user ? String(user.email) : "usuario@exemplo.com"
+      return { name, email }
+    }
+
+    return { name: "Usuário", email: "usuario@exemplo.com" }
+  }, [user])
+
+  const userInitial = userName?.charAt(0).toUpperCase() || "U"
+
+  const handleLogout = () => {
+    logout()
+    if (typeof window !== "undefined") {
+      router.replace("/login")
+    }
+  }
 
   const toggleSidebar = () => setIsSidebarOpen((previous) => !previous)
   const closeSidebar = () => setIsSidebarOpen(false)
@@ -83,12 +114,23 @@ export default function AppLayout({
           </div>
           <div className="flex items-center gap-3">
             <div className="hidden text-right text-sm md:block">
-              <div className="font-medium text-slate-900">Usuário</div>
-              <div className="text-slate-500">usuario@exemplo.com</div>
+              <div className="font-medium text-slate-900">{userName}</div>
+              <div className="text-slate-500">{userEmail}</div>
             </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 text-sm font-semibold text-slate-700">
-              U
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                  aria-label="Abrir menu do usuário"
+                >
+                  {userInitial}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onSelect={() => handleLogout()}>Sair</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 

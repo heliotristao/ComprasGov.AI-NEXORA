@@ -38,3 +38,4 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## Histórico Técnico de Alterações
 
 * **[2025-10-22] - Tarefa FRONTEND-003:** Implementada a lógica de autenticação com Zustand para gerenciamento de sessão.
+* **[2025-10-22] - Tarefa FRONTEND-005:** Implementada a funcionalidade de Logout no menu do usuário.
