@@ -19,3 +19,4 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 
 ## 4. Histórico Técnico de Alterações
 * **[Data Atual] - Tarefa SETUP-002:** Repositório populado com estrutura de diretórios e arquivos de governança.
+* **[Data Atual] - Tarefa INFRA-001:** Criado script Terraform inicial para provisionamento da VPC base do projeto na AWS.
