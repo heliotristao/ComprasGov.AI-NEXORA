@@ -33,6 +33,7 @@ resource "aws_eks_cluster" "main" {
   vpc_config {
     subnet_ids = data.aws_subnets.private.ids
   }
+
 }
 
 resource "aws_eks_node_group" "main" {
