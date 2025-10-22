@@ -24,3 +24,17 @@ resource "aws_ecr_repository" "governance_service" {
     Service = "governance-service"
   }
 }
+
+resource "aws_ecr_repository" "planning_service" {
+  name                 = "nexora-planning-service"
+  image_tag_mutability = "IMMUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = {
+    Project = "NEXORA-ComprasGov.AI"
+    Service = "planning-service"
+  }
+}
