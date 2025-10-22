@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-22] - Tarefa BACKEND-005:** Criados os manifestos Kubernetes (Deployment, Service, Ingress) para o 'planning-service'.
 * **[2025-10-22] - Tarefa BACKEND-004:** Criada a estrutura de boilerplate inicial para o microsserviço 'planning-service'.
 * **[2025-10-22] - Tarefa BACKEND-003:** Implementado o endpoint de autenticação com geração de token JWT no 'governance-service'.
 * **[2025-10-22] - Tarefa CD-001:** Criado o pipeline de Implantação Contínua no GitHub Actions para o 'governance-service'.
