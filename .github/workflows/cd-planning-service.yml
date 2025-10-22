@@ -1,0 +1,43 @@
+name: CD Backend - planning-service
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'backend/planning-service/**'
+
+jobs:
+  deploy-to-eks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Set up Kubeconfig for EKS
+        uses: aws-actions/amazon-eks-kubeconfig@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_EKS_KUBECTL_ROLE_ARN }} # Placeholder for a role that can access EKS
+          cluster-name: nexora-comprasgov-cluster
+
+      - name: Update image tag in Kubernetes manifest
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          ECR_REGISTRY=$ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
+          ECR_REPOSITORY=nexora-planning-service
+
+          sed -i "s|image:.*|image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" backend/planning-service/k8s/deployment.yaml
+
+      - name: Deploy to EKS
+        run: |
+          kubectl apply -f backend/planning-service/k8s/deployment.yaml
+          kubectl apply -f backend/planning-service/k8s/service.yaml
+          kubectl apply -f backend/planning-service/k8s/ingress.yaml
