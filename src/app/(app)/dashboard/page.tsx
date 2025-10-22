@@ -1,4 +1,7 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import withAuth from "@/components/auth/withAuth"
 
 const dashboardStats = [
   { label: "Licitações em Andamento", value: "5", description: "Processos ativos acompanhados pela equipe." },
@@ -6,7 +9,7 @@ const dashboardStats = [
   { label: "Economia Estimada", value: "R$ 240K", description: "Redução potencial identificada em análises recentes." },
 ]
 
-export default function DashboardPage() {
+function DashboardPage() {
   return (
     <div className="space-y-8">
       <header className="space-y-2">
@@ -33,3 +36,5 @@ export default function DashboardPage() {
     </div>
   )
 }
+
+export default withAuth(DashboardPage)
