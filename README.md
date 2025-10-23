@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-23] - Tarefa IA-P-04:** Integrada a fundação de IA Generativa (LangChain) ao 'planning-service'.
 * **[2025-10-23] - Tarefa IA-P-03 (Rev):** Integrada a funcionalidade de previsão de preços (Mercado.AI) ao 'planning-service'.
 * **[2025-10-23] - Tarefa IA-P-01:** Criado ocollector-servicecom um web scraper para extrair dados de preços do PNCP.
 * **[2025-10-23] - Tarefa IA-P-02:** Implementada a persistência dos dados de preços de mercado no banco de dados.

@@ -6,3 +6,4 @@
 **/.idea
 **/*.tfvars
 **/__pycache__/
+.env
