@@ -6,6 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCreatePlanning } from "@/hooks/api/usePlannings";
 import { useGenerateNecessity } from "@/hooks/api/useGenerateNecessity";
+import { useGenerateTechnicalViability } from "@/hooks/api/useGenerateTechnicalViability";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,7 @@ export default function NewPlanningPage() {
   const router = useRouter();
   const createPlanningMutation = useCreatePlanning();
   const generateNecessityMutation = useGenerateNecessity();
+  const generateTechnicalViabilityMutation = useGenerateTechnicalViability();
   const [currentStep, setCurrentStep] = useState(0);
 
   const formMethods = useForm<FormData>({
@@ -65,6 +67,7 @@ export default function NewPlanningPage() {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = formMethods;
 
@@ -193,6 +196,41 @@ export default function NewPlanningPage() {
                         {errors.technical_viability.message}
                       </p>
                     )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const problemDescription = getValues("necessity");
+
+                        if (!problemDescription || problemDescription.trim().length === 0) {
+                          toast.error(
+                            "Preencha a justificativa da necessidade antes de gerar.",
+                          );
+                          return;
+                        }
+
+                        generateTechnicalViabilityMutation.mutate(
+                          { problem_description: problemDescription },
+                          {
+                            onSuccess: (data) => {
+                              formMethods.setValue(
+                                "technical_viability",
+                                data.technical_viability,
+                              );
+                            },
+                            onError: () => {
+                              toast.error("Erro ao gerar viabilidade técnica.");
+                            },
+                          },
+                        );
+                      }}
+                      disabled={generateTechnicalViabilityMutation.isPending}
+                    >
+                      {generateTechnicalViabilityMutation.isPending
+                        ? "Gerando..."
+                        : "Gerar com IA"}
+                    </Button>
                   </div>
                 </div>
               )}
