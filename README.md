@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-22] - Tarefa FRONTEND-008:** Conectada a tabela de listagem de planejamentos ao endpoint da API.
 * **[2025-10-22] - Tarefa BACKEND-007:** Implementado o endpoint de listagem de planejamentos no 'planning-service'.
 * **[2025-10-22] - Tarefa INFRA-008:** Configurado o provedor de identidade OIDC e a IAM Role para permitir que o GitHub Actions se autentique na AWS de forma segura.
 * **[2025-10-22] - Tarefa BACKEND-006:** Implementado o endpoint de criação de novos planejamentos no 'planning-service'.

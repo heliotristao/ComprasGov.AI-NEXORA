@@ -22,7 +22,6 @@
       "@/*": ["./*"],
       "react-hook-form": ["./lib/stubs/react-hook-form"],
       "@hookform/resolvers/zod": ["./lib/stubs/zod-resolver"],
-      "@tanstack/react-query": ["./lib/stubs/react-query"],
       "@radix-ui/react-dropdown-menu": ["./lib/stubs/radix-dropdown-menu"]
     }
   },
