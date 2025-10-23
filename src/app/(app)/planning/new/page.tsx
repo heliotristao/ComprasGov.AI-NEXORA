@@ -69,7 +69,36 @@ export default function NewPlanningPage() {
     register,
     handleSubmit,
     formState: { errors },
+    getValues,
+    setValue,
   } = formMethods;
+
+  const handleGenerateTechnicalViability = () => {
+    const problemDescription = getValues("necessity").trim();
+
+    if (!problemDescription) {
+      toast.error(
+        "Preencha a justificativa da necessidade antes de gerar a viabilidade técnica.",
+      );
+      return;
+    }
+
+    generateTechnicalViabilityMutation.mutate(
+      { problem_description: problemDescription },
+      {
+        onSuccess: (data) => {
+          setValue("technical_viability", data.generated_text, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
+        },
+        onError: () => {
+          toast.error("Erro ao gerar viabilidade técnica.");
+        },
+      },
+    );
+  };
 
   const goToNextStep = () => {
     setCurrentStep((step) => Math.min(step + 1, stepConfigurations.length - 1));
@@ -200,36 +229,7 @@ export default function NewPlanningPage() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => {
-                        const problemDescription = formMethods
-                          .getValues("necessity")
-                          .trim();
-
-                        if (!problemDescription) {
-                          toast.error(
-                            "Preencha a justificativa da necessidade antes de gerar a viabilidade técnica.",
-                          );
-                          return;
-                        }
-
-                        generateTechnicalViabilityMutation.mutate(
-                          { problem_description: problemDescription },
-                          {
-                            onSuccess: (data) => {
-                              formMethods.setValue(
-                                "technical_viability",
-                                data.generated_text,
-                                { shouldDirty: true, shouldTouch: true },
-                              );
-                            },
-                            onError: () => {
-                              toast.error(
-                                "Erro ao gerar viabilidade técnica.",
-                              );
-                            },
-                          },
-                        );
-                      }}
+                      onClick={handleGenerateTechnicalViability}
                       disabled={generateTechnicalViabilityMutation.isPending}
                     >
                       {generateTechnicalViabilityMutation.isPending ? (
