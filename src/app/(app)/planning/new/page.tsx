@@ -59,14 +59,14 @@ export default function NewPlanningPage() {
   const generateNecessityMutation = useGenerateNecessity();
   const [currentStep, setCurrentStep] = useState(0);
 
+  const formMethods = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+  });
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-  });
+  } = formMethods;
 
   const goToNextStep = () => {
     setCurrentStep((step) => Math.min(step + 1, stepConfigurations.length - 1));
@@ -138,7 +138,7 @@ export default function NewPlanningPage() {
                           { problem_description: "teste" },
                           {
                             onSuccess: (data) => {
-                              setValue("necessity", data.necessity);
+                              formMethods.setValue("necessity", data.necessity);
                             },
                             onError: () => {
                               toast.error("Erro ao gerar justificativa.");
