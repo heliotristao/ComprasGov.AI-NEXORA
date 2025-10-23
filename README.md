@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-23] - Tarefa BACKEND-010:** Refatorado o endpoint de listagem de planejamentos para ler os dados do banco de dados.
 * **[2025-10-22] - Tarefa BACKEND-009:** Refatorado o endpoint de criação de planejamentos para persistir os dados no banco de dados.
 * **[2025-10-22] - Tarefa BACKEND-008:** Refatorado o endpoint de autenticação para validar usuários contra o banco de dados.
 * **[2025-10-23] - Tarefa DB-002:** Configurado o Alembic para gerenciamento de migrações de banco de dados nos serviços de backend.
