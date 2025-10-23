@@ -5,6 +5,8 @@ from app.llm.chains.quantities_timeline_chain import \
     get_quantities_timeline_chain
 from app.llm.chains.solution_comparison_chain import \
     get_solution_comparison_chain
+from app.llm.chains.technical_viability_chain import \
+    get_technical_viability_chain
 from app.llm.generator import generate_text
 
 router = APIRouter()
@@ -19,6 +21,10 @@ class SolutionComparisonRequest(BaseModel):
 
 
 class QuantitiesTimelineRequest(BaseModel):
+    problem_description: str
+
+
+class TechnicalViabilityRequest(BaseModel):
     problem_description: str
 
 
@@ -47,6 +53,26 @@ async def post_generate_solution_comparison(
     """
     try:
         chain = get_solution_comparison_chain()
+        input_data = {"problem_description": request.problem_description}
+        result = await chain.ainvoke(input_data)
+        return {"generated_text": result['text']}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"An unexpected error occurred: {e}"
+        )
+
+
+@router.post("/etp/generate/technical-viability")
+async def post_generate_technical_viability(
+    request: TechnicalViabilityRequest
+):
+    """
+    Generates the 'Technical Viability' section for an ETP.
+    """
+    try:
+        chain = get_technical_viability_chain()
         input_data = {"problem_description": request.problem_description}
         result = await chain.ainvoke(input_data)
         return {"generated_text": result['text']}
