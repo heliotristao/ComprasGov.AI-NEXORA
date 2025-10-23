@@ -18,7 +18,9 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-23] - Tarefa IA-P-03 (Rev):** Integrada a funcionalidade de previsão de preços (Mercado.AI) ao 'planning-service'.
 * **[2025-10-23] - Tarefa IA-P-01:** Criado ocollector-servicecom um web scraper para extrair dados de preços do PNCP.
+* **[2025-10-23] - Tarefa IA-P-02:** Implementada a persistência dos dados de preços de mercado no banco de dados.
 * **[2025-10-23] - Tarefa FRONTEND-P-01:** Expandido o formulário de criação de planejamento com campos detalhados do ETP.
 * **[2025-10-23] - Tarefa BACKEND-P-01:** Expandido o modelo de dados doplanning-servicepara uma estrutura de ETP mais detalhada.
 * **[2025-10-23] - Tarefa BACKEND-012:** Implementado o endpoint de WebSocket no 'dispute-service' em Go.
