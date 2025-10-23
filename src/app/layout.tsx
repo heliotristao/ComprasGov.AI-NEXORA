@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import type { ReactNode } from "react"
 import "./globals.css"
 import { Providers } from "@/components/providers"
+import { Toaster } from "@/components/ui/sonner"
 
 export const metadata: Metadata = {
   title: "NEXORA ComprasGov.AI",
@@ -16,7 +17,10 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className="antialiased font-sans">
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <Toaster />
+        </Providers>
       </body>
     </html>
   )
