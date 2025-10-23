@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime
-from fastapi import APIRouter, status, Response, Depends
+from fastapi import APIRouter, status, Response, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.models.planning import PlanningCreate, Planning
+from app.models.planning import PlanningCreate, Planning, PlanningUpdate
 from app.db.models.planning import Planning as PlanningModel
 from app.db.session import SessionLocal
 from typing import List
@@ -46,3 +46,27 @@ def list_plannings(db: Session = Depends(get_db)):
     List all plannings.
     """
     return db.query(PlanningModel).all()
+
+
+@router.patch("/plannings/{planning_id}", response_model=Planning)
+def update_planning(
+    *,
+    planning_id: int,
+    planning_in: PlanningUpdate,
+    db: Session = Depends(get_db)
+):
+    """
+    Update a planning.
+    """
+    db_planning = db.query(PlanningModel).get(planning_id)
+    if not db_planning:
+        raise HTTPException(status_code=404, detail="Planning not found")
+
+    update_data = planning_in.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_planning, key, value)
+
+    db.add(db_planning)
+    db.commit()
+    db.refresh(db_planning)
+    return db_planning
