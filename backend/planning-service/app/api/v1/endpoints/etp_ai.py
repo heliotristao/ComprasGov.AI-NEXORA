@@ -1,21 +1,23 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from app.llm.generator import generate_text
+from app.llm.chains.necessity_chain import necessity_chain
 
 router = APIRouter()
 
-class GenerateRequest(BaseModel):
-    prompt: str
+class NecessityRequest(BaseModel):
+    problem_description: str
 
-@router.post("/etp/generate")
-def post_generate_text(request: GenerateRequest):
+@router.post("/etp/generate/necessity")
+async def post_generate_necessity(request: NecessityRequest):
     """
-    Generates text using the OpenAI API.
+    Generates the 'Justificativa da Necessidade' section for an ETP
+    based on a problem description.
     """
     try:
-        generated_text = generate_text(request.prompt)
-        return {"generated_text": generated_text}
+        input_data = {"problem_description": request.problem_description}
+        result = await necessity_chain.ainvoke(input_data)
+        return {"generated_text": result['text']}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail="An unexpected error occurred.")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred during text generation.")
