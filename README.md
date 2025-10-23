@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-23] - Tarefa DB-002:** Configurado o Alembic para gerenciamento de migrações de banco de dados nos serviços de backend.
 * **[2025-10-22] - Tarefa DB-001:** Provisionada a instância de banco de dados PostgreSQL (RDS) via Terraform.
 * **[2025-10-23] - Tarefa FRONTEND-009:** Conectado o formulário de criação de planejamento ao endpoint da API.
 * **[2025-10-22] - Tarefa FRONTEND-008:** Conectada a tabela de listagem de planejamentos ao endpoint da API.
