@@ -5,3 +5,4 @@
 **/.DS_Store
 **/.idea
 **/*.tfvars
+**/__pycache__/

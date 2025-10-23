@@ -1,14 +1,19 @@
 from logging.config import fileConfig
+import os
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
 from app.db.base import Base
+from app.db.models.user import User  # Ensure User model is imported
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+# Set sqlalchemy.url from environment variable
+config.set_main_option("sqlalchemy.url", os.environ.get("DATABASE_URL", "postgresql://user:password@localhost:5432/db"))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -41,7 +46,6 @@ def run_migrations_offline() -> None:
     context.configure(
         url=url,
         target_metadata=target_metadata,
-        literal_binds=True,
         dialect_opts={"paramstyle": "named"},
     )
 
@@ -71,7 +75,11 @@ def run_migrations_online() -> None:
             context.run_migrations()
 
 
-if context.is_offline_mode():
+# This is a hack to allow us to generate migrations without a live database connection
+if os.environ.get("ALEMBIC_OFFLINE_MODE", "false").lower() == "true":
     run_migrations_offline()
 else:
-    run_migrations_online()
+    if context.is_offline_mode():
+        run_migrations_offline()
+    else:
+        run_migrations_online()
