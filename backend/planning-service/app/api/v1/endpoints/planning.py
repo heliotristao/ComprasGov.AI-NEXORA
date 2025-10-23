@@ -41,27 +41,8 @@ def create_planning(
 
 
 @router.get("/plannings", response_model=List[Planning])
-def list_plannings():
+def list_plannings(db: Session = Depends(get_db)):
     """
     List all plannings.
     """
-    # Hardcoded data for now, simulating a database read
-    return [
-        Planning(
-            id=uuid.uuid4(),
-            created_at=datetime.utcnow(),
-            description="Planejamento estratégico para aquisição de novos "
-            "servidores.",
-            market_analysis="Análise de mercado indica alta demanda por "
-            "processamento em nuvem.",
-            risks="Risco de atraso na entrega dos fornecedores.",
-        ),
-        Planning(
-            id=uuid.uuid4(),
-            created_at=datetime.utcnow(),
-            description="Planejamento de contratação de serviços de "
-            "consultoria em segurança.",
-            market_analysis="Mercado de cibersegurança em expansão.",
-            risks="Escassez de profissionais qualificados.",
-        ),
-    ]
+    return db.query(PlanningModel).all()
