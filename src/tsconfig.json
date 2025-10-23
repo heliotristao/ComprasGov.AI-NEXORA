@@ -20,8 +20,6 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "react-hook-form": ["./lib/stubs/react-hook-form"],
-      "@hookform/resolvers/zod": ["./lib/stubs/zod-resolver"],
       "@radix-ui/react-dropdown-menu": ["./lib/stubs/radix-dropdown-menu"]
     }
   },
