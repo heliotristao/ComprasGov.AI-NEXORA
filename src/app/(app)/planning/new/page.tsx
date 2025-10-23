@@ -5,12 +5,14 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCreatePlanning } from "@/hooks/api/usePlannings";
+import { useGenerateNecessity } from "@/hooks/api/useGenerateNecessity";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   year: z
@@ -54,11 +56,13 @@ const stepConfigurations: {
 export default function NewPlanningPage() {
   const router = useRouter();
   const createPlanningMutation = useCreatePlanning();
+  const generateNecessityMutation = useGenerateNecessity();
   const [currentStep, setCurrentStep] = useState(0);
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -125,6 +129,29 @@ export default function NewPlanningPage() {
                     {errors.necessity && (
                       <p className="text-sm text-red-500">{errors.necessity.message}</p>
                     )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        generateNecessityMutation.mutate(
+                          { problem_description: "teste" },
+                          {
+                            onSuccess: (data) => {
+                              setValue("necessity", data.necessity);
+                            },
+                            onError: () => {
+                              toast.error("Erro ao gerar justificativa.");
+                            },
+                          }
+                        )
+                      }
+                      disabled={generateNecessityMutation.isPending}
+                    >
+                      {generateNecessityMutation.isPending
+                        ? "Gerando..."
+                        : "Gerar com IA"}
+                    </Button>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="solution_comparison">Comparativo de Soluções</Label>
