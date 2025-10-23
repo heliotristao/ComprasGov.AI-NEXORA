@@ -1,10 +1,14 @@
 import httpx
 import asyncio
 from datetime import datetime, timedelta
+from sqlalchemy.orm import Session
+from app.db.models.market_price import MarketPrice
 
-async def scrape_pncp():
+
+async def scrape_pncp(db: Session):
     """
-    Scrapes the PNCP API to collect procurement data.
+    Scrapes the PNCP API to collect procurement data and saves it to the
+    database.
     """
     collected_items = []
     base_url = "https://pncp.gov.br/api/consulta"
@@ -14,7 +18,6 @@ async def scrape_pncp():
     start_date = today - timedelta(days=1)
     start_date_filter = start_date.strftime('%Y%m%d')
     end_date_filter = today.strftime('%Y%m%d')
-
 
     async with httpx.AsyncClient(timeout=30.0) as client:
         # First, find recent procurements
@@ -32,7 +35,7 @@ async def scrape_pncp():
             procurements = search_response.json().get('data', [])
         except (httpx.RequestError, httpx.HTTPStatusError) as e:
             print(f"Error fetching procurements: {e}")
-            return []
+            return 0
 
         # For each procurement, get its details
         for procurement in procurements:
@@ -52,22 +55,35 @@ async def scrape_pncp():
 
                 # Extract item details
                 for item in details.get('itens', []):
+                    purchase_date = datetime.strptime(
+                        details.get('dataPublicacao'), '%Y-%m-%dT%H:%M:%S'
+                    ).date()
                     collected_items.append({
-                        "descricao": item.get('descricao'),
-                        "quantidade": item.get('quantidade'),
-                        "valor_unitario": item.get('valorUnitario'),
-                        "data_compra": details.get('dataPublicacao')
+                        "item_description": item.get('descricao'),
+                        "quantity": item.get('quantidade'),
+                        "unit_value": item.get('valorUnitario'),
+                        "purchase_date": purchase_date,
+                        "source": "PNCP"
                     })
             except (httpx.RequestError, httpx.HTTPStatusError) as e:
-                print(f"Error fetching details for {procurement.get('id')}: {e}")
-                continue # Move to the next procurement
+                print(
+                    f"Error fetching details for {procurement.get('id')}: {e}")
+                continue  # Move to the next procurement
 
-    return collected_items
+    if collected_items:
+        db.bulk_insert_mappings(MarketPrice, collected_items)
+        db.commit()
+
+    return len(collected_items)
 
 if __name__ == '__main__':
     async def main():
-        data = await scrape_pncp()
-        print(f"Collected {len(data)} items.")
-        if data:
-            print("First item:", data[0])
+        from app.db.session import SessionLocal
+        db = SessionLocal()
+        try:
+            count = await scrape_pncp(db)
+            print(f"Collected and saved {count} items.")
+        finally:
+            db.close()
+
     asyncio.run(main())
