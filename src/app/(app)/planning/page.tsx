@@ -1,5 +1,8 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
+import { Button } from '@/components/ui/button';
 import { usePlannings } from '@/hooks/api/usePlannings';
 import {
   Table,
@@ -18,6 +21,7 @@ interface Planning {
 
 export default function PlanningPage() {
   const { data, isLoading, isError } = usePlannings();
+  const router = useRouter();
 
   if (isLoading) {
     return <div>Carregando planejamentos...</div>;
@@ -37,6 +41,7 @@ export default function PlanningPage() {
               <TableHead>ID</TableHead>
               <TableHead>Nome</TableHead>
               <TableHead>Descrição</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -46,11 +51,20 @@ export default function PlanningPage() {
                   <TableCell>{planning.id}</TableCell>
                   <TableCell>{planning.name}</TableCell>
                   <TableCell>{planning.description}</TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => router.push(`/planning/${planning.id}/tr`)}
+                    >
+                      Gerar TR
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={3} className="text-center">
+                <TableCell colSpan={4} className="text-center">
                   Nenhum planejamento encontrado.
                 </TableCell>
               </TableRow>

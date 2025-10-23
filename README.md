@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-23] - Tarefa FRONTEND-P-06:** Criada a página e a navegação para o módulo de Termo de Referência (TR).
 * **[2025-10-23] - Tarefa FRONTEND-P-05:** Implementado o botão 'Gerar com IA' para a seção 'Viabilidade Técnica'.
 * **[2025-10-23] - Tarefa IA-P-09:** Criada a cadeia de IA para gerar a seção 'Especificações Técnicas' do TR.
 * **[2025-10-23] - Tarefa IA-P-08:** Criada a cadeia de IA para gerar a seção 'Viabilidade Técnica' do ETP.
