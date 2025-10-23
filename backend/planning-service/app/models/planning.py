@@ -15,7 +15,7 @@ class PlanningCreate(PlanningBase):
 
 
 class Planning(PlanningBase):
-    id: uuid.UUID
+    id: int
     created_at: datetime
 
     class Config:
