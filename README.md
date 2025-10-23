@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-23] - Tarefa BACKEND-P-01:** Expandido o modelo de dados doplanning-servicepara uma estrutura de ETP mais detalhada.
 * **[2025-10-23] - Tarefa BACKEND-012:** Implementado o endpoint de WebSocket no 'dispute-service' em Go.
 * **[2025-10-23] - Tarefa BACKEND-011:** Criada a estrutura de boilerplate em Go para o 'dispute-service'.
 * **[2025-10-23] - Tarefa COMPOSE-001:** Criado o arquivo docker-compose.yml para orquestrar o ambiente de desenvolvimento.
