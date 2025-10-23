@@ -16,10 +16,15 @@ export const usePlannings = () => {
 interface PlanningData {
   year: string;
   name: string;
+  necessity: string;
+  solution_comparison: string;
+  contract_quantities: string;
+  technical_viability: string;
+  expected_results: string;
 }
 
 const createPlanning = async (data: PlanningData) => {
-  const response = await api.post('/api/planning', data);
+  const response = await api.post('/api/v1/plannings', data);
   return response.data;
 };
 
