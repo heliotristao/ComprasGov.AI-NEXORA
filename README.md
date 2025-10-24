@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-24] - Tarefa EXTRA-004:** Implementado o seeding inicial das Funções (Roles) e do primeiro usuário Master.
 * **[2025-10-24] - Tarefa FRONTEND-P-12:** Gerado o código-fonte para a funcionalidade de exclusão de usuários com modal de confirmação.
 * **[2025-10-24] - Tarefa FRONTEND-P-11:** Gerado o código-fonte para o formulário de criação e edição de usuários.
 * **[2025-10-24] - Tarefa BACKEND-P-06:** Implementada a lógica de autorização (RBAC) para proteger os endpoints da API.
