@@ -2,8 +2,15 @@
   "version": 2,
   "builds": [
     {
-      "src": "src/next.config.mjs",
+      "src": "package.json",
       "use": "@vercel/next"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://api.comprasgov.ai/api/:path*"
     }
   ]
 }
+
