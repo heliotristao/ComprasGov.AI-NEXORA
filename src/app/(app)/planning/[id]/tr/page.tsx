@@ -9,6 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useGenerateTechnicalSpecs } from "@/hooks/api/useGenerateTechnicalSpecs";
 import { usePlanning } from "@/hooks/api/usePlanning";
+import {
+  useTermsOfReference,
+  useUpdateTermsOfReference,
+} from "@/hooks/api/useTermsOfReference";
 
 type TermOfReferencePageProps = {
   params: {
@@ -19,8 +23,21 @@ type TermOfReferencePageProps = {
 export default function TermOfReferencePage({ params }: TermOfReferencePageProps) {
   const { id } = params;
   const { data: planning, isLoading, isError } = usePlanning(id);
+  const {
+    data: termsOfReference,
+    isLoading: isLoadingTermsOfReference,
+    isError: isTermsOfReferenceError,
+  } = useTermsOfReference(id);
   const generateTechnicalSpecsMutation = useGenerateTechnicalSpecs();
-  const [technicalSpecs, setTechnicalSpecs] = useState<string | undefined>();
+  const updateTermsOfReferenceMutation = useUpdateTermsOfReference({
+    trId: termsOfReference?.id,
+    planningId: id,
+  });
+  const [technicalSpecsDraft, setTechnicalSpecsDraft] = useState<string | null>(
+    null,
+  );
+  const technicalSpecs =
+    technicalSpecsDraft ?? termsOfReference?.technical_specs ?? "";
 
   const handleGenerateTechnicalSpecs = () => {
     const problemDescription = (
@@ -38,7 +55,7 @@ export default function TermOfReferencePage({ params }: TermOfReferencePageProps
       { problem_description: problemDescription },
       {
         onSuccess: (data) => {
-          setTechnicalSpecs(data.technical_specs);
+          setTechnicalSpecsDraft(data.technical_specs);
         },
         onError: () => {
           toast.error("Erro ao gerar as especificações técnicas.");
@@ -47,7 +64,27 @@ export default function TermOfReferencePage({ params }: TermOfReferencePageProps
     );
   };
 
-  if (isLoading) {
+  const handleSaveProgress = () => {
+    if (!termsOfReference?.id) {
+      toast.error("Não foi possível identificar o Termo de Referência.");
+      return;
+    }
+
+    updateTermsOfReferenceMutation.mutate(
+      { technical_specs: technicalSpecs },
+      {
+        onSuccess: (data) => {
+          toast.success("Especificações técnicas salvas com sucesso.");
+          setTechnicalSpecsDraft(data.technical_specs);
+        },
+        onError: () => {
+          toast.error("Erro ao salvar as especificações técnicas.");
+        },
+      },
+    );
+  };
+
+  if (isLoading || isLoadingTermsOfReference) {
     return (
       <div className="space-y-6">
         <div className="space-y-2">
@@ -63,7 +100,7 @@ export default function TermOfReferencePage({ params }: TermOfReferencePageProps
     );
   }
 
-  if (isError) {
+  if (isError || isTermsOfReferenceError) {
     return (
       <div className="space-y-6">
         <div className="space-y-2">
@@ -93,29 +130,51 @@ export default function TermOfReferencePage({ params }: TermOfReferencePageProps
           <Label htmlFor="technical-specifications" className="text-base font-semibold">
             Especificações Técnicas do Objeto
           </Label>
-          <Button
-            type="button"
-            onClick={handleGenerateTechnicalSpecs}
-            disabled={
-              generateTechnicalSpecsMutation.isPending || !planning
-            }
-          >
-            {generateTechnicalSpecsMutation.isPending ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Gerando...
-              </span>
-            ) : (
-              "Gerar com IA"
-            )}
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              onClick={handleGenerateTechnicalSpecs}
+              disabled={
+                generateTechnicalSpecsMutation.isPending ||
+                !planning ||
+                updateTermsOfReferenceMutation.isPending
+              }
+            >
+              {generateTechnicalSpecsMutation.isPending ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Gerando...
+                </span>
+              ) : (
+                "Gerar com IA"
+              )}
+            </Button>
+            <Button
+              type="button"
+              onClick={handleSaveProgress}
+              disabled={
+                updateTermsOfReferenceMutation.isPending ||
+                !technicalSpecs.trim() ||
+                !termsOfReference?.id
+              }
+            >
+              {updateTermsOfReferenceMutation.isPending ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Salvando...
+                </span>
+              ) : (
+                "Salvar Progresso"
+              )}
+            </Button>
+          </div>
         </div>
         <Textarea
           id="technical-specifications"
           placeholder="Descreva aqui as especificações técnicas do objeto."
           className="min-h-[320px]"
-          value={technicalSpecs ?? planning?.technical_specs ?? ""}
-          onChange={(event) => setTechnicalSpecs(event.target.value)}
+          value={technicalSpecs}
+          onChange={(event) => setTechnicalSpecsDraft(event.target.value)}
         />
       </div>
     </div>
