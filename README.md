@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-23] - Tarefa FRONTEND-P-08:** Implementado o botão 'Salvar Progresso' para persistência incremental do ETP.
 * **[2025-10-23] - Tarefa BACKEND-P-02:** Implementado o endpoint de atualização (PATCH) para salvar o progresso dos planejamentos.
 * **[2025-10-23] - Tarefa FRONTEND-P-07:** Implementado o botão 'Gerar com IA' para a seção 'Especificações Técnicas' do TR.
 * **[2025-10-23] - Tarefa FRONTEND-P-06:** Criada a página e a navegação para o módulo de Termo de Referência (TR).

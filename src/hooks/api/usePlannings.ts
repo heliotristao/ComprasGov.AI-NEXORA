@@ -13,7 +13,7 @@ export const usePlannings = () => {
   });
 };
 
-interface PlanningData {
+export interface PlanningData {
   year: string;
   name: string;
   necessity: string;
