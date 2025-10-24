@@ -18,6 +18,10 @@ def main():
     parser.add_argument("--password", type=str, required=True, help="The password for the user.")
     args = parser.parse_args()
 
+    if len(args.password) < 8:
+        print("Erro: A senha deve ter no mínimo 8 caracteres.")
+        exit(1)
+
     db = SessionLocal()
     try:
         # Check if user already exists
