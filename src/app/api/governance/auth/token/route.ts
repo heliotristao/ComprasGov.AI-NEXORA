@@ -1,18 +1,26 @@
 import { NextRequest, NextResponse } from "next/server"
 
-const DEFAULT_GOVERNANCE_URL =
-  process.env.GOVERNANCE_SERVICE_URL ||
-  process.env.NEXT_PUBLIC_GOVERNANCE_SERVICE_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:8000"
+import { getOptionalApiBaseUrl } from "@/lib/env"
+
+const governanceServiceUrlCandidates = [
+  getOptionalApiBaseUrl(),
+  process.env.NEXT_PUBLIC_GOVERNANCE_SERVICE_URL,
+  process.env.GOVERNANCE_SERVICE_URL,
+].filter((value): value is string => Boolean(value && value.trim()))
 
 function ensureBaseUrl() {
-  try {
-    return new URL(DEFAULT_GOVERNANCE_URL)
-  } catch (error) {
-    console.error("Invalid governance service URL", error)
-    return null
+  for (const candidate of governanceServiceUrlCandidates) {
+    try {
+      return new URL(candidate)
+    } catch (error) {
+      console.error(`Invalid governance service URL configured: ${candidate}`, error)
+    }
   }
+
+  console.error(
+    "Configuração da API de governança ausente ou inválida. Defina NEXT_PUBLIC_API_URL ou uma variável compatível."
+  )
+  return null
 }
 
 export async function POST(request: NextRequest) {
