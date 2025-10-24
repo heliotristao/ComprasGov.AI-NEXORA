@@ -1,7 +1,8 @@
 {
+  "version": 2,
   "builds": [
     {
-      "src": "src/package.json",
+      "src": "src/next.config.mjs",
       "use": "@vercel/next"
     }
   ]
