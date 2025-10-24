@@ -4,18 +4,10 @@ from sqlalchemy.orm import Session
 
 from app.models.token import Token
 from app.core.security import verify_password, create_access_token
-from app.db.session import SessionLocal
 from app.db.models.user import User
+from app.api.deps import get_db
 
 router = APIRouter()
-
-# Dependency to get a DB session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @router.post("/token", response_model=Token)
 async def login_for_access_token(
