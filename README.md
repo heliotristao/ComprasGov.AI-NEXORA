@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-24] - Tarefa FIX-009:** Corrigida a configuração de `build` no `vercel.json` para apontar para `next.config.mjs`, resolvendo o erro 404.
 * **[2025-10-24] - Tarefa FIX-008:** Corrigido o caminho do script de seeding no pipeline de CI do `governance-service`.
 * **[2025-10-24] - Tarefa FIX-007:** Corrigida a falha de build do Next.js renomeando o arquivo de configuração.
 * **[2025-10-24] - Tarefa FIX-006:** Corrigido o erro 404 na Vercel através da configuração do `vercel.json`.
