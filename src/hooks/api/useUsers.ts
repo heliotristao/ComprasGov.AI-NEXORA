@@ -19,6 +19,18 @@ type CreateUserInput = {
   roles: string[];
 };
 
+const fetchUsers = async (): Promise<User[]> => {
+  const { data } = await api.get('/users/');
+  return data;
+};
+
+export const useUsers = () => {
+  return useQuery<User[]>({
+    queryKey: ['users'],
+    queryFn: fetchUsers,
+  });
+};
+
 const fetchRoles = async (): Promise<Role[]> => {
   const { data } = await api.get('/roles/');
   return data;
@@ -49,6 +61,21 @@ export const useCreateUser = () => {
 
   return useMutation<User, unknown, CreateUserInput>({
     mutationFn: createUserRequest,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+};
+
+const deleteUserRequest = async (userId: string): Promise<void> => {
+  await api.delete(`/users/${userId}`);
+};
+
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<void, unknown, string>({
+    mutationFn: deleteUserRequest,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
     },
