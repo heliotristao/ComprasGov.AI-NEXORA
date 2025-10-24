@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-24] - Tarefa FRONTEND-P-11:** Criado o formulário para criação e edição de usuários, incluindo a atribuição de funções.
 * **[2025-10-24] - Tarefa BACKEND-P-06:** Implementada a lógica de autorização (RBAC) para proteger os endpoints da API.
 * **[2025-10-24] - Tarefa BACKEND-P-05:** Criados os endpoints da API para o gerenciamento de Funções e suas associações com usuários.
 * **[2025-10-24] - Tarefa BACKEND-P-04:** Criados os endpoints da API (CRUD) para o gerenciamento de usuários.

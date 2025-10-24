@@ -19,6 +19,7 @@ const navigationItems = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Planejamento", href: "#" },
   { label: "Licitações", href: "#" },
+  { label: "Usuários", href: "/admin/users" },
 ]
 
 export default function AppLayout({
