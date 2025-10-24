@@ -1,5 +1,9 @@
 name: CI Backend - planning-service
 
+permissions:
+  id-token: write
+  contents: read
+
 on:
   push:
     branches: [ "main" ]
@@ -13,9 +17,6 @@ on:
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
 
     steps:
       - name: Checkout repository
