@@ -14,7 +14,8 @@ interface LoginResponse {
 }
 
 async function requestLogin(credentials: LoginCredentials): Promise<LoginResponse> {
-  const response = await fetch("/api/governance/auth/token", {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL
+  const response = await fetch(`${apiUrl}/token`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

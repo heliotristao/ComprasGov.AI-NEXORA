@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-24] - Tarefa FIX-012:** Corrigida a comunicação de rede entre o frontend e os serviços de backend no ambiente Docker.
 * **[2025-10-24] - Tarefa EXTRA-005:** Implementado um mecanismo de "upsert" para garantir a existência do usuário Master padrão.
 * **[2025-10-24] - Tarefa FRONTEND-P-13:** Implementado sistema de notificações (toasts) para feedback de ações do usuário.
 * **[2025-10-24] - Tarefa EXTRA-004:** Implementado o seeding inicial das Funções (Roles) e do primeiro usuário Master.
