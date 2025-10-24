@@ -64,6 +64,22 @@ services:
     networks:
       - nexora-net
 
+  create-user:
+    build:
+      context: ./backend/governance-service
+    command: >
+      sh -c "
+        alembic upgrade head &&
+        python app/scripts/create_user.py --email $$EMAIL --password $$PASSWORD
+      "
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - ./backend/governance-service/.env
+    networks:
+      - nexora-net
+
 networks:
   nexora-net:
     driver: bridge

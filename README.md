@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-23] - Tarefa EXTRA-003 (Rev. 2):** Recriado o script de linha de comando para a criação de usuários administradores.
 * **[2025-10-24] - Tarefa FIX-004 (Rev. 2):** Padronizada a autenticação OIDC em todos os pipelines de CI/CD.
 * **2025-10-24 - Tarefa IA-P-05 (Rev. 2):** Recriada a cadeia de IA para gerar a seção 'Justificativa da Necessidade' do ETP.
 * **2025-10-24 - Tarefa EXTRA-002 (Rev. 2):** Padronizado o formato de data em todo o histórico de alterações do README.
