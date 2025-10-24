@@ -90,9 +90,8 @@ async def post_generate_technical_viability(
     """
     try:
         chain = get_technical_viability_chain()
-        input_data = {"problem_description": request.problem_description}
-        result = await chain.ainvoke(input_data)
-        return {"generated_text": result['text']}
+        result = await chain.ainvoke(request.problem_description)
+        return {"generated_text": result}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
