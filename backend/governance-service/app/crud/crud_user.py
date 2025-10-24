@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from app.db.models.user import User
+from app.db.models.role import Role
 from app.schemas.user import UserCreate, UserUpdate
 from app.core.security import get_password_hash
 
@@ -33,4 +34,16 @@ def delete_user(db: Session, user_id: int):
     if db_user:
         db.delete(db_user)
         db.commit()
+    return db_user
+
+def add_role_to_user(db: Session, db_user: User, db_role: Role):
+    db_user.roles.append(db_role)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+def remove_role_from_user(db: Session, db_user: User, db_role: Role):
+    db_user.roles.remove(db_role)
+    db.commit()
+    db.refresh(db_user)
     return db_user

@@ -2,8 +2,9 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.api.deps import get_db
-from app.crud import crud_user
+from app.crud import crud_user, crud_role
 from app.schemas.user import UserCreate, UserUpdate, UserInDB
+from app.schemas.role import Role
 
 router = APIRouter()
 
@@ -67,4 +68,34 @@ def delete_user(
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
     user = crud_user.delete_user(db=db, user_id=user_id)
+    return user
+
+@router.post("/{user_id}/roles/{role_id}", response_model=UserInDB)
+def assign_role_to_user(
+    user_id: int,
+    role_id: int,
+    db: Session = Depends(get_db),
+):
+    db_user = crud_user.get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    db_role = crud_role.get_role(db, role_id=role_id)
+    if db_role is None:
+        raise HTTPException(status_code=404, detail="Role not found")
+    user = crud_user.add_role_to_user(db=db, db_user=db_user, db_role=db_role)
+    return user
+
+@router.delete("/{user_id}/roles/{role_id}", response_model=UserInDB)
+def remove_role_from_user(
+    user_id: int,
+    role_id: int,
+    db: Session = Depends(get_db),
+):
+    db_user = crud_user.get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    db_role = crud_role.get_role(db, role_id=role_id)
+    if db_role is None:
+        raise HTTPException(status_code=404, detail="Role not found")
+    user = crud_user.remove_role_from_user(db=db, db_user=db_user, db_role=db_role)
     return user
