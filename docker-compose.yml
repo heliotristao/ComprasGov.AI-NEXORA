@@ -50,6 +50,20 @@ services:
     networks:
       - nexora-net
 
+  milvus:
+    image: milvusdb/milvus:v2.4.4-standalone
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    volumes:
+      - ./volumes/milvus:/var/lib/milvus
+    environment:
+      ETCD_USE_EMBED: "true"
+      ETCD_DATA_DIR: "/var/lib/milvus/etcd"
+      COMMON_STORAGETYPE: "local"
+    networks:
+      - nexora-net
+
 networks:
   nexora-net:
     driver: bridge

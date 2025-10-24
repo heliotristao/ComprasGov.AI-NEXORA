@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-24] - Tarefa IA-P-10:** Configurada a infraestrutura de Vector Store (Milvus) para o sistema de RAG.
 * **[2025-10-23] - Tarefa FRONTEND-P-09:** Implementada a persistência de dados (carregar e salvar) na página do Termo de Referência.
 * **[2025-10-23] - Tarefa FRONTEND-P-08:** Implementado o botão 'Salvar Progresso' para persistência incremental do ETP.
 * **[2025-10-23] - Tarefa BACKEND-P-02:** Implementado o endpoint de atualização (PATCH) para salvar o progresso dos planejamentos.
