@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCreatePlanning } from "@/hooks/api/usePlannings";
 import { useGenerateNecessity } from "@/hooks/api/useGenerateNecessity";
 import { useGenerateTechnicalViability } from "@/hooks/api/useGenerateTechnicalViability";
-import { useRouter } from "next/navigation";
+import { useUpdatePlanning } from "@/hooks/api/useUpdatePlanning";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,12 +56,15 @@ const stepConfigurations: {
   { title: "Resultados Esperados", fields: ["expected_results"] },
 ];
 
-export default function NewPlanningPage() {
+function PlanningFormContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const createPlanningMutation = useCreatePlanning();
   const generateNecessityMutation = useGenerateNecessity();
   const generateTechnicalViabilityMutation = useGenerateTechnicalViability();
+  const updatePlanningMutation = useUpdatePlanning();
   const [currentStep, setCurrentStep] = useState(0);
+  const planningId = searchParams.get("planningId") ?? undefined;
 
   const formMethods = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -118,6 +122,26 @@ export default function NewPlanningPage() {
         alert("Erro ao criar planejamento.");
       },
     });
+  };
+
+  const handleSaveProgress = () => {
+    if (!planningId) {
+      return;
+    }
+
+    const currentValues = getValues();
+
+    updatePlanningMutation.mutate(
+      { id: planningId, data: currentValues },
+      {
+        onSuccess: () => {
+          toast.success("Progresso salvo com sucesso!");
+        },
+        onError: () => {
+          toast.error("Erro ao salvar progresso.");
+        },
+      },
+    );
   };
 
   return (
@@ -260,7 +284,7 @@ export default function NewPlanningPage() {
               )}
             </div>
 
-            <div className="mt-8 flex items-center justify-between">
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
               <Button
                 type="button"
                 variant="outline"
@@ -269,19 +293,51 @@ export default function NewPlanningPage() {
               >
                 Voltar
               </Button>
-              {currentStep < stepConfigurations.length - 1 ? (
-                <Button type="button" onClick={goToNextStep}>
-                  Avançar
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleSaveProgress}
+                  disabled={!planningId || updatePlanningMutation.isPending}
+                  title={
+                    !planningId
+                      ? "Disponível ao editar um planejamento existente."
+                      : undefined
+                  }
+                >
+                  {updatePlanningMutation.isPending ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Salvando...
+                    </span>
+                  ) : (
+                    "Salvar Progresso"
+                  )}
                 </Button>
-              ) : (
-                <Button type="submit" disabled={createPlanningMutation.isPending}>
-                  {createPlanningMutation.isPending ? "Salvando..." : "Salvar Planejamento"}
-                </Button>
-              )}
+                {currentStep < stepConfigurations.length - 1 ? (
+                  <Button type="button" onClick={goToNextStep}>
+                    Avançar
+                  </Button>
+                ) : (
+                  <Button type="submit" disabled={createPlanningMutation.isPending}>
+                    {createPlanningMutation.isPending
+                      ? "Salvando..."
+                      : "Salvar Planejamento"}
+                  </Button>
+                )}
+              </div>
             </div>
           </form>
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function NewPlanningPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto p-4">Carregando formulário...</div>}>
+      <PlanningFormContent />
+    </Suspense>
   );
 }
