@@ -1,3 +1,5 @@
+process.env.NEXT_DISABLE_ESLINT_PATCH = '1';
+
 import nextConfigs from 'eslint-config-next';
 
 const nextBaseConfig = nextConfigs.find((config) => config?.name === 'next');
