@@ -18,7 +18,7 @@ import {
   SubContent as DropdownMenuPrimitiveSubContent,
   SubTrigger as DropdownMenuPrimitiveSubTrigger,
   Trigger as DropdownMenuPrimitiveTrigger,
-} from "@radix-ui/react-dropdown-menu"
+} from "@/lib/stubs/radix-dropdown-menu"
 
 import { cn } from "@/lib/utils"
 

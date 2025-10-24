@@ -104,6 +104,52 @@ function PlanningFormContent() {
     );
   };
 
+  const handleGenerateNecessity = () => {
+    const name = getValues("name").trim();
+    const solutionComparison = getValues("solution_comparison").trim();
+    const contractQuantities = getValues("contract_quantities").trim();
+    const expectedResults = getValues("expected_results").trim();
+
+    const contextSections = [
+      name ? `Nome do planejamento: ${name}` : null,
+      solutionComparison
+        ? `Comparativo de soluções considerado: ${solutionComparison}`
+        : null,
+      contractQuantities
+        ? `Quantitativos previstos para o contrato: ${contractQuantities}`
+        : null,
+      expectedResults
+        ? `Resultados esperados com a contratação: ${expectedResults}`
+        : null,
+    ].filter(Boolean);
+
+    const problemDescription = contextSections.join("\n\n").trim();
+
+    if (!problemDescription) {
+      toast.error(
+        "Preencha ao menos um dos campos do planejamento antes de gerar a justificativa da necessidade.",
+      );
+      return;
+    }
+
+    generateNecessityMutation.mutate(
+      { problem_description: problemDescription },
+      {
+        onSuccess: (data) => {
+          setValue("necessity", data.necessity, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
+          toast.success("Justificativa da necessidade gerada com sucesso.");
+        },
+        onError: () => {
+          toast.error("Erro ao gerar justificativa.");
+        },
+      },
+    );
+  };
+
   const goToNextStep = () => {
     setCurrentStep((step) => Math.min(step + 1, stepConfigurations.length - 1));
   };
@@ -189,24 +235,17 @@ function PlanningFormContent() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() =>
-                        generateNecessityMutation.mutate(
-                          { problem_description: "teste" },
-                          {
-                            onSuccess: (data) => {
-                              formMethods.setValue("necessity", data.necessity);
-                            },
-                            onError: () => {
-                              toast.error("Erro ao gerar justificativa.");
-                            },
-                          }
-                        )
-                      }
+                      onClick={handleGenerateNecessity}
                       disabled={generateNecessityMutation.isPending}
                     >
-                      {generateNecessityMutation.isPending
-                        ? "Gerando..."
-                        : "Gerar com IA"}
+                      {generateNecessityMutation.isPending ? (
+                        <span className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Gerando...
+                        </span>
+                      ) : (
+                        "Gerar com IA"
+                      )}
                     </Button>
                   </div>
                   <div className="space-y-2">
