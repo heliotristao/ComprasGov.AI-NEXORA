@@ -1,24 +1,45 @@
-from langchain_openai import ChatOpenAI
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
-from langchain.chains import LLMChain
+from langchain_core.runnables import RunnablePassthrough
+from langchain_milvus.vectorstores import Milvus
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+
 
 def get_technical_viability_chain():
     """
     Returns a LangChain chain that generates a technical viability analysis
-    for a given problem description.
+    for a given problem description, using a RAG setup.
     """
-    prompt = PromptTemplate(
-        input_variables=["problem_description"],
-        template="""Você é um arquiteto de soluções e especialista em análise de risco técnico em projetos governamentais. Sua tarefa é redigir a seção 'Análise de Viabilidade Técnica' de um Estudo Técnico Preliminar (ETP).
+    template = """Você é um analista de sistemas sênior. Sua tarefa é redigir a seção 'Análise de Viabilidade Técnica' de um ETP.
 
-Com base na descrição da solução proposta abaixo, avalie sua viabilidade técnica. Considere os requisitos tecnológicos, a maturidade da tecnologia e os desafios de implementação.
+Use o CONTEXTO ABAIXO, que contém documentação técnica e estudos de caso, para avaliar a viabilidade da solução proposta para o problema.
 
-Solução Proposta: {problem_description}
+CONTEXTO:
+{context}
+
+PROBLEMA A SER RESOLVIDO:
+{problem_description}
 
 Análise de Viabilidade Técnica:
 """
+    prompt = PromptTemplate.from_template(template)
+    llm = ChatOpenAI(temperature=0.7, model_name="gpt-4")
+
+    vector_store = Milvus(
+        embedding_function=OpenAIEmbeddings(),
+        connection_args={"host": "milvus", "port": 19530},
+        collection_name="rag_documents",
+    )
+    retriever = vector_store.as_retriever()
+
+    def format_docs(docs):
+        return "\n\n".join(doc.page_content for doc in docs)
+
+    rag_chain = (
+        {"context": retriever | format_docs, "problem_description": RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
     )
 
-    llm = ChatOpenAI(temperature=0.7, model_name="gpt-4")
-    chain = LLMChain(llm=llm, prompt=prompt)
-    return chain
+    return rag_chain
