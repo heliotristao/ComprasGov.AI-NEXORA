@@ -19,8 +19,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
-      "@radix-ui/react-dropdown-menu": ["./lib/stubs/radix-dropdown-menu"]
+      "@/*": ["./*"]
     }
   },
   "include": [
