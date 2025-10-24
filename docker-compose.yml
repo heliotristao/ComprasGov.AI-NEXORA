@@ -20,6 +20,8 @@ services:
   governance-service:
     build:
       context: ./backend/governance-service
+    ports:
+      - "8001:8000"
     environment:
       DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
     depends_on:
@@ -31,6 +33,8 @@ services:
   planning-service:
     build:
       context: ./backend/planning-service
+    ports:
+      - "8002:8000"
     environment:
       DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
     depends_on:
