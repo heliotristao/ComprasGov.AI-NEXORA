@@ -22,6 +22,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Verify seeding script path
+        run: test -f backend/governance-service/app/scripts/create_user.py || (echo "Seeding script not found at the expected path" && exit 1)
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
