@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { useToast } from '@/hooks/useToast';
 import { api } from '@/lib/axios';
 
 export type Role = {
@@ -58,11 +59,19 @@ const createUserRequest = async ({ roles, ...userPayload }: CreateUserInput): Pr
 
 export const useCreateUser = () => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   return useMutation<User, unknown, CreateUserInput>({
     mutationFn: createUserRequest,
     onSuccess: () => {
+      toast({ title: 'Usuário criado com sucesso!', variant: 'success' });
       queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+    onError: () => {
+      toast({
+        title: 'Erro ao criar usuário. Tente novamente.',
+        variant: 'destructive',
+      });
     },
   });
 };
@@ -73,11 +82,19 @@ const deleteUserRequest = async (userId: string): Promise<void> => {
 
 export const useDeleteUser = () => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   return useMutation<void, unknown, string>({
     mutationFn: deleteUserRequest,
     onSuccess: () => {
+      toast({ title: 'Usuário excluído com sucesso!', variant: 'success' });
       queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+    onError: () => {
+      toast({
+        title: 'Erro ao excluir usuário. Tente novamente.',
+        variant: 'destructive',
+      });
     },
   });
 };
