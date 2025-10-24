@@ -70,13 +70,11 @@ services:
     command: >
       sh -c "
         alembic upgrade head &&
-        python app/scripts/create_user.py --email $$EMAIL --password $$PASSWORD
+        python app/scripts/create_user.py
       "
     depends_on:
       postgres:
         condition: service_healthy
-    env_file:
-      - ./backend/governance-service/.env
     networks:
       - nexora-net
 
