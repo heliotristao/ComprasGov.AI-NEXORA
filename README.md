@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-24] - Tarefa IA-P-14:** Implementada a técnica de RAG na cadeia de IA para as 'Especificações Técnicas' do TR.
 * **[2025-10-24] - Tarefa IA-P-13:** Implementada a técnica de RAG na cadeia de IA para a 'Viabilidade Técnica'.
 * **[2025-10-24] - Tarefa FIX-009:** Corrigida a configuração de `build` no `vercel.json` para apontar para `next.config.mjs`, resolvendo o erro 404.
 * **[2025-10-24] - Tarefa FIX-008:** Corrigido o caminho do script de seeding no pipeline de CI do `governance-service`.

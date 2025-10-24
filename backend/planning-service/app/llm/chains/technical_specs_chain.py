@@ -1,31 +1,52 @@
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
+from langchain_milvus.vectorstores import Milvus
 
 def get_technical_specs_chain():
     """
-    Creates and returns a LangChain chain specifically for generating the
-    'Technical Specifications of the Object' section of a Terms of Reference.
+    Creates and returns a RAG-based LangChain chain for generating the
+    'Technical Specifications' section of a Terms of Reference.
     """
+    # 1. Create a retriever
+    embeddings = OpenAIEmbeddings()
+    vector_store = Milvus(
+        embedding_function=embeddings,
+        connection_args={"host": "milvus", "port": 19530},
+        collection_name="rag_documents",
+    )
+    retriever = vector_store.as_retriever()
+
+    # 2. Update the Prompt Template
     prompt_template = """
-    Você é um engenheiro especialista em elaborar Termos de Referência para o governo brasileiro.
-    Sua tarefa é redigir a seção 'Especificações Técnicas do Objeto' com base na descrição da necessidade.
+    Você é um engenheiro especialista em elaborar Termos de Referência. Sua tarefa é redigir a seção 'Especificações Técnicas' para o objeto descrito.
 
-    As especificações devem ser claras, objetivas, mensuráveis e não podem direcionar para uma marca ou fornecedor específico.
-    Formate a saída como uma lista numerada.
+    Use o CONTEXTO ABAIXO, que contém normas técnicas e catálogos de produtos, para criar especificações detalhadas, objetivas e não restritivas.
 
-    Necessidade a ser atendida: {problem_description}
+    CONTEXTO:
+    {context}
 
-    Especificações Técnicas do Objeto:
+    OBJETO DA CONTRATAÇÃO (derivado do ETP):
+    {object_description}
+
+    Especificações Técnicas Detalhadas:
     """
 
     prompt = PromptTemplate(
         template=prompt_template,
-        input_variables=["problem_description"]
+        input_variables=["context", "object_description"]
     )
 
+    # 3. Define the LLM
     llm = ChatOpenAI(temperature=0.3, model_name="gpt-4o")
 
-    chain = LLMChain(llm=llm, prompt=prompt)
+    # 4. Refactor the Chain for RAG using LCEL
+    rag_chain = (
+        {"context": retriever, "object_description": RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
 
-    return chain
+    return rag_chain
