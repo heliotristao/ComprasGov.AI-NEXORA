@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint",
+    "dev": "node scripts/run-next.js dev",
+    "build": "node scripts/run-next.js build",
+    "start": "node scripts/run-next.js start",
+    "lint": "node --require @rushstack/eslint-patch/modern-module-resolution node_modules/eslint/bin/eslint.js",
     "vercel-build": "npm run build"
   },
   "dependencies": {
