@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { useToast } from "@/hooks/useToast";
 import { api } from "@/lib/axios";
 
 export interface TermsOfReferenceResponse {
@@ -57,6 +58,7 @@ export const useUpdateTermsOfReference = ({
   planningId,
 }: UseUpdateTermsOfReferenceParams) => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   return useMutation({
     mutationFn: async (variables: UpdateTermsOfReferenceVariables) => {
@@ -67,7 +69,14 @@ export const useUpdateTermsOfReference = ({
       return updateTermsOfReference(trId, variables);
     },
     onSuccess: (data) => {
+      toast({ title: "Progresso do TR salvo com sucesso!", variant: "success" });
       queryClient.setQueryData(termsOfReferenceQueryKey(planningId), data);
+    },
+    onError: () => {
+      toast({
+        title: "Erro ao salvar progresso do TR. Tente novamente.",
+        variant: "destructive",
+      });
     },
   });
 };
