@@ -18,6 +18,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Frontend:** Consulte CODEX.MD.
 
 ## 4. Histórico Técnico de Alterações
+* **[2025-10-24] - Tarefa INFRA-009:** Criado o Provedor de Identidade OIDC da AWS via Terraform para habilitar a autenticação dos pipelines.
 * **[2025-10-24] - Tarefa FIX-010:** Sincronizada a regra de validação de senha entre o backend e o frontend.
 * **[2025-10-24] - Tarefa IA-P-14:** Implementada a técnica de RAG na cadeia de IA para as 'Especificações Técnicas' do TR.
 * **[2025-10-24] - Tarefa IA-P-13:** Implementada a técnica de RAG na cadeia de IA para a 'Viabilidade Técnica'.

@@ -2,10 +2,6 @@ provider "aws" {
   region = "us-east-1"
 }
 
-data "aws_iam_openid_connect_provider" "github" {
-  url            = "https://token.actions.githubusercontent.com"
-}
-
 resource "aws_iam_role" "github_actions_ecr" {
   name = "github-actions-ecr-role"
   assume_role_policy = jsonencode({
@@ -14,7 +10,7 @@ resource "aws_iam_role" "github_actions_ecr" {
       {
         Effect = "Allow",
         Principal = {
-          Federated = data.aws_iam_openid_connect_provider.github.arn
+          Federated = aws_iam_openid_connect_provider.github.arn
         },
         Action = "sts:AssumeRoleWithWebIdentity",
         Condition = {
