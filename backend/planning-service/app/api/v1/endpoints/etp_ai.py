@@ -8,6 +8,7 @@ from app.llm.chains.solution_comparison_chain import \
 from app.llm.chains.technical_viability_chain import \
     get_technical_viability_chain
 from app.llm.generator import generate_text
+from app.llm.chains.necessity_chain import get_necessity_chain
 
 router = APIRouter()
 
@@ -62,6 +63,22 @@ async def post_generate_solution_comparison(
         raise HTTPException(
             status_code=500, detail=f"An unexpected error occurred: {e}"
         )
+
+
+class NecessityRequest(BaseModel):
+    problem_description: str
+
+class NecessityResponse(BaseModel):
+    necessity_text: str
+
+@router.post("/etp/generate/necessity", response_model=NecessityResponse)
+async def generate_necessity(request: NecessityRequest):
+    """
+    Generates the 'Justification for the Need' text based on a problem description.
+    """
+    chain = get_necessity_chain()
+    result = await chain.ainvoke({"problem_description": request.problem_description})
+    return {"necessity_text": result.content}
 
 
 @router.post("/etp/generate/technical-viability")
