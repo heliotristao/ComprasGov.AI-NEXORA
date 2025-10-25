@@ -2,13 +2,10 @@ services:
   - type: web
     name: governance-service
     env: docker
-    repo: {{ env.RENDER_REPO_URL }}
     rootDir: backend/governance-service
     region: oregon
     branch: main
     plan: free
     envVars:
-      - key: DATABASE_URL
-      - key: SECRET_KEY
       - key: PORT
         value: 10000
