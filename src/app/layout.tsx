@@ -4,9 +4,15 @@ import "./globals.css"
 import { Providers } from "@/components/providers"
 import { Toaster } from "@/components/ui/sonner"
 
+import favicon from "@/public/assets/images/favicon.svg"
+
 export const metadata: Metadata = {
   title: "NEXORA ComprasGov.AI",
   description: "Plataforma de governança para contratações públicas.",
+  icons: {
+    icon: favicon.src,
+    shortcut: favicon.src,
+  },
 }
 
 export default function RootLayout({
