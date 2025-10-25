@@ -29,7 +29,12 @@ async function requestLogin(credentials: LoginCredentials): Promise<LoginRespons
   let tokenEndpoint: string
 
   try {
-    tokenEndpoint = new URL("/token", configuredBaseUrl).toString()
+    const baseUrlWithoutApiPrefix = configuredBaseUrl.replace(/\/api\/v1\/?$/, "")
+    const normalizedBaseUrl = baseUrlWithoutApiPrefix.endsWith("/")
+      ? baseUrlWithoutApiPrefix.slice(0, -1)
+      : baseUrlWithoutApiPrefix
+
+    tokenEndpoint = new URL("/token", normalizedBaseUrl).toString()
   } catch (error) {
     console.error("Configuração de NEXT_PUBLIC_API_URL ausente ou inválida.", error)
     throw new Error(
