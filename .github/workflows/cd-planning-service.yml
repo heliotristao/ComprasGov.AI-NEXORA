@@ -9,11 +9,15 @@ on:
 jobs:
   trigger-render-deploy:
     runs-on: ubuntu-latest
-    if: ${{ secrets.RENDER_DEPLOY_HOOK != '' }}
+    if: ${{ secrets.RENDER_PLANNING_DEPLOY_HOOK != '' }}
 
     steps:
       - name: Trigger Render deployment
         env:
-          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_PLANNING_DEPLOY_HOOK }}
         run: |
+          if [ -z "${RENDER_DEPLOY_HOOK}" ]; then
+            echo "RENDER_PLANNING_DEPLOY_HOOK secret is not configured." >&2
+            exit 1
+          fi
           curl -fsSL -X POST "$RENDER_DEPLOY_HOOK"
