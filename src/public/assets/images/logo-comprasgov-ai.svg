@@ -1,0 +1,15 @@
+<svg width="512" height="160" viewBox="0 0 512 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="16" width="128" height="128" rx="28" fill="#0D63C6" />
+  <path d="M42 92.5L88 76L71.5 122L63.6 103.5L42 92.5Z" fill="#FFFFFF" />
+  <path d="M69.8 83.7L88 76L80.3 94.6" stroke="#0D63C6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+  <line x1="79.6" y1="68.5" x2="94" y2="83" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
+  <circle cx="94" cy="83" r="6" fill="#FFFFFF" />
+  <circle cx="79.6" cy="68.5" r="6" fill="#FFFFFF" />
+  <circle cx="101.5" cy="68.5" r="6" fill="#FFFFFF" />
+  <path d="M79.6 68.5H101.5" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
+  <g fill="#0D1C2C" font-family="'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-weight="600">
+    <text font-size="44" x="152" y="82">Compras</text>
+    <text font-size="44" x="152" y="126">Gov.AI</text>
+  </g>
+  <text x="152" y="152" font-size="24" fill="#0D63C6" font-family="'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-weight="600">NEXORA</text>
+</svg>

@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -15,6 +16,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/hooks/useAuth"
+
+import logo from "@/public/assets/images/logo-comprasgov-ai.svg"
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Informe um email válido." }),
@@ -48,14 +51,24 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-muted px-4 py-12">
       <div className="w-full max-w-md">
-        <Card>
-          <CardHeader>
-            <CardTitle>Entrar</CardTitle>
-            <CardDescription>
-              Use suas credenciais para acessar a plataforma.
-            </CardDescription>
+        <Card className="border-border/80 shadow-lg">
+          <CardHeader className="space-y-6 text-center">
+            <Image
+              src={logo}
+              alt="Logo ComprasGov.AI - NEXORA"
+              className="mx-auto h-16 w-auto"
+              priority
+            />
+            <div className="space-y-1">
+              <CardTitle className="text-2xl font-semibold text-secondary">
+                Bem-vindo de volta
+              </CardTitle>
+              <CardDescription className="text-base text-muted-foreground">
+                Acesse o ComprasGov.AI - NEXORA com suas credenciais oficiais.
+              </CardDescription>
+            </div>
           </CardHeader>
           <CardContent>
             <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate>
