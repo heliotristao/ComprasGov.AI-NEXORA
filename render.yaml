@@ -2,7 +2,7 @@ services:
   - type: web
     name: governance-service
     env: docker
-    repo: https://github.com/heliotristao/ComprasGov.AI-NEXORA
+    repo: {{ env.RENDER_REPO_URL }}
     rootDir: backend/governance-service
     region: oregon
     branch: main
