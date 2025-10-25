@@ -17,7 +17,15 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Backend e Infraestrutura:** Consulte JULES.MD.
 * **Frontend:** Consulte CODEX.MD.
 
-## 4. Histórico Técnico de Alterações
+## 4. Importação do Blueprint na Render
+Ao importar o blueprint da Render, o campo de repositório não é preenchido automaticamente. Utilize uma das opções abaixo para apontar o blueprint para o seu clone ou fork:
+
+1. Durante a etapa "Connect repository" da importação, selecione manualmente o repositório correto na sua conta da Render.
+2. Alternativamente, antes da importação, defina a variável de ambiente **RENDER_REPO_URL** no Render com a URL completa do seu repositório. O blueprint utilizará esse valor para o campo `repo`.
+
+> Caso esteja usando um fork, confirme que a URL informada corresponde ao fork desejado antes de concluir a importação.
+
+## 5. Histórico Técnico de Alterações
 * **[2025-10-24] - Tarefa INFRA-PROD-03R:** Realizado o deploy do 'planning-service' na plataforma Render.com.
 * **[2025-10-24] - Tarefa INFRA-PROD-02R:** Realizado o deploy do 'governance-service' na plataforma Render.com.
 * **[2025-10-24] - Tarefa FIX-012:** Corrigida a comunicação de rede entre o frontend e os serviços de backend no ambiente Docker.
