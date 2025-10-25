@@ -26,6 +26,7 @@ Ao importar o blueprint da Render, o campo de repositório não é preenchido au
 > Caso esteja usando um fork, confirme que a URL informada corresponde ao fork desejado antes de concluir a importação.
 
 ## 5. Histórico Técnico de Alterações
+* **[2025-10-25] - Tarefa FIX-016:** Corrigida a ausência da rota de autenticação `POST /token` no `governance-service`, resolvendo o erro 404 no login.
 * **[2025-10-25] - Tarefa FIX-015:** Ajustado o path da chamada de API de autenticação no frontend para corresponder à rota exposta pelo backend, resolvendo o erro 404.
 * **[2025-10-25] - Tarefa DEVOPS-PROD-02:** Limpeza do pipeline de CI/CD do backend, removendo passos legados de autenticação da AWS.
 * **[2025-10-25] - Tarefa FIX-014:** Configurada a política de CORS nos serviços de backend para permitir requisições do frontend em produção, resolvendo o bloqueio de comunicação.
