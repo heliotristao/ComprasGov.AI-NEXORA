@@ -25,6 +25,19 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
+  // INÍCIO DO CÓDIGO DE DIAGNÓSTICO - DEBUG-001
+  console.log("--- INICIANDO DIAGNÓSTICO DE AMBIENTE ---")
+  console.log(
+    "Valor de process.env.NEXT_PUBLIC_API_URL:",
+    process.env.NEXT_PUBLIC_API_URL,
+  )
+  console.log(
+    "Tipo de process.env.NEXT_PUBLIC_API_URL:",
+    typeof process.env.NEXT_PUBLIC_API_URL,
+  )
+  console.log("Objeto process.env completo:", process.env)
+  console.log("--- FIM DO DIAGNÓSTICO DE AMBIENTE ---")
+  // FIM DO CÓDIGO DE DIAGNÓSTICO - DEBUG-001
   const authMutation = useAuth()
   const {
     register,
