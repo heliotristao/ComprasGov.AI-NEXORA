@@ -26,6 +26,7 @@ Ao importar o blueprint da Render, o campo de repositório não é preenchido au
 > Caso esteja usando um fork, confirme que a URL informada corresponde ao fork desejado antes de concluir a importação.
 
 ## 5. Histórico Técnico de Alterações
+* **[2025-10-25] - Tarefa BACKEND-P-08:** Criado o endpoint `GET /plans` no `planning-service` para listar os planos de contratação.
 * **[2025-10-25] - Tarefa DEBUG-002:** Habilitada a documentação da API (Swagger UI) no `governance-service` para fins de diagnóstico do endpoint de autenticação.
 * **[2025-10-25] - Tarefa DEVOPS-PROD-03:** Simplificado o pipeline de CI do backend, removendo a etapa legada de push da imagem Docker para a AWS.
 * **[2025-10-25] - Tarefa FIX-016:** Corrigida a ausência da rota de autenticação `POST /token` no `governance-service`, resolvendo o erro 404 no login.
