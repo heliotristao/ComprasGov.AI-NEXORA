@@ -2,14 +2,14 @@ from fastapi import APIRouter, Depends
 from typing import List
 from datetime import datetime
 from app.schemas.plan import Plan
-from app.api.v1.dependencies import get_current_user, User
+from app.api.v1.dependencies import get_current_user
 
 router = APIRouter()
 
-@router.get("/plans", response_model=List[Plan])
-def list_plans(current_user: User = Depends(get_current_user)):
+@router.get("/plans", response_model=List[Plan], dependencies=[Depends(get_current_user)])
+def list_plans():
     """
-    List all plans.
+    Retrieve a list of plans.
     """
     return [
         {
