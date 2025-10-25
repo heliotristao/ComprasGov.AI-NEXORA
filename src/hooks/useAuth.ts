@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 
+import { config } from "@/lib/config"
 import { useAuthStore } from "@/stores/authStore"
-import { getApiBaseUrl } from "@/lib/env"
 
 interface LoginCredentials {
   email: string
@@ -15,18 +15,29 @@ interface LoginResponse {
 }
 
 async function requestLogin(credentials: LoginCredentials): Promise<LoginResponse> {
-  let apiBaseUrl: string
+  const configuredBaseUrl = config.api.baseUrl?.trim()
+
+  if (!configuredBaseUrl) {
+    const error = new Error(
+      "Falha na configuração do ambiente. Verifique a variável NEXT_PUBLIC_API_URL e tente novamente.",
+    )
+
+    console.error("Configuração de NEXT_PUBLIC_API_URL ausente ou inválida.", error)
+    throw error
+  }
+
+  let tokenEndpoint: string
 
   try {
-    apiBaseUrl = getApiBaseUrl()
+    tokenEndpoint = new URL("/token", configuredBaseUrl).toString()
   } catch (error) {
     console.error("Configuração de NEXT_PUBLIC_API_URL ausente ou inválida.", error)
     throw new Error(
-      "Falha na configuração do ambiente. Verifique a variável NEXT_PUBLIC_API_URL e tente novamente."
+      "Falha na configuração do ambiente. Verifique a variável NEXT_PUBLIC_API_URL e tente novamente.",
     )
   }
 
-  const response = await fetch(`${apiBaseUrl}/token`, {
+  const response = await fetch(tokenEndpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
