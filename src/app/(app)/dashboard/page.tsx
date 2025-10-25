@@ -88,12 +88,19 @@ function DashboardPage() {
               title: "Planos em Elaboração",
               value: String(data.plans_in_progress),
               icon: FileText,
+              href: "/plans",
             },
-            { title: "Licitações Abertas", value: String(data.open_tenders), icon: Gavel },
+            {
+              title: "Licitações Abertas",
+              value: String(data.open_tenders),
+              icon: Gavel,
+              href: "/tenders",
+            },
             {
               title: "Contratos Ativos",
               value: String(data.active_contracts),
               icon: FileSignature,
+              href: "/contracts",
             },
           ].map((card) => (
             <DashboardCard
@@ -101,6 +108,7 @@ function DashboardPage() {
               title={card.title}
               value={card.value}
               icon={card.icon}
+              href={card.href}
             />
           ))
         ) : null}
