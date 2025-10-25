@@ -9,6 +9,6 @@ services:
     plan: free
     envVars:
       - key: DATABASE_URL
-        value: postgres://comprasgov_user:AbC123XyZ@dpg-abcdefg12345-a.oregon-postgres.render.com/comprasgov_db
+        value: postgresql://comprasgov_user:AbC123XyZ@dpg-abcdefg12345-a.oregon-postgres.render.com/comprasgov_db
       - key: SECRET_KEY
         value: 76374328578cb697cd76affd0a521e95090811a001d9fc83c597f59d2b9a5727
