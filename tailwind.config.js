@@ -11,8 +11,18 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#0D63C6",
+          DEFAULT: "#0D63C6", // Azul do ícone
           foreground: "#FFFFFF",
+          50: "#E6F0FF",
+          100: "#C9DFFE",
+          200: "#94C1FC",
+          300: "#5F9CF5",
+          400: "#337AE8",
+          500: "#0D63C6",
+          600: "#0A4FA2",
+          700: "#083F81",
+          800: "#052E5C",
+          900: "#031E3D",
         },
         secondary: {
           DEFAULT: "#0B1C2C",
