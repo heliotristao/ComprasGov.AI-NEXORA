@@ -12,6 +12,10 @@ jobs:
     if: ${{ secrets.RENDER_DEPLOY_HOOK != '' }}
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Aciona o deploy no Render via Deploy Hook
       - name: Trigger Render deployment
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
