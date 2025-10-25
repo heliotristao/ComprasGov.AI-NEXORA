@@ -26,6 +26,7 @@ Ao importar o blueprint da Render, o campo de repositório não é preenchido au
 > Caso esteja usando um fork, confirme que a URL informada corresponde ao fork desejado antes de concluir a importação.
 
 ## 5. Histórico Técnico de Alterações
+* **[2025-10-25] - Tarefa FIX-014:** Configurada a política de CORS nos serviços de backend para permitir requisições do frontend em produção, resolvendo o bloqueio de comunicação.
 * **[2025-10-25] - Tarefa OPS-PROD-002:** Corrigida a variável de ambiente `NEXT_PUBLIC_API_URL` no Vercel para incluir o prefixo `/api/v1`, resolvendo a falha de comunicação do frontend em produção.
 * **[2025-10-25] - Tarefa OPS-PROD-002:** Corrigida a configuração de deploy do Vercel para remover a referência a um "Secret" inexistente.
 * **[2025-10-25] - Tarefa DEVOPS-PROD-01:** Unificado e corrigido o processo de CI/CD. Deploys para Render (backend) e Vercel (frontend) agora são automatizados via GitHub Actions de forma segura.
