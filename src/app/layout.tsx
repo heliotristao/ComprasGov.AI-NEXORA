@@ -10,8 +10,18 @@ export const metadata: Metadata = {
   title: "NEXORA ComprasGov.AI",
   description: "Plataforma de governança para contratações públicas.",
   icons: {
-    icon: favicon.src,
-    shortcut: favicon.src,
+    icon: [
+      {
+        url: favicon.src,
+        type: "image/svg+xml",
+      },
+    ],
+    shortcut: [
+      {
+        url: favicon.src,
+        type: "image/svg+xml",
+      },
+    ],
   },
 }
 
