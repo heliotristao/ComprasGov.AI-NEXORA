@@ -8,12 +8,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
+import withAuth from "@/components/auth/withAuth"
+
 type NewPlanFormValues = {
   object: string
   justification: string
 }
 
-export default function NewPlanPage() {
+function NewPlanPageComponent() {
   const { register, handleSubmit } = useForm<NewPlanFormValues>({
     defaultValues: {
       object: "",
@@ -32,8 +34,7 @@ export default function NewPlanPage() {
           Criar Novo Plano de Contratação
         </h1>
         <p className="text-sm text-slate-600">
-          Preencha as informações iniciais para começar a estruturar o plano de
-          contratação.
+          Preencha as informações iniciais para começar a estruturar o plano de contratação.
         </p>
       </div>
 
@@ -44,11 +45,7 @@ export default function NewPlanPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form
-            className="space-y-6"
-            onSubmit={handleSubmit(onSubmit)}
-            noValidate
-          >
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate>
             <div className="space-y-2">
               <Label htmlFor="object">Objeto da Contratação</Label>
               <Textarea
@@ -85,3 +82,5 @@ export default function NewPlanPage() {
     </div>
   )
 }
+
+export default withAuth(NewPlanPageComponent)
