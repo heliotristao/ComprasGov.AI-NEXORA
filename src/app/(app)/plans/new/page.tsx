@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useMutation } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -19,6 +20,9 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
 import withAuth from "@/components/auth/withAuth"
+import { useToast } from "@/hooks/useToast"
+import { config } from "@/lib/config"
+import { useAuthStore } from "@/stores/authStore"
 
 const newPlanSchema = z.object({
   object: z
@@ -35,10 +39,12 @@ type NewPlanFormValues = z.infer<typeof newPlanSchema>
 
 function NewPlanPageComponent() {
   const router = useRouter()
+  const { toast } = useToast()
+  const token = useAuthStore((state) => state.token)
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<NewPlanFormValues>({
     resolver: zodResolver(newPlanSchema),
     defaultValues: {
@@ -47,9 +53,81 @@ function NewPlanPageComponent() {
     },
   })
 
-  const onSubmit = async (_data: NewPlanFormValues) => {
-    // TODO: Implementar lógica de salvamento na tarefa subsequente.
-    await new Promise((resolve) => setTimeout(resolve, 1200))
+  const createPlanMutation = useMutation({
+    mutationFn: async (data: NewPlanFormValues) => {
+      if (!config.api.baseUrl) {
+        throw new Error(
+          "A URL base da API não está configurada. Configure a variável NEXT_PUBLIC_API_URL."
+        )
+      }
+
+      if (!token) {
+        throw new Error("Sessão expirada. Faça login novamente.")
+      }
+
+      const requestUrl = new URL("plans", config.api.baseUrl).toString()
+
+      const response = await fetch(requestUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        let errorMessage = "Falha ao criar o plano. Tente novamente."
+
+        try {
+          const errorBody = await response.json()
+
+          if (typeof errorBody?.message === "string" && errorBody.message.trim().length > 0) {
+            errorMessage = errorBody.message
+          }
+        } catch {
+          // Ignora erros ao processar o corpo da resposta de erro.
+        }
+
+        throw new Error(errorMessage)
+      }
+
+      const rawBody = await response.text()
+
+      if (!rawBody) {
+        return null
+      }
+
+      try {
+        return JSON.parse(rawBody)
+      } catch {
+        return rawBody
+      }
+    },
+    onSuccess: () => {
+      toast({ title: "Plano criado com sucesso!", variant: "success" })
+      router.push("/plans")
+    },
+    onError: (error: unknown) => {
+      const description =
+        error instanceof Error && error.message !== "Falha ao criar o plano. Tente novamente."
+          ? error.message
+          : undefined
+
+      toast({
+        title: "Falha ao criar o plano. Tente novamente.",
+        description,
+        variant: "destructive",
+      })
+    },
+  })
+
+  const onSubmit = async (data: NewPlanFormValues) => {
+    try {
+      await createPlanMutation.mutateAsync(data)
+    } catch {
+      // Os erros já são tratados no onError da mutação.
+    }
   }
 
   return (
@@ -142,9 +220,9 @@ function NewPlanPageComponent() {
             <Button
               type="submit"
               className="w-full sm:w-auto"
-              disabled={isSubmitting}
+              disabled={createPlanMutation.isPending}
             >
-              {isSubmitting ? (
+              {createPlanMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                   Salvando...
