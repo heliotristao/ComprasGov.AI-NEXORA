@@ -1,21 +1,38 @@
-from fastapi import APIRouter, Depends
 from typing import List
-from datetime import datetime
-from app.schemas.plan import Plan
-from app.api.v1.dependencies import get_current_user
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from app import schemas
+from app.api import deps
+from app.crud import crud_plan
 
 router = APIRouter()
 
-@router.get("/plans", response_model=List[Plan], dependencies=[Depends(get_current_user)])
-def list_plans():
+@router.get("/", response_model=List[schemas.Plan])
+def read_plans(
+    db: Session = Depends(deps.get_db),
+    current_user: dict = Depends(deps.get_current_user)
+):
     """
-    Retrieve a list of plans.
+    Retrieve plans.
     """
-    return [
-        {
-            "id": "PLAN-2025-001",
-            "objective": "Contratação de serviço de limpeza",
-            "status": "Em Elaboração",
-            "created_at": "2025-10-25T10:00:00Z"
-        }
-    ]
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    return []
+
+
+@router.post("/", response_model=schemas.Plan, status_code=201)
+def create_plan(
+    *,
+    db: Session = Depends(deps.get_db),
+    plan_in: schemas.PlanCreate,
+    current_user: dict = Depends(deps.get_current_user)
+):
+    """
+    Create new plan.
+    """
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    plan = crud_plan.create_plan(db=db, obj_in=plan_in)
+    return plan
