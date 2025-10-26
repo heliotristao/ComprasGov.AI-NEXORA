@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -34,7 +36,9 @@ export default function PlansPage() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-3xl font-bold text-slate-900">Planos de Contratação</h1>
-        <Button className="ml-auto w-full sm:w-auto">Novo Plano</Button>
+        <Link className="ml-auto w-full sm:w-auto sm:flex-none" href="/plans/new">
+          <Button className="w-full sm:w-auto">Novo Plano</Button>
+        </Link>
       </div>
 
       <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
