@@ -1,37 +1,32 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
-import { useMemo } from "react"
 import { useRouter } from "next/navigation"
-
-import { MoreHorizontal, PlusCircle } from "lucide-react"
+import { PlusCircle, Search, Filter, Download, MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react"
 
 import withAuth from "@/components/auth/withAuth"
-import { Badge } from "@/components/ui/badge"
+import { DataTable, type Column } from "@/components/data-display/data-table"
+import { StatusBadge } from "@/components/data-display/status-badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Skeleton } from "@/components/ui/skeleton"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import type { PlanSummary } from "@/hooks/api/usePlans"
-import { usePlans } from "@/hooks/api/usePlans"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { usePlans, type PlanSummary } from "@/hooks/api/usePlans"
+import { PROCESS_STATUS } from "@/lib/constants"
 
 interface NormalizedPlan {
   id: string
+  identifier: string
   object: string
-  status: string
-  createdAt?: string
+  status: keyof typeof PROCESS_STATUS
+  createdAt: string
+  estimatedValue?: number
 }
 
 function normalizePlan(plan: PlanSummary, index: number): NormalizedPlan {
@@ -44,220 +39,242 @@ function normalizePlan(plan: PlanSummary, index: number): NormalizedPlan {
         ? plan.identifier
         : undefined) ?? fallbackId
 
+  const identifier =
+    (typeof plan.identifier === "string" && plan.identifier.length > 0
+      ? plan.identifier
+      : undefined) ?? fallbackId
+
   const object =
     (typeof plan.object === "string" && plan.object.length > 0
       ? plan.object
       : typeof plan.title === "string" && plan.title.length > 0
         ? plan.title
-        : typeof plan.name === "string" && plan.name.length > 0
-          ? plan.name
-          : typeof plan.description === "string" && plan.description.length > 0
-            ? plan.description
-            : "—")
+        : undefined) ?? "Sem título"
 
   const status =
-    typeof plan.status === "string" && plan.status.length > 0
+    (typeof plan.status === "string" && plan.status.length > 0
       ? plan.status
-      : "Status não informado"
+      : undefined) ?? "draft"
 
-  const createdAtRaw =
-    (typeof plan.createdAt === "string" && plan.createdAt.length > 0
-      ? plan.createdAt
-      : typeof plan.created_at === "string" && plan.created_at.length > 0
-        ? plan.created_at
-        : undefined) ?? undefined
+  const createdAt =
+    (typeof plan.created_at === "string" && plan.created_at.length > 0
+      ? plan.created_at
+      : typeof plan.createdAt === "string" && plan.createdAt.length > 0
+        ? plan.createdAt
+        : undefined) ?? new Date().toISOString()
 
   return {
     id,
+    identifier,
     object,
-    status,
-    createdAt: createdAtRaw,
+    status: status as keyof typeof PROCESS_STATUS,
+    createdAt,
+    estimatedValue: typeof plan.estimated_value === "number" ? plan.estimated_value : undefined,
   }
 }
 
-function formatDate(value?: string) {
-  if (!value) {
-    return "—"
-  }
-
-  const parsedDate = new Date(value)
-
-  if (Number.isNaN(parsedDate.getTime())) {
-    return value
-  }
-
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }).format(parsedDate)
-}
-
-function resolveStatusBadge(status: string) {
-  const normalized = status.toLowerCase()
-
-  if (normalized.includes("elabora")) {
-    return { label: "Em Elaboração", variant: "info" as const }
-  }
-
-  if (normalized.includes("revis")) {
-    return { label: "Em Revisão", variant: "warning" as const }
-  }
-
-  if (normalized.includes("aprov")) {
-    return { label: "Aprovado", variant: "success" as const }
-  }
-
-  return { label: status, variant: "secondary" as const }
-}
-
-const skeletonRows = Array.from({ length: 5 })
-
-function PlansPageComponent() {
-  const { data, isLoading, isError } = usePlans()
+function PlansPage() {
   const router = useRouter()
+  const { data: rawPlans, isLoading, isError } = usePlans()
+  const [searchQuery, setSearchQuery] = useState("")
+  const [statusFilter, setStatusFilter] = useState<string>("all")
 
-  const plans = useMemo(() => {
-    if (!data || data.length === 0) {
-      return []
-    }
+  // Normalizar e filtrar planos
+  const plans: NormalizedPlan[] = (rawPlans || []).map(normalizePlan)
 
-    return data.map(normalizePlan)
-  }, [data])
+  const filteredPlans = plans.filter((plan) => {
+    const matchesSearch =
+      plan.object.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      plan.identifier.toLowerCase().includes(searchQuery.toLowerCase())
 
-  const showEmptyState = !isLoading && !isError && plans.length === 0
+    const matchesStatus = statusFilter === "all" || plan.status === statusFilter
 
-  return (
-    <div className="space-y-8">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Planos de Contratação
-          </h1>
-          <p className="text-sm text-slate-500">
-            Acompanhe o status dos planos e avance cada etapa do processo.
+    return matchesSearch && matchesStatus
+  })
+
+  // Definir colunas da tabela
+  const columns: Column<NormalizedPlan>[] = [
+    {
+      id: "identifier",
+      label: "Identificador",
+      accessor: (row) => row.identifier,
+      sortable: true,
+      width: "w-32",
+    },
+    {
+      id: "object",
+      label: "Objeto",
+      accessor: (row) => (
+        <div className="max-w-md">
+          <p className="line-clamp-2 font-medium" title={row.object}>
+            {row.object}
           </p>
         </div>
-        <Link className="w-full sm:w-auto" href="/plans/new">
-          <Button className="w-full sm:w-auto">
-            <PlusCircle aria-hidden className="h-4 w-4" />
+      ),
+      sortable: true,
+    },
+    {
+      id: "status",
+      label: "Status",
+      accessor: (row) => <StatusBadge status={row.status} />,
+      width: "w-32",
+      align: "center",
+    },
+    {
+      id: "estimatedValue",
+      label: "Valor Estimado",
+      accessor: (row) =>
+        row.estimatedValue
+          ? new Intl.NumberFormat("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            }).format(row.estimatedValue)
+          : "-",
+      sortable: true,
+      width: "w-40",
+      align: "right",
+    },
+    {
+      id: "createdAt",
+      label: "Criado em",
+      accessor: (row) => new Date(row.createdAt).toLocaleDateString("pt-BR"),
+      sortable: true,
+      width: "w-32",
+    },
+    {
+      id: "actions",
+      label: "Ações",
+      accessor: (row) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => router.push(`/plans/${row.id}`)}>
+              <Eye className="mr-2 h-4 w-4" />
+              Visualizar
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push(`/plans/${row.id}/edit`)}>
+              <Edit className="mr-2 h-4 w-4" />
+              Editar
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-red-600">
+              <Trash2 className="mr-2 h-4 w-4" />
+              Excluir
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+      width: "w-20",
+      align: "center",
+    },
+  ]
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="h-8 w-48 animate-pulse rounded bg-slate-200" />
+        <div className="h-64 animate-pulse rounded-lg bg-slate-200" />
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+        Não foi possível carregar os planos. Tente novamente mais tarde.
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-h1 text-slate-900">Planos de Contratação</h1>
+          <p className="text-body-small text-slate-500">
+            Gerencie todos os planos de contratação do órgão
+          </p>
+        </div>
+        <Link href="/plans/new">
+          <Button>
+            <PlusCircle className="mr-2 h-4 w-4" />
             Novo Plano
           </Button>
         </Link>
-      </header>
+      </div>
 
-      <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-slate-50/60">
-              <TableHead className="w-[200px] text-slate-600">ID do Plano</TableHead>
-              <TableHead className="text-slate-600">Objeto</TableHead>
-              <TableHead className="w-[160px] text-slate-600">Status</TableHead>
-              <TableHead className="w-[160px] text-slate-600">Criado em</TableHead>
-              <TableHead className="w-[120px] text-right text-slate-600">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading
-              ? skeletonRows.map((_, index) => (
-                  <TableRow key={`skeleton-${index}`} className="hover:bg-transparent">
-                    <TableCell>
-                      <Skeleton className="h-4 w-32" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-full max-w-[320px]" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-5 w-28 rounded-full" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-24" />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Skeleton className="ml-auto h-8 w-8 rounded-full" />
-                    </TableCell>
-                  </TableRow>
-                ))
-              : null}
+      {/* Filtros */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-h4">Filtros</CardTitle>
+          <CardDescription>Refine sua busca por planos</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-3">
+            {/* Busca */}
+            <div className="relative md:col-span-2">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                placeholder="Buscar por identificador ou objeto..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
 
-            {!isLoading && isError ? (
-              <TableRow>
-                <TableCell colSpan={5} className="py-10 text-center text-sm text-red-600">
-                  Não foi possível carregar os planos de contratação. Tente novamente mais tarde.
-                </TableCell>
-              </TableRow>
-            ) : null}
+            {/* Filtro de Status */}
+            <select 
+              value={statusFilter} 
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            >
+              <option value="all">Todos os status</option>
+              <option value="draft">Rascunho</option>
+              <option value="pending">Pendente</option>
+              <option value="approved">Aprovado</option>
+              <option value="rejected">Rejeitado</option>
+              <option value="archived">Arquivado</option>
+            </select>
+          </div>
 
-            {!isLoading && !isError
-              ? plans.map((plan, index) => {
-                  const { label, variant } = resolveStatusBadge(plan.status)
+          {/* Ações */}
+          <div className="mt-4 flex items-center justify-between">
+            <p className="text-body-small text-slate-500">
+              {filteredPlans.length} {filteredPlans.length === 1 ? "plano encontrado" : "planos encontrados"}
+            </p>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm">
+                <Filter className="mr-2 h-4 w-4" />
+                Mais Filtros
+              </Button>
+              <Button variant="outline" size="sm">
+                <Download className="mr-2 h-4 w-4" />
+                Exportar
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-                  return (
-                    <TableRow
-                      key={plan.id ?? `plan-${index}`}
-                      className="transition-colors hover:bg-slate-50"
-                    >
-                      <TableCell className="font-medium text-slate-900">
-                        {plan.id}
-                      </TableCell>
-                      <TableCell className="text-slate-700">{plan.object}</TableCell>
-                      <TableCell>
-                        <Badge variant={variant}>{label}</Badge>
-                      </TableCell>
-                      <TableCell className="text-slate-600">
-                        {formatDate(plan.createdAt)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-label="Abrir menu de ações"
-                              variant="ghost"
-                              size="icon-sm"
-                              className="ml-auto text-slate-500 hover:text-slate-900"
-                            >
-                              <MoreHorizontal aria-hidden className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onSelect={() =>
-                                router.push(`/plans/${encodeURIComponent(plan.id)}`)
-                              }
-                            >
-                              Visualizar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>Editar</DropdownMenuItem>
-                            <DropdownMenuItem>Excluir</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })
-              : null}
-
-            {showEmptyState ? (
-              <TableRow>
-                <TableCell colSpan={5} className="py-12">
-                  <div className="flex flex-col items-center justify-center gap-4 text-center">
-                    <p className="text-sm text-slate-500">
-                      Nenhum plano de contratação encontrado.
-                    </p>
-                    <Link href="/plans/new">
-                      <Button variant="outline">Criar Novo Plano</Button>
-                    </Link>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : null}
-          </TableBody>
-        </Table>
-      </section>
+      {/* Tabela */}
+      <Card>
+        <CardContent className="p-0">
+          <DataTable
+            data={filteredPlans}
+            columns={columns}
+            showPagination
+            initialPageSize={25}
+            emptyMessage="Nenhum plano encontrado"
+          />
+        </CardContent>
+      </Card>
     </div>
   )
 }
 
-const PlansPage = withAuth(PlansPageComponent)
+export default withAuth(PlansPage)
 
-export default PlansPage

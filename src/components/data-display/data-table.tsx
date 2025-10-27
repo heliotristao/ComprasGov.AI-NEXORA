@@ -34,6 +34,29 @@ export interface DataTableColumn<T> {
 }
 
 /**
+ * Alias para DataTableColumn (para compatibilidade)
+ */
+export type Column<T> = DataTableColumn<T>
+
+/**
+ * Definição de coluna da tabela (duplicado para remover)
+ */
+interface _DataTableColumn<T> {
+  /** ID único da coluna */
+  id: string
+  /** Label exibido no header */
+  label: string
+  /** Função para acessar o valor da célula */
+  accessor: (row: T) => React.ReactNode
+  /** Se a coluna é ordenável */
+  sortable?: boolean
+  /** Largura da coluna (classe Tailwind) */
+  width?: string
+  /** Alinhamento do texto */
+  align?: "left" | "center" | "right"
+}
+
+/**
  * Props para o componente DataTable
  */
 export interface DataTableProps<T> {
