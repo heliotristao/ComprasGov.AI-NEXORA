@@ -52,3 +52,22 @@ def read_plan(
     if not plan:
         raise HTTPException(status_code=404, detail="Plan not found")
     return plan
+
+
+@router.put("/{plan_id}", response_model=schemas.Plan)
+def update_plan(
+    *,
+    db: Session = Depends(deps.get_db),
+    plan_id: str,
+    plan_in: schemas.PlanUpdate,
+    current_user: dict = Depends(deps.get_current_user)
+):
+    """
+    Update a plan.
+    """
+    plan = crud_plan.get_plan(db=db, plan_id=plan_id)
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+
+    plan = crud_plan.update_plan(db=db, db_obj=plan, obj_in=plan_in)
+    return plan
