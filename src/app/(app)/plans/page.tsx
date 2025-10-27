@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { PlusCircle, Search, Filter, Download, MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react"
@@ -75,22 +75,43 @@ function normalizePlan(plan: PlanSummary, index: number): NormalizedPlan {
 
 function PlansPage() {
   const router = useRouter()
-  const { data: rawPlans, isLoading, isError } = usePlans()
   const [searchQuery, setSearchQuery] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(25)
 
-  // Normalizar e filtrar planos
-  const plans: NormalizedPlan[] = (rawPlans || []).map(normalizePlan)
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery)
+      setPage(1) // Reset to first page on search
+    }, 500)
 
-  const filteredPlans = plans.filter((plan) => {
-    const matchesSearch =
-      plan.object.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      plan.identifier.toLowerCase().includes(searchQuery.toLowerCase())
+    return () => clearTimeout(timer)
+  }, [searchQuery])
 
-    const matchesStatus = statusFilter === "all" || plan.status === statusFilter
+  // Reset page when status filter changes
+  useEffect(() => {
+    setPage(1)
+  }, [statusFilter])
 
-    return matchesSearch && matchesStatus
+  // Fetch plans with server-side filters
+  const { data, isLoading, isError } = usePlans({
+    search: debouncedSearch || undefined,
+    status: statusFilter !== "all" ? statusFilter : undefined,
+    page,
+    limit: pageSize,
   })
+
+  // Normalizar planos
+  const plans: NormalizedPlan[] = useMemo(
+    () => (data?.plans || []).map(normalizePlan),
+    [data?.plans]
+  )
+
+  const totalPlans = data?.total || 0
+  const totalPages = Math.ceil(totalPlans / pageSize)
 
   // Definir colunas da tabela
   const columns: Column<NormalizedPlan>[] = [
@@ -244,7 +265,7 @@ function PlansPage() {
           {/* Ações */}
           <div className="mt-4 flex items-center justify-between">
             <p className="text-body-small text-slate-500">
-              {filteredPlans.length} {filteredPlans.length === 1 ? "plano encontrado" : "planos encontrados"}
+              {totalPlans} {totalPlans === 1 ? "plano encontrado" : "planos encontrados"}
             </p>
             <div className="flex gap-2">
               <Button variant="outline" size="sm">
@@ -264,10 +285,10 @@ function PlansPage() {
       <Card>
         <CardContent className="p-0">
           <DataTable
-            data={filteredPlans}
+            data={plans}
             columns={columns}
             showPagination
-            initialPageSize={25}
+            initialPageSize={pageSize}
             emptyMessage="Nenhum plano encontrado"
           />
         </CardContent>

@@ -42,6 +42,8 @@ interface DashboardSummaryResponse {
   plans_in_progress: number
   open_tenders: number
   active_contracts: number
+  total_estimated_value: string | null
+  economy_generated: string | null
 }
 
 interface Process {
@@ -109,7 +111,8 @@ function DashboardPage() {
       })
       
       if (!response.ok) return []
-      return await response.json()
+      const result = await response.json()
+      return result.plans || []
     },
     enabled: Boolean(token),
   })
@@ -250,7 +253,7 @@ function DashboardPage() {
           />
           <MetricCard
             title="Economia Gerada"
-            value="R$ 2,5M"
+            value={data?.economy_generated ? `R$ ${(parseFloat(data.economy_generated) / 1000000).toFixed(1)}M` : "R$ 0"}
             icon={TrendingUp}
             description="Últimos 6 meses"
             trend="up"
