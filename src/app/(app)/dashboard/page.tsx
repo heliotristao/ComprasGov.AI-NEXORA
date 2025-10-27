@@ -86,7 +86,7 @@ function DashboardPage() {
       if (!token) throw new Error("Token de autenticação ausente.")
 
       const baseUrl = getApiBaseUrl()
-      const requestUrl = new URL("/dashboard/summary", baseUrl)
+      const requestUrl = new URL("/api/v1/dashboard/summary", baseUrl)
 
       const response = await fetch(requestUrl, {
         headers: { Authorization: `Bearer ${token}` },
@@ -106,7 +106,7 @@ function DashboardPage() {
       if (!token) throw new Error("Token ausente.")
       
       const baseUrl = getApiBaseUrl()
-      const response = await fetch(`${baseUrl}/plans?limit=5`, {
+      const response = await fetch(`${baseUrl}/api/v1/plans?limit=5`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       
