@@ -391,8 +391,7 @@ export default function ETPListPage() {
                                 Visualizar
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={() => router.push(`/etp/${etp.id}/consolidar`)}
-                                disabled={etp.progresso < 100}
+                                onClick={() => etp.progresso >= 100 && router.push(`/etp/${etp.id}/consolidar`)}
                               >
                                 <FileText className="mr-2 h-4 w-4" />
                                 Consolidar

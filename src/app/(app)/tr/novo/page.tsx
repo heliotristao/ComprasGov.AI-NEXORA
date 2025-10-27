@@ -75,7 +75,7 @@ export default function NovoTRPage() {
   if (!etpId) {
     return (
       <div className="max-w-2xl mx-auto py-8">
-        <Alert variant="destructive">
+        <Alert variant="error">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             ETP não identificado. Volte para a lista de ETPs e tente novamente.

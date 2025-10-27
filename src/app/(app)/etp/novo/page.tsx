@@ -93,7 +93,7 @@ export default function NovoETPPage() {
   if (!planId) {
     return (
       <div className="max-w-2xl mx-auto py-8">
-        <Alert variant="destructive">
+        <Alert variant="error">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Plano de contratação não identificado. Volte para a lista de planos e tente novamente.

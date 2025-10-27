@@ -367,8 +367,7 @@ export default function TRListPage() {
                                 Visualizar
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={() => router.push(`/tr/${tr.id}/consolidar`)}
-                                disabled={tr.progresso < 100}
+                                onClick={() => tr.progresso >= 100 && router.push(`/tr/${tr.id}/consolidar`)}
                               >
                                 <FileText className="mr-2 h-4 w-4" />
                                 Consolidar
