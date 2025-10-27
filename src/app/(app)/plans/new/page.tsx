@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -40,6 +40,7 @@ type NewPlanFormValues = z.infer<typeof newPlanSchema>
 function NewPlanPageComponent() {
   const router = useRouter()
   const { toast } = useToast()
+  const queryClient = useQueryClient()
   const token = useAuthStore((state) => state.token)
   const {
     register,
@@ -104,7 +105,8 @@ function NewPlanPageComponent() {
         return rawBody
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["plans"] })
       toast({ title: "Plano criado com sucesso!", variant: "success" })
       router.push("/plans")
     },
