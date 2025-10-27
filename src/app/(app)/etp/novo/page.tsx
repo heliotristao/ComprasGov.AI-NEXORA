@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -20,7 +20,7 @@ interface ModeloInstitucional {
   modelo_superior_nome: string
 }
 
-export default function NovoETPPage() {
+function NovoETPContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const planId = searchParams.get("planId")
@@ -189,6 +189,21 @@ export default function NovoETPPage() {
         </Card>
       )}
     </div>
+  )
+}
+
+export default function NovoETPPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    }>
+      <NovoETPContent />
+    </Suspense>
   )
 }
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -9,7 +9,7 @@ import { FileText, AlertCircle, Loader2, CheckCircle2 } from "lucide-react"
 import { api } from "@/lib/axios"
 import { toast } from "sonner"
 
-export default function NovoTRPage() {
+function NovoTRContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const etpId = searchParams.get("etpId")
@@ -179,6 +179,21 @@ export default function NovoTRPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function NovoTRPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    }>
+      <NovoTRContent />
+    </Suspense>
   )
 }
 
