@@ -36,3 +36,19 @@ def create_plan(
 
     plan = crud_plan.create_plan(db=db, obj_in=plan_in)
     return plan
+
+
+@router.get("/{plan_id}", response_model=schemas.Plan)
+def read_plan(
+    *,
+    db: Session = Depends(deps.get_db),
+    plan_id: str,
+    current_user: dict = Depends(deps.get_current_user)
+):
+    """
+    Get plan by ID.
+    """
+    plan = crud_plan.get_plan(db=db, plan_id=plan_id)
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    return plan
