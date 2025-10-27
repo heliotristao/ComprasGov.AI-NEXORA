@@ -211,6 +211,12 @@ function PlanDetailsPageComponent() {
     router.push("/plans")
   }
 
+  const handleEdit = () => {
+    if (planId) {
+      router.push(`/plans/${planId}/edit`)
+    }
+  }
+
   const displayPlanId = normalizedPlan?.id ?? planId ?? "Plano sem identificador"
 
   const { label: statusLabel, variant: statusVariant } = normalizedPlan
@@ -236,7 +242,12 @@ function PlanDetailsPageComponent() {
             <Button variant="outline" onClick={handleBack} className="w-full sm:w-auto">
               Voltar
             </Button>
-            <Button className="w-full sm:w-auto" variant="secondary">
+            <Button
+              className="w-full sm:w-auto"
+              variant="secondary"
+              onClick={handleEdit}
+              disabled={!planId}
+            >
               Editar
             </Button>
           </div>
