@@ -104,9 +104,55 @@ class DocumentGenerator:
         Returns:
             Caminho do arquivo gerado
         """
-        # Similar ao ETP, mas para TR
-        # TODO: Implementar
-        pass
+        # Buscar documento
+        documento = self.db.query(DocumentoTR).filter(
+            DocumentoTR.id == documento_id
+        ).first()
+        
+        if not documento:
+            raise ValueError(f"Documento {documento_id} não encontrado")
+        
+        # Buscar template
+        template = self.db.query(ModeloInstitucional).filter(
+            ModeloInstitucional.id == documento.template_id
+        ).first()
+        
+        if not template:
+            raise ValueError(f"Template {documento.template_id} não encontrado")
+        
+        # Buscar instituição
+        instituicao = self.db.query(Instituicao).filter(
+            Instituicao.id == template.instituicao_id
+        ).first()
+        
+        # Criar documento Word
+        doc = Document()
+        
+        # Aplicar configurações do template
+        self._aplicar_configuracoes(doc, template, instituicao)
+        
+        # Adicionar cabeçalho
+        self._adicionar_cabecalho(doc, template, instituicao)
+        
+        # Adicionar título
+        self._adicionar_titulo(doc, "TERMO DE REFERÊNCIA - TR")
+        
+        # Adicionar identificação
+        self._adicionar_identificacao_tr(doc, documento, template)
+        
+        # Adicionar conteúdo das seções
+        self._adicionar_secoes_tr(doc, documento, template)
+        
+        # Adicionar rodapé
+        self._adicionar_rodape(doc, template, instituicao)
+        
+        # Salvar documento
+        if not output_path:
+            output_path = f"/tmp/tr_{documento_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx"
+        
+        doc.save(output_path)
+        
+        return output_path
     
     def _aplicar_configuracoes(
         self,
@@ -331,4 +377,101 @@ class DocumentGenerator:
         
         # Por enquanto, apenas retornar path mockado
         return pdf_path
+
+
+
+    def _adicionar_identificacao_tr(
+        self,
+        doc: Document,
+        documento: DocumentoTR,
+        template: ModeloInstitucional
+    ):
+        """
+        Adiciona seção de identificação do documento TR
+        """
+        p = doc.add_paragraph()
+        p.add_run("IDENTIFICAÇÃO").bold = True
+        
+        # Número do documento
+        doc.add_paragraph(f"Documento nº: {documento.id}")
+        
+        # Referência ao ETP
+        if documento.etp_id:
+            doc.add_paragraph(f"Baseado no ETP nº: {documento.etp_id}")
+        
+        # Data de criação
+        doc.add_paragraph(
+            f"Data de Elaboração: {documento.created_at.strftime('%d/%m/%Y')}"
+        )
+        
+        # Versão do template
+        doc.add_paragraph(f"Modelo: {template.nome} (v{template.versao})")
+        
+        doc.add_paragraph()  # Espaço
+    
+    def _adicionar_secoes_tr(
+        self,
+        doc: Document,
+        documento: DocumentoTR,
+        template: ModeloInstitucional
+    ):
+        """
+        Adiciona todas as seções do documento TR
+        """
+        estrutura = template.estrutura
+        dados = documento.dados
+        
+        for secao in estrutura.get("secoes", []):
+            # Adicionar título da seção
+            p = doc.add_paragraph()
+            run = p.add_run(f"{secao['ordem']}. {secao['titulo'].upper()}")
+            run.bold = True
+            run.font.size = Pt(12)
+            
+            # Adicionar nota explicativa se houver
+            if secao.get("nota_explicativa"):
+                p = doc.add_paragraph()
+                run = p.add_run(f"Nota: {secao['nota_explicativa']}")
+                run.italic = True
+                run.font.size = Pt(9)
+                run.font.color.rgb = RGBColor(128, 128, 128)
+            
+            # Adicionar campos da seção
+            secao_dados = dados.get(secao["id"], {})
+            
+            for campo in secao.get("campos", []):
+                campo_valor = secao_dados.get(campo["id"], "")
+                
+                if campo_valor:
+                    # Adicionar label do campo
+                    p = doc.add_paragraph()
+                    run = p.add_run(f"{campo['label']}:")
+                    run.bold = True
+                    run.font.size = Pt(10)
+                    
+                    # Adicionar valor do campo
+                    if campo["tipo"] in ["textarea", "text"]:
+                        doc.add_paragraph(str(campo_valor))
+                    elif campo["tipo"] == "radio":
+                        doc.add_paragraph(f"☑ {campo_valor}")
+                    elif campo["tipo"] == "select":
+                        doc.add_paragraph(f"→ {campo_valor}")
+                    else:
+                        doc.add_paragraph(str(campo_valor))
+                    
+                    # Indicar se foi gerado por IA
+                    if campo["id"] in documento.campos_gerados_ia:
+                        p = doc.add_paragraph()
+                        run = p.add_run("✨ Conteúdo gerado com assistência de IA")
+                        run.italic = True
+                        run.font.size = Pt(8)
+                        run.font.color.rgb = RGBColor(100, 100, 200)
+                        
+                        # Adicionar score de confiança
+                        score = documento.scores_confianca_ia.get(campo["id"], 0)
+                        if score:
+                            run = p.add_run(f" (Confiança: {score*100:.0f}%)")
+                            run.font.size = Pt(8)
+            
+            doc.add_paragraph()  # Espaço entre seções
 
