@@ -4,7 +4,7 @@ import { useEffect, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
@@ -19,7 +19,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectItem } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import { api } from "@/lib/axios"
@@ -33,6 +35,9 @@ interface PlanDetailsResponse {
   name?: string
   description?: string
   justification?: string
+  estimated_value?: number | string | null
+  responsible_department?: string | null
+  priority?: string | null
   [key: string]: unknown
 }
 
@@ -40,7 +45,12 @@ interface NormalizedPlanDetails {
   id: string
   object: string
   justification: string
+  estimatedValue?: number
+  responsibleDepartment: string
+  priority: "Baixa" | "Média" | "Alta"
 }
+
+const PRIORITY_OPTIONS = ["Baixa", "Média", "Alta"] as const
 
 const editPlanSchema = z.object({
   object: z
@@ -51,6 +61,17 @@ const editPlanSchema = z.object({
     .string()
     .trim()
     .min(1, { message: "Descreva a justificativa da contratação." }),
+  estimated_value: z
+    .number()
+    .refine((value) => Number.isFinite(value), {
+      message: "Informe o valor estimado.",
+    })
+    .positive({ message: "O valor estimado deve ser maior que zero." }),
+  responsible_department: z
+    .string()
+    .trim()
+    .min(1, { message: "Informe o setor responsável." }),
+  priority: z.enum(PRIORITY_OPTIONS),
 })
 
 type EditPlanFormValues = z.infer<typeof editPlanSchema>
@@ -96,10 +117,35 @@ function normalizePlanDetails(
         ? details.description
         : "")
 
+  const estimatedValueRaw = details.estimated_value
+  const estimatedValue =
+    typeof estimatedValueRaw === "number"
+      ? estimatedValueRaw
+      : typeof estimatedValueRaw === "string"
+        ? Number.parseFloat(estimatedValueRaw)
+        : undefined
+
+  const responsibleDepartment =
+    typeof details.responsible_department === "string" &&
+    details.responsible_department.trim().length > 0
+      ? details.responsible_department.trim()
+      : ""
+
+  const priority =
+    typeof details.priority === "string" &&
+    PRIORITY_OPTIONS.includes(details.priority as (typeof PRIORITY_OPTIONS)[number])
+      ? (details.priority as (typeof PRIORITY_OPTIONS)[number])
+      : "Média"
+
   return {
     id,
     object,
     justification,
+    estimatedValue: Number.isFinite(estimatedValue ?? NaN)
+      ? (estimatedValue as number)
+      : undefined,
+    responsibleDepartment,
+    priority,
   }
 }
 
@@ -174,10 +220,13 @@ function PlanEditPageComponent() {
     return normalizePlanDetails(data, planId)
   }, [data, planId])
 
-  const defaultValues = useMemo(
+  const defaultValues = useMemo<Partial<EditPlanFormValues>>(
     () => ({
       object: normalizedPlan?.object ?? "",
       justification: normalizedPlan?.justification ?? "",
+      estimated_value: normalizedPlan?.estimatedValue,
+      responsible_department: normalizedPlan?.responsibleDepartment ?? "",
+      priority: normalizedPlan?.priority ?? "Média",
     }),
     [normalizedPlan]
   )
@@ -186,6 +235,7 @@ function PlanEditPageComponent() {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm<EditPlanFormValues>({
     resolver: zodResolver(editPlanSchema),
@@ -235,10 +285,18 @@ function PlanEditPageComponent() {
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <Skeleton className="h-5 w-48" />
-                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-10 w-full" />
               </div>
               <div className="space-y-2">
                 <Skeleton className="h-5 w-64" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-56" />
+                <Skeleton className="h-24 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-56" />
                 <Skeleton className="h-24 w-full" />
               </div>
             </CardContent>
@@ -266,11 +324,109 @@ function PlanEditPageComponent() {
                     Dados do plano
                   </CardTitle>
                   <CardDescription className="text-sm text-slate-600">
-                    Revise e ajuste o objeto e a justificativa da contratação conforme necessário.
+                    Revise e ajuste os atributos essenciais do plano de contratação conforme necessário.
                   </CardDescription>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="estimated_value">Valor Estimado</Label>
+                  <div className="flex">
+                    <span className="inline-flex items-center rounded-l-md border border-r-0 border-slate-300 bg-slate-100 px-3 text-sm text-slate-600">
+                      R$
+                    </span>
+                    <Input
+                      id="estimated_value"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      className="rounded-l-none"
+                      placeholder="Informe o valor previsto para a contratação"
+                      {...register("estimated_value", { valueAsNumber: true })}
+                      aria-invalid={Boolean(errors.estimated_value)}
+                      aria-describedby={
+                        errors.estimated_value
+                          ? "estimated-value-error"
+                          : "estimated-value-description"
+                      }
+                    />
+                  </div>
+                  <p id="estimated-value-description" className="text-sm text-slate-500">
+                    Utilize valores positivos com até duas casas decimais.
+                  </p>
+                  {errors.estimated_value ? (
+                    <p
+                      id="estimated-value-error"
+                      className="text-sm text-destructive"
+                      role="alert"
+                    >
+                      {errors.estimated_value.message}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="responsible_department">Setor Responsável</Label>
+                  <Input
+                    id="responsible_department"
+                    type="text"
+                    placeholder="Informe o órgão ou setor responsável pelo plano"
+                    {...register("responsible_department")}
+                    aria-invalid={Boolean(errors.responsible_department)}
+                    aria-describedby={
+                      errors.responsible_department
+                        ? "responsible-department-error"
+                        : "responsible-department-description"
+                    }
+                  />
+                  <p id="responsible-department-description" className="text-sm text-slate-500">
+                    Identifique o departamento que conduzirá as ações relacionadas ao plano.
+                  </p>
+                  {errors.responsible_department ? (
+                    <p
+                      id="responsible-department-error"
+                      className="text-sm text-destructive"
+                      role="alert"
+                    >
+                      {errors.responsible_department.message}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="priority">Prioridade</Label>
+                  <Controller
+                    control={control}
+                    name="priority"
+                    render={({ field }) => (
+                      <Select
+                        id="priority"
+                        value={field.value ?? ""}
+                        onValueChange={field.onChange}
+                        placeholder="Selecione a prioridade"
+                        aria-invalid={Boolean(errors.priority)}
+                        aria-describedby={
+                          errors.priority
+                            ? "priority-error"
+                            : "priority-description"
+                        }
+                      >
+                        <SelectItem value="Baixa">Baixa</SelectItem>
+                        <SelectItem value="Média">Média</SelectItem>
+                        <SelectItem value="Alta">Alta</SelectItem>
+                      </Select>
+                    )}
+                  />
+                  <p id="priority-description" className="text-sm text-slate-500">
+                    Defina o nível de urgência para execução do plano.
+                  </p>
+                  {errors.priority ? (
+                    <p id="priority-error" className="text-sm text-destructive" role="alert">
+                      {errors.priority.message}
+                    </p>
+                  ) : null}
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="object">Objeto da Contratação</Label>
                   <Textarea
