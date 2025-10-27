@@ -20,13 +20,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Select, SelectItem } from "@/components/ui/select"
 import { 
   Plus, 
   Search, 
@@ -240,27 +234,17 @@ export default function ModelosInstitucionaisPage() {
               />
             </div>
 
-            <Select value={filtroTipo} onValueChange={setFiltroTipo}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos os tipos</SelectItem>
-                <SelectItem value="ETP">ETP</SelectItem>
-                <SelectItem value="TR">TR</SelectItem>
-              </SelectContent>
+            <Select value={filtroTipo} onValueChange={setFiltroTipo} placeholder="Tipo" className="w-[180px]">
+              <SelectItem value="todos">Todos os tipos</SelectItem>
+              <SelectItem value="ETP">ETP</SelectItem>
+              <SelectItem value="TR">TR</SelectItem>
             </Select>
 
-            <Select value={filtroStatus} onValueChange={setFiltroStatus}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos os status</SelectItem>
-                <SelectItem value="ativo">Ativo</SelectItem>
-                <SelectItem value="rascunho">Rascunho</SelectItem>
-                <SelectItem value="arquivado">Arquivado</SelectItem>
-              </SelectContent>
+            <Select value={filtroStatus} onValueChange={setFiltroStatus} placeholder="Status" className="w-[180px]">
+              <SelectItem value="todos">Todos os status</SelectItem>
+              <SelectItem value="ativo">Ativo</SelectItem>
+              <SelectItem value="rascunho">Rascunho</SelectItem>
+              <SelectItem value="arquivado">Arquivado</SelectItem>
             </Select>
           </div>
         </CardContent>

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectItem } from "@/components/ui/select"
 import { Card } from "@/components/ui/card"
 import { Sparkles, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -156,17 +156,13 @@ export function ETPSecaoForm({
           <Select
             value={valor}
             onValueChange={(v) => handleChange(campo.id, v)}
+            placeholder="Selecione uma opção"
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione uma opção" />
-            </SelectTrigger>
-            <SelectContent>
-              {campo.opcoes.map((opcao) => (
-                <SelectItem key={opcao} value={opcao}>
-                  {opcao}
-                </SelectItem>
-              ))}
-            </SelectContent>
+            {campo.opcoes.map((opcao) => (
+              <SelectItem key={opcao} value={opcao}>
+                {opcao}
+              </SelectItem>
+            ))}
           </Select>
         )}
 

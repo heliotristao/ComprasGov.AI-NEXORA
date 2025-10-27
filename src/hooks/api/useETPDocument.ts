@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { apiClient } from "@/lib/axios"
+import { api } from "@/lib/axios"
 
 interface DocumentoETP {
   id: number
@@ -46,7 +46,7 @@ export function useETPDocument(documentoId: number) {
   } = useQuery<DocumentoETP>({
     queryKey: ["etp-documento", documentoId],
     queryFn: async () => {
-      const response = await apiClient.get(`/api/v1/etp/${documentoId}`)
+      const response = await api.get(`/api/v1/etp/${documentoId}`)
       return response.data
     },
     enabled: !!documentoId
@@ -59,7 +59,7 @@ export function useETPDocument(documentoId: number) {
   } = useQuery<Template>({
     queryKey: ["template", documento?.template_id],
     queryFn: async () => {
-      const response = await apiClient.get(`/api/v1/modelos-institucionais/${documento?.template_id}`)
+      const response = await api.get(`/api/v1/modelos-institucionais/${documento?.template_id}`)
       return response.data
     },
     enabled: !!documento?.template_id
@@ -68,7 +68,7 @@ export function useETPDocument(documentoId: number) {
   // Mutation para atualizar dados
   const updateMutation = useMutation({
     mutationFn: async (dados: Record<string, any>) => {
-      const response = await apiClient.put(`/api/v1/etp/${documentoId}`, {
+      const response = await api.put(`/api/v1/etp/${documentoId}`, {
         dados
       })
       return response.data
@@ -81,7 +81,7 @@ export function useETPDocument(documentoId: number) {
   // Mutation para validar conformidade
   const validarMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiClient.get(`/api/v1/etp/${documentoId}/validar`)
+      const response = await api.get(`/api/v1/etp/${documentoId}/validar`)
       return response.data
     }
   })
@@ -94,7 +94,7 @@ export function useETPDocument(documentoId: number) {
       contexto: Record<string, any>
       prompt_customizado?: string
     }) => {
-      const response = await apiClient.post(`/api/v1/etp/${documentoId}/gerar-campo`, params)
+      const response = await api.post(`/api/v1/etp/${documentoId}/gerar-campo`, params)
       return response.data
     }
   })
@@ -106,7 +106,7 @@ export function useETPDocument(documentoId: number) {
       conteudo: string
       score_confianca: number
     }) => {
-      const response = await apiClient.post(
+      const response = await api.post(
         `/api/v1/etp/${documentoId}/aceitar-ia/${params.campo_id}`,
         {
           conteudo: params.conteudo,
