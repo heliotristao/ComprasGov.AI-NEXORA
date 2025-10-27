@@ -288,17 +288,22 @@ export default function ConsolidarETPPage({ params }: { params: { id: string } }
             </Alert>
 
             <div className="flex gap-4">
-              <Button asChild className="flex-1" size="lg">
-                <a href={documentoGerado} download>
-                  <Download className="h-4 w-4 mr-2" />
-                  Baixar DOCX
-                </a>
+              <Button 
+                className="flex-1" 
+                size="lg"
+                onClick={() => window.open(documentoGerado, '_blank')}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Baixar DOCX
               </Button>
-              <Button variant="outline" asChild className="flex-1" size="lg">
-                <a href={documentoGerado.replace('.docx', '.pdf')} download>
-                  <Download className="h-4 w-4 mr-2" />
-                  Baixar PDF
-                </a>
+              <Button 
+                variant="outline" 
+                className="flex-1" 
+                size="lg"
+                onClick={() => window.open(documentoGerado.replace('.docx', '.pdf'), '_blank')}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Baixar PDF
               </Button>
             </div>
 
