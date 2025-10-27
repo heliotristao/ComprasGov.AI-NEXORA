@@ -24,6 +24,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectItem } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
+import { TextInput } from "@/components/forms/text-input"
+import { TextareaInput } from "@/components/forms/textarea-input"
 import { api } from "@/lib/axios"
 import { useAuthStore } from "@/stores/authStore"
 
@@ -365,33 +367,14 @@ function PlanEditPageComponent() {
                   ) : null}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="responsible_department">Setor Responsável</Label>
-                  <Input
-                    id="responsible_department"
-                    type="text"
-                    placeholder="Informe o órgão ou setor responsável pelo plano"
-                    {...register("responsible_department")}
-                    aria-invalid={Boolean(errors.responsible_department)}
-                    aria-describedby={
-                      errors.responsible_department
-                        ? "responsible-department-error"
-                        : "responsible-department-description"
-                    }
-                  />
-                  <p id="responsible-department-description" className="text-sm text-slate-500">
-                    Identifique o departamento que conduzirá as ações relacionadas ao plano.
-                  </p>
-                  {errors.responsible_department ? (
-                    <p
-                      id="responsible-department-error"
-                      className="text-sm text-destructive"
-                      role="alert"
-                    >
-                      {errors.responsible_department.message}
-                    </p>
-                  ) : null}
-                </div>
+                <TextInput
+                  label="Setor Responsável"
+                  name="responsible_department"
+                  control={control}
+                  description="Identifique o departamento que conduzirá as ações relacionadas ao plano."
+                  placeholder="Informe o órgão ou setor responsável pelo plano"
+                  required
+                />
 
                 <div className="space-y-2">
                   <Label htmlFor="priority">Prioridade</Label>
@@ -427,57 +410,27 @@ function PlanEditPageComponent() {
                   ) : null}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="object">Objeto da Contratação</Label>
-                  <Textarea
-                    id="object"
-                    {...register("object")}
-                    placeholder="Descreva detalhadamente o que será contratado."
-                    rows={6}
-                    aria-invalid={Boolean(errors.object)}
-                    aria-describedby={errors.object ? "object-error" : "object-description"}
-                  />
-                  <p id="object-description" className="text-sm text-slate-500">
-                    Inclua escopo, quantidades e principais requisitos técnicos.
-                  </p>
-                  {errors.object ? (
-                    <p
-                      id="object-error"
-                      className="text-sm text-destructive"
-                      role="alert"
-                    >
-                      {errors.object.message}
-                    </p>
-                  ) : null}
-                </div>
+                <TextareaInput
+                  label="Objeto da Contratação"
+                  name="object"
+                  control={control}
+                  description="Inclua escopo, quantidades e principais requisitos técnicos."
+                  placeholder="Descreva detalhadamente o que será contratado."
+                  rows={6}
+                  required
+                />
 
-                <div className="space-y-2">
-                  <Label htmlFor="justification">Justificativa da Contratação</Label>
-                  <Textarea
-                    id="justification"
-                    {...register("justification")}
-                    placeholder="Explique o motivo e a necessidade da contratação."
-                    rows={6}
-                    aria-invalid={Boolean(errors.justification)}
-                    aria-describedby={
-                      errors.justification
-                        ? "justification-error"
-                        : "justification-description"
-                    }
-                  />
-                  <p id="justification-description" className="text-sm text-slate-500">
-                    Aponte o problema a ser resolvido, benefícios esperados e base legal.
-                  </p>
-                  {errors.justification ? (
-                    <p
-                      id="justification-error"
-                      className="text-sm text-destructive"
-                      role="alert"
-                    >
-                      {errors.justification.message}
-                    </p>
-                  ) : null}
-                </div>
+                <TextareaInput
+                  label="Justificativa da Contratação"
+                  name="justification"
+                  control={control}
+                  description="Aponte o problema a ser resolvido, benefícios esperados e base legal."
+                  placeholder="Explique o motivo e a necessidade da contratação."
+                  rows={6}
+                  maxLength={1000}
+                  showCharCount
+                  required
+                />
               </CardContent>
               <CardFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end">
                 <Button type="button" variant="outline" onClick={handleCancel}>

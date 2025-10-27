@@ -119,7 +119,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                 <Bell className="h-5 w-5" />
                 {notificationCount > 0 && (
                   <Badge
-                    variant="destructive"
+                    variant="warning"
                     className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 text-[10px]"
                   >
                     {notificationCount}
