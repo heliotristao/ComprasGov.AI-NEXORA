@@ -11,7 +11,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from sqlalchemy.orm import Session
-from app.db.base import SessionLocal, engine
+from app.db.session import SessionLocal, engine
+from app.db.base import Base
 from app.db.models.templates_gestao import (
     CampoObrigatorioLei,
     Instituicao,
