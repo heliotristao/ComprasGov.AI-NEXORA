@@ -16,6 +16,7 @@ from app.llm.chains.solution_comparison_chain import get_solution_comparison_cha
 from app.llm.chains.technical_viability_chain import get_technical_viability_chain
 from app.llm.chains.quantities_timeline_chain import get_quantities_timeline_chain
 from app.llm.chains.technical_specs_chain import get_technical_specs_chain
+from app.services.ai_provider import get_ai_provider
 
 
 class ETPAIService:
@@ -26,6 +27,7 @@ class ETPAIService:
     def __init__(self, db: Session):
         self.db = db
         self.llm = ChatOpenAI(model_name="gpt-4o", temperature=0.7)
+        self.ai_provider = get_ai_provider()
     
     async def gerar_campo(
         self,

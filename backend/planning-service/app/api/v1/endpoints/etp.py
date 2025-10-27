@@ -432,17 +432,53 @@ def calcular_progresso(documento: DocumentoETP, db: Session) -> Dict[str, Any]:
     """
     Calcula o progresso de preenchimento do documento
     """
-    # TODO: Implementar lógica real
-    # - Contar campos obrigatórios preenchidos
-    # - Calcular percentual
+    # Obter template
+    template = db.query(ModeloInstitucional).filter(
+        ModeloInstitucional.id == documento.template_id
+    ).first()
+    
+    if not template or not template.estrutura:
+        return {
+            "percentual": 0,
+            "campos_preenchidos": {}
+        }
+    
+    # Obter campos obrigatórios da lei
+    campos_lei = db.query(CampoObrigatorioLei).filter(
+        CampoObrigatorioLei.tipo_documento == "ETP",
+        CampoObrigatorioLei.obrigatorio == True
+    ).all()
+    
+    campos_obrigatorios_ids = {campo.codigo for campo.id in campos_lei}
+    
+    # Verificar quais campos estão preenchidos
+    campos_preenchidos = {}
+    total_campos = 0
+    campos_completos = 0
+    
+    dados = documento.dados or {}
+    
+    # Percorrer seções do template
+    for secao in template.estrutura.get("secoes", []):
+        for campo in secao.get("campos", []):
+            campo_id = campo.get("id")
+            total_campos += 1
+            
+            # Verificar se campo está preenchido
+            valor = dados.get(campo_id)
+            is_preenchido = bool(valor and str(valor).strip())
+            
+            campos_preenchidos[campo_id] = is_preenchido
+            
+            if is_preenchido:
+                campos_completos += 1
+    
+    # Calcular percentual
+    percentual = int((campos_completos / total_campos * 100)) if total_campos > 0 else 0
     
     return {
-        "percentual": 30,
-        "campos_preenchidos": {
-            "ETP-I": True,
-            "ETP-II": True,
-            "ETP-IV": False
-        }
+        "percentual": percentual,
+        "campos_preenchidos": campos_preenchidos
     }
 
 
@@ -450,18 +486,63 @@ def validar_documento(documento: DocumentoETP, template: ModeloInstitucional, ca
     """
     Valida conformidade do documento com a lei
     """
-    # TODO: Implementar lógica real de validação
+    dados = documento.dados or {}
+    mapeamento = template.mapeamento_lei or {}
+    
+    campos_obrigatorios_faltantes = []
+    avisos = []
+    
+    total_campos = 0
+    campos_preenchidos_count = 0
+    campos_obrigatorios_count = len(campos_lei)
+    campos_obrigatorios_preenchidos = 0
+    
+    # Verificar cada campo obrigatório da lei
+    for campo_lei in campos_lei:
+        # Obter mapeamento deste campo no template
+        campos_template = mapeamento.get(campo_lei.codigo, [])
+        
+        # Verificar se pelo menos um dos campos mapeados está preenchido
+        campo_preenchido = False
+        
+        for campo_id in campos_template:
+            valor = dados.get(campo_id)
+            if valor and str(valor).strip():
+                campo_preenchido = True
+                break
+        
+        if campo_preenchido:
+            campos_obrigatorios_preenchidos += 1
+        else:
+            campos_obrigatorios_faltantes.append(campo_lei.codigo)
+    
+    # Contar todos os campos do template
+    for secao in template.estrutura.get("secoes", []):
+        for campo in secao.get("campos", []):
+            total_campos += 1
+            valor = dados.get(campo.get("id"))
+            if valor and str(valor).strip():
+                campos_preenchidos_count += 1
+            elif not campo.get("obrigatorio", False):
+                # Campo não-obrigatório não preenchido
+                avisos.append(f"Campo {campo.get('nome', campo.get('id'))} não preenchido (não-obrigatório)")
+    
+    # Calcular progresso
+    progresso = int((campos_preenchidos_count / total_campos * 100)) if total_campos > 0 else 0
+    
+    # Documento é válido se todos os campos obrigatórios estão preenchidos
+    valido = len(campos_obrigatorios_faltantes) == 0
     
     return ValidacaoConformidade(
-        valido=False,
-        campos_obrigatorios_faltantes=["ETP-IV", "ETP-VI", "ETP-VII"],
-        avisos=["Campo ETP-III não preenchido (não-obrigatório)"],
-        progresso_percentual=30,
+        valido=valido,
+        campos_obrigatorios_faltantes=campos_obrigatorios_faltantes,
+        avisos=avisos[:10],  # Limitar avisos
+        progresso_percentual=progresso,
         detalhes={
-            "total_campos": 13,
-            "campos_preenchidos": 4,
-            "campos_obrigatorios": 8,
-            "campos_obrigatorios_preenchidos": 2
+            "total_campos": total_campos,
+            "campos_preenchidos": campos_preenchidos_count,
+            "campos_obrigatorios": campos_obrigatorios_count,
+            "campos_obrigatorios_preenchidos": campos_obrigatorios_preenchidos
         }
     )
 
