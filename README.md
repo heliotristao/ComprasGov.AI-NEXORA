@@ -26,6 +26,7 @@ Ao importar o blueprint da Render, o campo de repositório não é preenchido au
 > Caso esteja usando um fork, confirme que a URL informada corresponde ao fork desejado antes de concluir a importação.
 
 ## 5. Histórico Técnico de Alterações
+* **[2025-10-26] - Tarefa BACKEND-P-11:** Criado o endpoint `PUT /plans/{plan_id}` e enriquecido o modelo de dados do Plano com novos atributos.
 * **[2025-10-26] - Tarefa BACKEND-P-10:** Criado o endpoint `GET /plans/{plan_id}` no `planning-service` para obter os detalhes de um plano específico.
 * **[2025-10-26] - Tarefa BACKEND-P-09:** Criado o endpoint `POST /plans` no `planning-service` para a criação de novos planos de contratação.
 * **[2025-10-25] - Tarefa BACKEND-P-08:** Criado o endpoint `GET /plans` no `planning-service` para listar os planos de contratação.
