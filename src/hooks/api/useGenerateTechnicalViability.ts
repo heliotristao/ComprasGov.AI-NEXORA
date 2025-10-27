@@ -16,7 +16,7 @@ const generateTechnicalViability = async (
     '/api/planning/etp/generate/technical-viability',
     params,
   );
-  return response.data;
+  return response.data as GenerateTechnicalViabilityResponse;
 };
 
 export const useGenerateTechnicalViability = () => {

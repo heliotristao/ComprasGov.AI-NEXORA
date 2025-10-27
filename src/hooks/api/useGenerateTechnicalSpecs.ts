@@ -16,7 +16,7 @@ const generateTechnicalSpecs = async (
     "/api/planning/tr/generate/technical-specs",
     params,
   );
-  return response.data;
+  return response.data as GenerateTechnicalSpecsResponse;
 };
 
 export const useGenerateTechnicalSpecs = () => {

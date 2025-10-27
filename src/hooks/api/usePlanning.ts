@@ -11,7 +11,7 @@ export interface PlanningResponse {
 
 const fetchPlanning = async (id: string): Promise<PlanningResponse> => {
   const { data } = await api.get(`/api/planning/${id}`);
-  return data;
+  return data as PlanningResponse;
 };
 
 export const usePlanning = (id: string) => {

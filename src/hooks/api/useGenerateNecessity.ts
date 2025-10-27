@@ -11,7 +11,7 @@ interface GenerateNecessityResponse {
 
 const generateNecessity = async (params: GenerateNecessityParams): Promise<GenerateNecessityResponse> => {
   const response = await api.post('/api/planning/etp/generate/necessity', params);
-  return response.data;
+  return response.data as GenerateNecessityResponse;
 };
 
 export const useGenerateNecessity = () => {

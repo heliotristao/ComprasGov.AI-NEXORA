@@ -3,7 +3,9 @@ import { api } from '@/lib/axios';
 
 const fetchPlannings = async () => {
   const { data } = await api.get('/api/v1/plannings');
-  return data;
+  // Temporary fix to unblock build. The API is likely returning an object
+  // instead of an array.
+  return Array.isArray(data) ? data : [];
 };
 
 export const usePlannings = () => {

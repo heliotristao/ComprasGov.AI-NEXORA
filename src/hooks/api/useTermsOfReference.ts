@@ -21,7 +21,7 @@ const fetchTermsOfReference = async (
     `/api/planning/terms-of-reference/${planningId}`,
   );
 
-  return data;
+  return data as TermsOfReferenceResponse;
 };
 
 interface UpdateTermsOfReferenceVariables {
@@ -37,7 +37,7 @@ const updateTermsOfReference = async (
     payload,
   );
 
-  return data;
+  return data as TermsOfReferenceResponse;
 };
 
 export const useTermsOfReference = (planningId: string) => {

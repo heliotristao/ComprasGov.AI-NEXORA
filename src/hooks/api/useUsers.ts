@@ -22,7 +22,7 @@ type CreateUserInput = {
 
 const fetchUsers = async (): Promise<User[]> => {
   const { data } = await api.get('/users/');
-  return data;
+  return data as User[];
 };
 
 export const useUsers = () => {
@@ -34,7 +34,7 @@ export const useUsers = () => {
 
 const fetchRoles = async (): Promise<Role[]> => {
   const { data } = await api.get('/roles/');
-  return data;
+  return data as Role[];
 };
 
 export const useRoles = () => {
@@ -54,7 +54,7 @@ const createUserRequest = async ({ roles, ...userPayload }: CreateUserInput): Pr
     await Promise.all(roles.map((roleId) => api.post(`/users/${userId}/roles/${roleId}`)));
   }
 
-  return data;
+  return data as User;
 };
 
 export const useCreateUser = () => {
