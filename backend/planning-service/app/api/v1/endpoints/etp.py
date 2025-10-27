@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional, Dict, Any
 
 from app.db.base import get_db
+from app.api.v1.dependencies import get_current_user
 from app.schemas.etp_schemas import (
     DocumentoETPCreate,
     DocumentoETPUpdate,
@@ -185,8 +186,46 @@ async def excluir_documento_etp(
     
     db.delete(db_documento)
     db.commit()
-    
+
     return None
+
+
+@router.put("/etp/{documento_id}/section/{section_id}", response_model=Dict[str, str])
+async def salvar_secao_etp(
+    documento_id: int,
+    section_id: str,
+    payload: Dict[str, Any],
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Salva os dados de uma seção específica do ETP.
+    """
+    db_documento = db.query(DocumentoETP).filter(DocumentoETP.id == documento_id).first()
+
+    if not db_documento:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Documento ETP não encontrado"
+        )
+
+    # TODO: Verify user permissions
+
+    # Initialize dados as a dictionary if it's None
+    if db_documento.dados is None:
+        db_documento.dados = {}
+
+    # Merge the new data for the specific section
+    db_documento.dados[section_id] = payload
+
+    # Mark the JSONB field as modified
+    from sqlalchemy.orm.attributes import flag_modified
+    flag_modified(db_documento, "dados")
+
+    db.commit()
+    db.refresh(db_documento)
+
+    return {"message": f"Seção {section_id} salva com sucesso."}
 
 
 # ============================================================================

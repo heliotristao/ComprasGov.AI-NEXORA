@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-10-27] - Tarefa BACKEND-P-12:** Criado o endpoint para salvamento de dados do Wizard de ETP, permitindo a persistência do progresso do usuário.
 * **[2024-10-27] - Tarefa FEAT-ETP-TR-001:** Implementado sistema completo de ETP e TR com integração de IA, criação automática de TR a partir de ETP, gestão multi-tenant de templates e geração de documentos DOCX/PDF. (Commit: `2924849`)
 * **[2024-10-27] - Tarefa FIX-017:** Corrigidas as URLs dos endpoints da API no dashboard para incluir o prefixo `/api/v1`. (Commit: `6ce0587`)
 * **[2025-10-26] - Tarefa BACKEND-P-11:** Criado o endpoint `PUT /plans/{plan_id}` e enriquecido o modelo de dados do Plano com novos atributos.
