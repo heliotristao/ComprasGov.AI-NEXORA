@@ -108,6 +108,18 @@ export const PAGINATION = {
   PAGE_SIZE_OPTIONS: [10, 25, 50, 100],
 } as const
 
+// Export direto para facilitar uso
+export const PAGE_SIZE_OPTIONS = PAGINATION.PAGE_SIZE_OPTIONS
+
+// Status (alias para PROCESS_STATUS_LABELS)
+export const STATUS = {
+  DRAFT: "Rascunho",
+  PENDING: "Pendente",
+  APPROVED: "Aprovado",
+  REJECTED: "Rejeitado",
+  ARCHIVED: "Arquivado",
+} as const
+
 // Breakpoints (em pixels)
 export const BREAKPOINTS = {
   MOBILE: 640,
