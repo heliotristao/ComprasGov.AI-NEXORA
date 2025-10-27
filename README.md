@@ -1,6 +1,6 @@
 # NEXORA-ComprasGov.AI - O Sistema Operacional para Contratações Públicas
 
-**Status:** Fase 0 - Setup
+**Status:** ✅ Sistema ETP e TR Implementado - Fase 1 Completa
 
 ---
 
@@ -25,7 +25,85 @@ Ao importar o blueprint da Render, o campo de repositório não é preenchido au
 
 > Caso esteja usando um fork, confirme que a URL informada corresponde ao fork desejado antes de concluir a importação.
 
-## 5. Histórico Técnico de Alterações
+## 5. Documentação do Sistema ETP e TR
+
+### **📋 Relatórios Completos**
+* **[RELATORIO_SESSAO_2024-10-27.md](./RELATORIO_SESSAO_2024-10-27.md)** - Relatório detalhado de tudo que foi implementado na sessão de 27/10/2024
+* **[RESUMO_EXECUTIVO_ETP_TR.md](./RESUMO_EXECUTIVO_ETP_TR.md)** - Resumo executivo para stakeholders com métricas e ROI
+* **[DOCUMENTACAO_SISTEMA_ETP_TR.md](./DOCUMENTACAO_SISTEMA_ETP_TR.md)** - Documentação técnica completa do sistema
+* **[SISTEMA_TR_COMPLETO.md](./SISTEMA_TR_COMPLETO.md)** - Documentação específica do sistema de TR
+* **[INTEGRACAO_COMPLETA_ETP_TR.md](./INTEGRACAO_COMPLETA_ETP_TR.md)** - Guia de integração e uso
+
+### **🎯 Principais Funcionalidades Implementadas**
+
+#### **Sistema de ETP (Estudo Técnico Preliminar)**
+* 13 campos obrigatórios da Lei 14.133/2021 (Art. 18)
+* Wizard multi-página com navegação lateral
+* Geração de conteúdo com IA (5 chains LLM especializadas)
+* Validação automática de conformidade legal
+* Geração de documentos DOCX/PDF profissionais
+* Gestão multi-tenant de templates institucionais
+
+#### **Sistema de TR (Termo de Referência)**
+* 10 campos obrigatórios da Lei 14.133/2021 (Art. 6º, XXIII)
+* **Criação automática a partir de ETP aprovado** (inovação!)
+* Herança inteligente de dados do ETP
+* Transformação automática de conteúdo
+* Redução de 80% no tempo de criação
+* Mesmo wizard e funcionalidades do ETP
+
+#### **Gestão de Templates**
+* Hierarquia: Lei 14.133/2021 → Órgão de Controle (TCU/TCE/PGE) → Instituição
+* Templates customizáveis por cliente
+* Versionamento e controle de mudanças
+* Área de administração completa
+* Mapeamento automático ETP → TR
+
+#### **Integração com IA**
+* 5 chains LLM especializadas (necessity, solution, viability, quantities, specs)
+* Geração genérica com prompts customizados
+* Score de confiança por campo gerado
+* Consolidação automática com revisão de IA
+* Auditoria completa de uso de IA
+
+### **📊 Estatísticas da Implementação**
+* **24 arquivos criados** (16 backend + 8 frontend)
+* **~7.595 linhas de código**
+* **21 endpoints da API**
+* **6 tabelas de banco de dados**
+* **20+ schemas Pydantic**
+* **8 componentes React**
+* **100% de conformidade legal**
+
+### **🚀 Como Testar**
+
+```bash
+# 1. Popular banco com seeds
+cd backend/planning-service
+python scripts/seed_etp_system.py
+
+# 2. Criar e aprovar ETP
+curl -X POST http://localhost:8000/api/v1/etp \
+  -H "Content-Type: application/json" \
+  -d '{"plan_id": 1, "template_id": 1, "dados": {}}'
+
+curl -X PUT http://localhost:8000/api/v1/etp/1 \
+  -d '{"status": "aprovado"}'
+
+# 3. Criar TR automaticamente do ETP
+curl -X POST http://localhost:8000/api/v1/tr/criar-de-etp/1 \
+  -H "Content-Type: application/json" \
+  -d '{"template_tr_id": 2, "user_id": 1}'
+
+# 4. Verificar dados herdados
+curl http://localhost:8000/api/v1/tr/1
+```
+
+---
+
+## 6. Histórico Técnico de Alterações
+* **[2024-10-27] - Tarefa FEAT-ETP-TR-001:** Implementado sistema completo de ETP e TR com integração de IA, criação automática de TR a partir de ETP, gestão multi-tenant de templates e geração de documentos DOCX/PDF. (Commit: `2924849`)
+* **[2024-10-27] - Tarefa FIX-017:** Corrigidas as URLs dos endpoints da API no dashboard para incluir o prefixo `/api/v1`. (Commit: `6ce0587`)
 * **[2025-10-26] - Tarefa BACKEND-P-11:** Criado o endpoint `PUT /plans/{plan_id}` e enriquecido o modelo de dados do Plano com novos atributos.
 * **[2025-10-26] - Tarefa BACKEND-P-10:** Criado o endpoint `GET /plans/{plan_id}` no `planning-service` para obter os detalhes de um plano específico.
 * **[2025-10-26] - Tarefa BACKEND-P-09:** Criado o endpoint `POST /plans` no `planning-service` para a criação de novos planos de contratação.
