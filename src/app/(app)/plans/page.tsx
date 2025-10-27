@@ -181,6 +181,10 @@ function PlansPage() {
               <Edit className="mr-2 h-4 w-4" />
               Editar
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push(`/etp/novo?planId=${row.id}`)}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Criar ETP
+            </DropdownMenuItem>
             <DropdownMenuItem className="text-red-600">
               <Trash2 className="mr-2 h-4 w-4" />
               Excluir
