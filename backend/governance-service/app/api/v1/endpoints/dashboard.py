@@ -6,7 +6,7 @@ from decimal import Decimal
 from app.api.deps import get_db
 from app.schemas.plan import DashboardSummaryResponse
 from app.models.plan import Plan, PlanStatus
-from app.api.v1.endpoints.auth import get_current_user
+from app.api.deps import get_current_user
 
 router = APIRouter()
 
