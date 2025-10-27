@@ -2,7 +2,7 @@
 
 import { use } from "react"
 import { useRouter } from "next/navigation"
-import { ETPWizard } from "@/components/etp/ETPWizard"
+import { TRWizard } from "@/components/tr/TRWizard"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 
@@ -50,8 +50,7 @@ export default function TRWizardPage({ params }: PageProps) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Reutilizando o componente ETPWizard - ele funciona para ambos */}
-        <ETPWizard documentoId={documentoId} planId={0} />
+        <TRWizard documentoId={documentoId} etpId={0} />
       </div>
     </div>
   )
