@@ -121,8 +121,8 @@ export function ETPWizard({ documentoId, planId }: ETPWizardProps) {
     if (!dados) return "pendente"
 
     // Verificar se todos os campos obrigatórios estão preenchidos
-    const camposObrigatorios = secao.campos.filter(c => c.obrigatorio)
-    const camposPreenchidos = camposObrigatorios.filter(c => {
+    const camposObrigatorios = secao.campos.filter((c: any) => c.obrigatorio)
+    const camposPreenchidos = camposObrigatorios.filter((c: any) => {
       const valor = dados[c.id]
       return valor !== undefined && valor !== null && valor !== ""
     })
