@@ -1,0 +1,336 @@
+[
+  {
+    "codigo": "TR-1",
+    "nome": "Definição do objeto",
+    "descricao": "Definição precisa, suficiente e clara do objeto, vedadas especificações que, por excessivas, irrelevantes ou desnecessárias, limitem ou frustrem a competição ou a realização do fornecimento",
+    "tipo_documento": "TR",
+    "obrigatorio": true,
+    "artigo_lei": "Lei Federal nº 14.133/2021, art. 6º, XXIII, 'a'",
+    "ordem": 1,
+    "subcampos_sugeridos": [
+      {
+        "id": "descricao_objeto",
+        "label": "Descrição detalhada do objeto",
+        "tipo": "textarea",
+        "obrigatorio": true,
+        "placeholder": "Descreva o objeto da contratação de forma precisa e clara..."
+      },
+      {
+        "id": "especificacoes_tecnicas",
+        "label": "Especificações técnicas",
+        "tipo": "textarea",
+        "obrigatorio": true,
+        "placeholder": "Detalhe as especificações técnicas necessárias..."
+      },
+      {
+        "id": "unidade_fornecimento",
+        "label": "Unidade de fornecimento",
+        "tipo": "text",
+        "obrigatorio": true,
+        "placeholder": "Ex: unidade, metro, hora, etc."
+      }
+    ]
+  },
+  {
+    "codigo": "TR-2",
+    "nome": "Fundamentação da contratação",
+    "descricao": "Fundamentação da contratação, que consiste na referência aos estudos técnicos preliminares correspondentes ou, quando não for possível divulgar esses estudos, no extrato das partes que não contiverem informações sigilosas",
+    "tipo_documento": "TR",
+    "obrigatorio": true,
+    "artigo_lei": "Lei Federal nº 14.133/2021, art. 6º, XXIII, 'b'",
+    "ordem": 2,
+    "subcampos_sugeridos": [
+      {
+        "id": "referencia_etp",
+        "label": "Referência ao ETP",
+        "tipo": "text",
+        "obrigatorio": true,
+        "placeholder": "ETP nº ___/2024"
+      },
+      {
+        "id": "justificativa_contratacao",
+        "label": "Justificativa da contratação",
+        "tipo": "textarea",
+        "obrigatorio": true,
+        "placeholder": "Com base no ETP, justifique a necessidade da contratação..."
+      }
+    ]
+  },
+  {
+    "codigo": "TR-3",
+    "nome": "Descrição da solução",
+    "descricao": "Descrição da solução como um todo, considerado todo o ciclo de vida do objeto",
+    "tipo_documento": "TR",
+    "obrigatorio": true,
+    "artigo_lei": "Lei Federal nº 14.133/2021, art. 6º, XXIII, 'c'",
+    "ordem": 3,
+    "subcampos_sugeridos": [
+      {
+        "id": "solucao_escolhida",
+        "label": "Solução escolhida",
+        "tipo": "textarea",
+        "obrigatorio": true,
+        "placeholder": "Descreva a solução escolhida para atender à necessidade..."
+      },
+      {
+        "id": "ciclo_vida",
+        "label": "Considerações sobre o ciclo de vida",
+        "tipo": "textarea",
+        "obrigatorio": true,
+        "placeholder": "Descreva aspectos de aquisição, operação, manutenção e descarte..."
+      }
+    ]
+  },
+  {
+    "codigo": "TR-4",
+    "nome": "Requisitos da contratação",
+    "descricao": "Requisitos da contratação, incluindo requisitos de segurança",
+    "tipo_documento": "TR",
+    "obrigatorio": true,
+    "artigo_lei": "Lei Federal nº 14.133/2021, art. 6º, XXIII, 'd'",
+    "ordem": 4,
+    "subcampos_sugeridos": [
+      {
+        "id": "requisitos_tecnicos",
+        "label": "Requisitos técnicos",
+        "tipo": "textarea",
+        "obrigatorio": true,
+        "placeholder": "Liste os requisitos técnicos obrigatórios..."
+      },
+      {
+        "id": "requisitos_seguranca",
+        "label": "Requisitos de segurança",
+        "tipo": "textarea",
+        "obrigatorio": true,
+        "placeholder": "Descreva os requisitos de segurança aplicáveis..."
+      },
+      {
+        "id": "requisitos_qualidade",
+        "label": "Requisitos de qualidade",
+        "tipo": "textarea",
+        "obrigatorio": false,
+        "placeholder": "Descreva padrões de qualidade esperados..."
+      }
+    ]
+  },
+  {
+    "codigo": "TR-5",
+    "nome": "Modelo de execução do objeto",
+    "descricao": "Modelo de execução do objeto, quando aplicável",
+    "tipo_documento": "TR",
+    "obrigatorio": true,
+    "artigo_lei": "Lei Federal nº 14.133/2021, art. 6º, XXIII, 'e'",
+    "ordem": 5,
+    "subcampos_sugeridos": [
+      {
+        "id": "forma_execucao",
+        "label": "Forma de execução",
+        "tipo": "select",
+        "obrigatorio": true,
+        "opcoes": ["Execução direta", "Execução indireta", "Execução mista"]
+      },
+      {
+        "id": "metodologia",
+        "label": "Metodologia de execução",
+        "tipo": "textarea",
+        "obrigatorio": true,
+        "placeholder": "Descreva como o objeto será executado..."
+      },
+      {
+        "id": "etapas_execucao",
+        "label": "Etapas de execução",
+        "tipo": "textarea",
+        "obrigatorio": true,
+        "placeholder": "Descreva as etapas e marcos de execução..."
+      }
+    ]
+  },
+  {
+    "codigo": "TR-6",
+    "nome": "Modelo de gestão contratual",
+    "descricao": "Modelo de gestão contratual, quando aplicável",
+    "tipo_documento": "TR",
+    "obrigatorio": true,
+    "artigo_lei": "Lei Federal nº 14.133/2021, art. 6º, XXIII, 'f'",
+    "ordem": 6,
+    "subcampos_sugeridos": [
+      {
+        "id": "gestor_contrato",
+        "label": "Gestor do contrato",
+        "tipo": "text",
+        "obrigatorio": true,
+        "placeholder": "Nome e cargo do gestor"
+      },
+      {
+        "id": "fiscal_contrato",
+        "label": "Fiscal do contrato",
+        "tipo": "text",
+        "obrigatorio": true,
+        "placeholder": "Nome e cargo do fiscal"
+      },
+      {
+        "id": "mecanismos_controle",
+        "label": "Mecanismos de controle",
+        "tipo": "textarea",
+        "obrigatorio": true,
+        "placeholder": "Descreva os mecanismos de acompanhamento e controle..."
+      }
+    ]
+  },
+  {
+    "codigo": "TR-7",
+    "nome": "Critérios de medição e pagamento",
+    "descricao": "Critérios de medição e de pagamento",
+    "tipo_documento": "TR",
+    "obrigatorio": true,
+    "artigo_lei": "Lei Federal nº 14.133/2021, art. 6º, XXIII, 'g'",
+    "ordem": 7,
+    "subcampos_sugeridos": [
+      {
+        "id": "forma_medicao",
+        "label": "Forma de medição",
+        "tipo": "textarea",
+        "obrigatorio": true,
+        "placeholder": "Descreva como será feita a medição dos serviços/produtos..."
+      },
+      {
+        "id": "periodicidade_medicao",
+        "label": "Periodicidade da medição",
+        "tipo": "select",
+        "obrigatorio": true,
+        "opcoes": ["Mensal", "Quinzenal", "Semanal", "Por etapa", "Outro"]
+      },
+      {
+        "id": "forma_pagamento",
+        "label": "Forma de pagamento",
+        "tipo": "textarea",
+        "obrigatorio": true,
+        "placeholder": "Descreva as condições de pagamento..."
+      },
+      {
+        "id": "prazo_pagamento",
+        "label": "Prazo de pagamento",
+        "tipo": "text",
+        "obrigatorio": true,
+        "placeholder": "Ex: 30 dias após apresentação da nota fiscal"
+      }
+    ]
+  },
+  {
+    "codigo": "TR-8",
+    "nome": "Forma e critérios de seleção do fornecedor",
+    "descricao": "Forma e critérios de seleção do fornecedor",
+    "tipo_documento": "TR",
+    "obrigatorio": true,
+    "artigo_lei": "Lei Federal nº 14.133/2021, art. 6º, XXIII, 'h'",
+    "ordem": 8,
+    "subcampos_sugeridos": [
+      {
+        "id": "modalidade_licitacao",
+        "label": "Modalidade de licitação",
+        "tipo": "select",
+        "obrigatorio": true,
+        "opcoes": ["Pregão", "Concorrência", "Concurso", "Leilão", "Diálogo competitivo", "Dispensa", "Inexigibilidade"]
+      },
+      {
+        "id": "criterio_julgamento",
+        "label": "Critério de julgamento",
+        "tipo": "select",
+        "obrigatorio": true,
+        "opcoes": ["Menor preço", "Maior desconto", "Melhor técnica ou conteúdo artístico", "Técnica e preço", "Maior retorno econômico"]
+      },
+      {
+        "id": "requisitos_habilitacao",
+        "label": "Requisitos de habilitação",
+        "tipo": "textarea",
+        "obrigatorio": true,
+        "placeholder": "Liste os requisitos para habilitação dos licitantes..."
+      }
+    ]
+  },
+  {
+    "codigo": "TR-9",
+    "nome": "Estimativas do valor da contratação",
+    "descricao": "Estimativas do valor da contratação, acompanhadas dos preços unitários referenciais, das memórias de cálculo e dos documentos que lhe dão suporte",
+    "tipo_documento": "TR",
+    "obrigatorio": true,
+    "artigo_lei": "Lei Federal nº 14.133/2021, art. 6º, XXIII, 'i'",
+    "ordem": 9,
+    "subcampos_sugeridos": [
+      {
+        "id": "valor_estimado_total",
+        "label": "Valor estimado total",
+        "tipo": "currency",
+        "obrigatorio": true,
+        "placeholder": "R$ 0,00"
+      },
+      {
+        "id": "precos_unitarios",
+        "label": "Preços unitários referenciais",
+        "tipo": "table",
+        "obrigatorio": true
+      },
+      {
+        "id": "memoria_calculo",
+        "label": "Memória de cálculo",
+        "tipo": "textarea",
+        "obrigatorio": true,
+        "placeholder": "Descreva como foi calculado o valor estimado..."
+      },
+      {
+        "id": "fontes_pesquisa",
+        "label": "Fontes de pesquisa de preços",
+        "tipo": "textarea",
+        "obrigatorio": true,
+        "placeholder": "Liste as fontes utilizadas para pesquisa de preços..."
+      }
+    ]
+  },
+  {
+    "codigo": "TR-10",
+    "nome": "Adequação orçamentária",
+    "descricao": "Adequação orçamentária, consignada a partir do exercício financeiro seguinte, se necessário",
+    "tipo_documento": "TR",
+    "obrigatorio": true,
+    "artigo_lei": "Lei Federal nº 14.133/2021, art. 6º, XXIII, 'j'",
+    "ordem": 10,
+    "subcampos_sugeridos": [
+      {
+        "id": "programa_trabalho",
+        "label": "Programa de trabalho",
+        "tipo": "text",
+        "obrigatorio": true,
+        "placeholder": "Código do programa de trabalho"
+      },
+      {
+        "id": "elemento_despesa",
+        "label": "Elemento de despesa",
+        "tipo": "text",
+        "obrigatorio": true,
+        "placeholder": "Código do elemento de despesa"
+      },
+      {
+        "id": "fonte_recursos",
+        "label": "Fonte de recursos",
+        "tipo": "text",
+        "obrigatorio": true,
+        "placeholder": "Código da fonte de recursos"
+      },
+      {
+        "id": "exercicio_financeiro",
+        "label": "Exercício(s) financeiro(s)",
+        "tipo": "text",
+        "obrigatorio": true,
+        "placeholder": "Ex: 2024, 2024/2025"
+      },
+      {
+        "id": "valor_previsto",
+        "label": "Valor previsto no orçamento",
+        "tipo": "currency",
+        "obrigatorio": true,
+        "placeholder": "R$ 0,00"
+      }
+    ]
+  }
+]
+
