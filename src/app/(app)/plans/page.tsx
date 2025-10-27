@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useMemo } from "react"
+import { useRouter } from "next/navigation"
 
 import { MoreHorizontal, PlusCircle } from "lucide-react"
 
@@ -114,6 +115,7 @@ const skeletonRows = Array.from({ length: 5 })
 
 function PlansPageComponent() {
   const { data, isLoading, isError } = usePlans()
+  const router = useRouter()
 
   const plans = useMemo(() => {
     if (!data || data.length === 0) {
@@ -218,7 +220,13 @@ function PlansPageComponent() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Visualizar</DropdownMenuItem>
+                            <DropdownMenuItem
+                              onSelect={() =>
+                                router.push(`/plans/${encodeURIComponent(plan.id)}`)
+                              }
+                            >
+                              Visualizar
+                            </DropdownMenuItem>
                             <DropdownMenuItem>Editar</DropdownMenuItem>
                             <DropdownMenuItem>Excluir</DropdownMenuItem>
                           </DropdownMenuContent>
