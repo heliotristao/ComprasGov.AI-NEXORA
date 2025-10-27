@@ -15,3 +15,6 @@ def create_plan(db: Session, *, obj_in: PlanCreate) -> Plan:
     db.commit()
     db.refresh(db_obj)
     return db_obj
+
+def get_plan(db: Session, *, plan_id: str) -> Plan | None:
+    return db.query(Plan).filter(Plan.id == plan_id).first()

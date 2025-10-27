@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 class PlanBase(BaseModel):
     objective: str
@@ -10,6 +11,7 @@ class PlanCreate(PlanBase):
 class Plan(PlanBase):
     id: str
     status: str
+    created_at: datetime
 
     class Config:
         from_attributes = True
