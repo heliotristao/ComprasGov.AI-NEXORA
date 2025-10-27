@@ -15,6 +15,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Progress } from "@/components/ui/progress"
 import { Sparkles, Loader2, Check, X, Edit2 } from "lucide-react"
 import { toast } from "sonner"
+import { api } from "@/lib/axios"
 
 interface Campo {
   id: string
@@ -51,24 +52,12 @@ export function GerarCampoIADialog({
     setGerando(true)
     
     try {
-      // TODO: Chamar API real
-      const response = await fetch(`/api/v1/etp/${documentoId}/gerar-campo`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          secao_id: secaoId,
-          campo_id: campo.id,
-          contexto: contexto
-        })
+      // Chamar API real usando axios
+      const { data } = await api.post(`/api/v1/etp/${documentoId}/gerar-campo`, {
+        secao_id: secaoId,
+        campo_id: campo.id,
+        contexto: contexto
       })
-
-      if (!response.ok) {
-        throw new Error("Erro ao gerar conteúdo")
-      }
-
-      const data = await response.json()
       
       setConteudoGerado(data.conteudo_gerado)
       setScoreConfianca(data.score_confianca * 100)
