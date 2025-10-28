@@ -38,7 +38,7 @@ export const trBensSchema = z.object({
   }),
   quantidades: z.object({
     quantidadeTotal: z.coerce
-      .number({ invalid_type_error: "Informe uma quantidade válida." })
+      .number({ message: "Informe uma quantidade válida." })
       .min(1, "Informe a quantidade estimada."),
     unidadeMedida: z
       .string()
@@ -87,7 +87,7 @@ export const trServicosSchema = z.object({
   }),
   dimensionamento: z.object({
     quantidadeProfissionais: z.coerce
-      .number({ invalid_type_error: "Informe a quantidade de profissionais." })
+      .number({ message: "Informe a quantidade de profissionais." })
       .min(1, "Informe a quantidade estimada de profissionais."),
     cargaHoraria: z
       .string()

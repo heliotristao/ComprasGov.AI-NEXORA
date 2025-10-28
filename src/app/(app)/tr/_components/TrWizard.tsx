@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FormProvider, useForm } from "react-hook-form"
+import { FormProvider, useForm, type Resolver } from "react-hook-form"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 
@@ -181,6 +181,15 @@ function normalizeStatus(status: string | null | undefined): StatusVariant {
   return "DRAFT"
 }
 
+function toNumberOrNaN(value: unknown): number {
+  if (value === null || value === undefined || value === "") {
+    return Number.NaN
+  }
+
+  const parsed = Number(value)
+  return Number.isNaN(parsed) ? Number.NaN : parsed
+}
+
 function buildDefaultValues(tr: TrRecord, tipo: TrType): TrFormValues {
   const formData = (tr.formData ?? {}) as Record<string, any>
 
@@ -200,12 +209,9 @@ function buildDefaultValues(tr: TrRecord, tipo: TrType): TrFormValues {
         normasReferencia: formData?.especificacoes?.normasReferencia ?? "",
       },
       quantidades: {
-        quantidadeTotal:
-          formData?.quantidades?.quantidadeTotal !== undefined
-            ? Number(formData?.quantidades?.quantidadeTotal)
-            : formData?.quantidades?.quantidade_total !== undefined
-              ? Number(formData?.quantidades?.quantidade_total)
-              : undefined,
+        quantidadeTotal: toNumberOrNaN(
+          formData?.quantidades?.quantidadeTotal ?? formData?.quantidades?.quantidade_total
+        ),
         unidadeMedida: formData?.quantidades?.unidadeMedida ?? formData?.quantidades?.unidade_medida ?? "",
         justificativaQuantidade:
           formData?.quantidades?.justificativaQuantidade ?? formData?.quantidades?.justificativa_quantidade ?? "",
@@ -231,12 +237,10 @@ function buildDefaultValues(tr: TrRecord, tipo: TrType): TrFormValues {
       requisitosTecnicos: formData?.escopo?.requisitosTecnicos ?? formData?.escopo?.requisitos_tecnicos ?? "",
     },
     dimensionamento: {
-      quantidadeProfissionais:
-        formData?.dimensionamento?.quantidadeProfissionais !== undefined
-          ? Number(formData?.dimensionamento?.quantidadeProfissionais)
-          : formData?.dimensionamento?.quantidade_profissionais !== undefined
-            ? Number(formData?.dimensionamento?.quantidade_profissionais)
-            : undefined,
+      quantidadeProfissionais: toNumberOrNaN(
+        formData?.dimensionamento?.quantidadeProfissionais ??
+          formData?.dimensionamento?.quantidade_profissionais
+      ),
       cargaHoraria: formData?.dimensionamento?.cargaHoraria ?? formData?.dimensionamento?.carga_horaria ?? "",
       criteriosAlocacao:
         formData?.dimensionamento?.criteriosAlocacao ?? formData?.dimensionamento?.criterios_alocacao ?? "",
@@ -279,7 +283,7 @@ export function TrWizard({ tr, initialStep = 1, tipo }: TrWizardProps) {
   const defaultValues = React.useMemo(() => buildDefaultValues(tr, tipo), [tr, tipo])
 
   const methods = useForm<TrFormValues>({
-    resolver: zodResolver(trFormSchema),
+    resolver: zodResolver(trFormSchema) as Resolver<TrFormValues>,
     mode: "onChange",
     defaultValues,
   })
