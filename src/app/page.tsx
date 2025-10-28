@@ -1,30 +1,49 @@
+"use client"
 
-"use client";
-import Link from "next/link";
-import { useState } from "react";
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Loader2 } from "lucide-react"
 
-export default function DashboardPage() {
-  const [items] = useState([
-    { label: "Novo Planejamento (PCA/DFD)", href: "/wizard/planning" },
-    { label: "Novo ETP", href: "/wizard/etp" },
-    { label: "Novo TR (Bens)", href: "/wizard/tr-bens" },
-    { label: "Novo TR (Serviços)", href: "/wizard/tr-servicos" },
-  ]);
+import { useAuthStore } from "@/stores/authStore"
+
+export default function HomePage() {
+  const router = useRouter()
+  const token = useAuthStore((state) => state.token)
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return
+    }
+
+    const redirectTo = (tokenValue: string | null | undefined) => {
+      if (tokenValue) {
+        router.replace("/dashboard")
+        return
+      }
+
+      router.replace("/login")
+    }
+
+    if (useAuthStore.persist.hasHydrated()) {
+      redirectTo(token)
+      return
+    }
+
+    const unsubscribe = useAuthStore.persist.onFinishHydration?.((state) => {
+      redirectTo(state?.token as string | null | undefined)
+    })
+
+    useAuthStore.persist.rehydrate?.()
+
+    return () => {
+      unsubscribe?.()
+    }
+  }, [router, token])
 
   return (
-    <section className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {items.map((it) => (
-          <Link
-            key={it.href}
-            href={it.href}
-            className="rounded-2xl border bg-white p-4 shadow-sm transition hover:shadow-md"
-          >
-            <div className="text-lg font-semibold">{it.label}</div>
-            <div className="mt-2 text-sm text-gray-500">Acessar →</div>
-          </Link>
-        ))}
-      </div>
-    </section>
-  );
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50">
+      <Loader2 className="h-6 w-6 animate-spin text-slate-500" aria-hidden="true" />
+      <p className="mt-3 text-sm text-slate-500">Redirecionando para a aplicação...</p>
+    </div>
+  )
 }
