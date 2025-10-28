@@ -25,7 +25,7 @@ const planningSchema = z.object({
     .trim()
     .min(1, "Descreva o objeto da contratação."),
   estimativaValor: z.coerce
-    .number({ invalid_type_error: "Informe um valor numérico." })
+    .number({ message: "Informe um valor numérico." })
     .nonnegative("Informe um valor igual ou superior a zero."),
 })
 
