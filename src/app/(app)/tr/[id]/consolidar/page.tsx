@@ -109,12 +109,12 @@ function normalizeTemplateDefinition(rawTemplate: unknown) {
   }
 
   const rawId = rawTemplate.id ?? rawTemplate.template_id ?? rawTemplate.modelo_id
-  const normalizedId = normalizeIdValue(rawId)
+  const templateId = normalizeIdValue(rawId)
   const nome = pickStringValue([rawTemplate.nome, rawTemplate.name, rawTemplate.titulo])
   const estrutura = normalizeTemplateStructure(rawTemplate)
 
   const template = {
-    id: normalizedId ?? undefined,
+    id: templateId ?? undefined,
     nome: nome ?? undefined,
     estrutura: estrutura ?? undefined,
   }
@@ -269,7 +269,7 @@ function normalizeTemplatesPayload(payload: unknown): TemplateOption[] {
   return templates
 }
 
-export default async function ConsolidarEtpPage({ params }: PageParams) {
+export default async function ConsolidarTrPage({ params }: PageParams) {
   requireRole(["AGENTE", "CONTROLE_INTERNO"])
 
   const documentId = Number(params.id)
@@ -281,11 +281,11 @@ export default async function ConsolidarEtpPage({ params }: PageParams) {
   const cookieHeader = cookies().toString() || null
 
   const [documentResponse, templatesResponse] = await Promise.all([
-    fetch(buildInternalUrl(`/api/etp/${documentId}`), {
+    fetch(buildInternalUrl(`/api/tr/${documentId}`), {
       headers: buildInternalHeaders(cookieHeader),
       cache: "no-store",
     }),
-    fetch(buildInternalUrl(`/api/templates?tipo=etp`), {
+    fetch(buildInternalUrl(`/api/templates?tipo=tr`), {
       headers: buildInternalHeaders(cookieHeader),
       cache: "no-store",
     }),
@@ -300,7 +300,7 @@ export default async function ConsolidarEtpPage({ params }: PageParams) {
   }
 
   const documentPayload = await documentResponse.json()
-  const documento = normalizeDocumentPayload(documentPayload, documentId, "etp")
+  const documento = normalizeDocumentPayload(documentPayload, documentId, "tr")
 
   let templates: TemplateOption[] = []
 
@@ -314,15 +314,15 @@ export default async function ConsolidarEtpPage({ params }: PageParams) {
   return (
     <div className="container max-w-6xl py-8">
       <ConsolidarDocumento
-        tipo="etp"
+        tipo="tr"
         documento={documento}
         templates={templates}
         endpoints={{
-          validate: `/api/etp/${documentId}/validate`,
-          generate: `/api/etp/${documentId}/generate`,
-          status: `/api/etp/${documentId}/status`,
+          validate: `/api/tr/${documentId}/validate`,
+          generate: `/api/tr/${documentId}/generate`,
+          status: `/api/tr/${documentId}/status`,
         }}
-        backHref={`/etp/${documentId}`}
+        backHref={`/tr/${documentId}`}
       />
     </div>
   )

@@ -7,7 +7,7 @@ import {
   ensureSessionOrUnauthorized,
   planningApiNotConfiguredResponse,
   proxyErrorResponse,
-} from "../../processes/_utils"
+} from "../../../processes/_utils"
 
 interface RouteParams {
   params: {
@@ -15,9 +15,9 @@ interface RouteParams {
   }
 }
 
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function POST(request: NextRequest, { params }: RouteParams) {
   const documentId = params.id
-  const targetUrl = buildPlanningApiUrl(`/tr/${documentId}`)
+  const targetUrl = buildPlanningApiUrl(`/etp/${documentId}/validate`)
 
   if (!targetUrl) {
     return planningApiNotConfiguredResponse()
@@ -31,16 +31,19 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
   const session = sessionOrResponse
 
+  const body = await request.text()
+
   try {
     const response = await fetch(targetUrl, {
-      method: "GET",
+      method: "POST",
       headers: buildAuthProxyHeaders(request.headers, session.token),
+      body: body || undefined,
       cache: "no-store",
     })
 
     return await buildProxyResponse(response)
   } catch (error) {
-    console.error(`Erro ao carregar TR ${documentId}`, error)
-    return proxyErrorResponse("Não foi possível carregar os dados do TR solicitado.")
+    console.error(`Erro ao validar conformidade do ETP ${documentId}`, error)
+    return proxyErrorResponse("Não foi possível validar a conformidade do documento.")
   }
 }

@@ -7,7 +7,7 @@ import {
   ensureSessionOrUnauthorized,
   planningApiNotConfiguredResponse,
   proxyErrorResponse,
-} from "../../processes/_utils"
+} from "../../../processes/_utils"
 
 interface RouteParams {
   params: {
@@ -15,9 +15,9 @@ interface RouteParams {
   }
 }
 
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function PATCH(request: NextRequest, { params }: RouteParams) {
   const documentId = params.id
-  const targetUrl = buildPlanningApiUrl(`/tr/${documentId}`)
+  const targetUrl = buildPlanningApiUrl(`/tr/${documentId}/status`)
 
   if (!targetUrl) {
     return planningApiNotConfiguredResponse()
@@ -31,16 +31,19 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
   const session = sessionOrResponse
 
+  const body = await request.text()
+
   try {
     const response = await fetch(targetUrl, {
-      method: "GET",
+      method: "PATCH",
       headers: buildAuthProxyHeaders(request.headers, session.token),
+      body: body || undefined,
       cache: "no-store",
     })
 
     return await buildProxyResponse(response)
   } catch (error) {
-    console.error(`Erro ao carregar TR ${documentId}`, error)
-    return proxyErrorResponse("Não foi possível carregar os dados do TR solicitado.")
+    console.error(`Erro ao atualizar status do TR ${documentId}`, error)
+    return proxyErrorResponse("Não foi possível atualizar o status do documento.")
   }
 }
