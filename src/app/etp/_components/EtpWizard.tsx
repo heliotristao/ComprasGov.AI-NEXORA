@@ -11,17 +11,17 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { StatusBadge, type StatusVariant } from "@/components/data-display/status-badge"
 import { api } from "@/lib/axios"
 
-import { AutosaveBadge, type AutosaveStatus } from "./AutosaveBadge"
+import { AutosaveBadge, type AutosaveStatus } from "@/app/_shared/components/AutosaveBadge"
 import { EtpFormStep1 } from "./EtpFormStep1"
 import { EtpFormStep2 } from "./EtpFormStep2"
 import { EtpFormStep3 } from "./EtpFormStep3"
-import { EtpStepper, type EtpWizardStep } from "./EtpStepper"
+import { WizardStepper, type WizardStep } from "@/app/_shared/components/WizardStepper"
 import { etpFormSchema, type EtpFormValues, type EtpRecord } from "./types"
 
 const AUTO_SAVE_DELAY = 1500
 const TOTAL_STEPS = 3
 
-const WIZARD_STEPS: (EtpWizardStep & { fields: (keyof EtpFormValues | `${keyof EtpFormValues}.${string}`)[] })[] = [
+const WIZARD_STEPS: (WizardStep & { fields: (keyof EtpFormValues | `${keyof EtpFormValues}.${string}`)[] })[] = [
   {
     id: 1,
     title: "Contexto e necessidade",
@@ -267,7 +267,7 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
           </div>
         </header>
 
-        <EtpStepper steps={WIZARD_STEPS} currentStep={currentStep} onStepChange={handleStepClick} />
+        <WizardStepper steps={WIZARD_STEPS} currentStep={currentStep} onStepChange={handleStepClick} />
 
         <Card className="border border-neutral-200 shadow-sm">
           <CardHeader>

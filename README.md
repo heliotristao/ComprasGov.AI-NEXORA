@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-10-28] - Tarefa ATOM-003:** Implementado o Wizard de Termo de Referência (TR) com fluxos dinâmicos para Bens e Serviços, incluindo auto-save, validação por etapa e integração via proxy com o backend.
 * **[2025-10-28] - Tarefa ATOM-002:** Implementado o Wizard de ETP com múltiplos passos, validação, auto-save e retomada de sessão, incluindo a listagem e criação de rascunhos.
 * **[2025-10-28] - Tarefa ATOM-001:** Criada a shell inicial com App Router, dashboard de acesso rápido e Wizard de Planejamento integrado ao layout global.
 * **[2025-10-27] - Tarefa BACKEND-P-12:** Criado o endpoint para salvamento de dados do Wizard de ETP, permitindo a persistência do progresso do usuário.
