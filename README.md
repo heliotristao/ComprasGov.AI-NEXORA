@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-10-28] - Tarefa ATOM-002:** Implementado o Wizard de ETP com múltiplos passos, validação, auto-save e retomada de sessão, incluindo a listagem e criação de rascunhos.
 * **[2025-10-28] - Tarefa ATOM-001:** Criada a shell inicial com App Router, dashboard de acesso rápido e Wizard de Planejamento integrado ao layout global.
 * **[2025-10-27] - Tarefa BACKEND-P-12:** Criado o endpoint para salvamento de dados do Wizard de ETP, permitindo a persistência do progresso do usuário.
 * **[2024-10-27] - Tarefa FEAT-ETP-TR-001:** Implementado sistema completo de ETP e TR com integração de IA, criação automática de TR a partir de ETP, gestão multi-tenant de templates e geração de documentos DOCX/PDF. (Commit: `2924849`)
