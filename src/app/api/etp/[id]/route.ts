@@ -17,7 +17,7 @@ interface RouteParams {
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   const documentId = params.id
-  const targetUrl = buildPlanningApiUrl(`/tr/${documentId}`)
+  const targetUrl = buildPlanningApiUrl(`/etp/${documentId}`)
 
   if (!targetUrl) {
     return planningApiNotConfiguredResponse()
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return await buildProxyResponse(response)
   } catch (error) {
-    console.error(`Erro ao carregar TR ${documentId}`, error)
-    return proxyErrorResponse("Não foi possível carregar os dados do TR solicitado.")
+    console.error(`Erro ao carregar ETP ${documentId}`, error)
+    return proxyErrorResponse("Não foi possível carregar os dados do ETP solicitado.")
   }
 }

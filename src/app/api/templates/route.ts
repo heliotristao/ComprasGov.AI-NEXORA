@@ -7,17 +7,10 @@ import {
   ensureSessionOrUnauthorized,
   planningApiNotConfiguredResponse,
   proxyErrorResponse,
-} from "../../processes/_utils"
+} from "../processes/_utils"
 
-interface RouteParams {
-  params: {
-    id: string
-  }
-}
-
-export async function GET(request: NextRequest, { params }: RouteParams) {
-  const documentId = params.id
-  const targetUrl = buildPlanningApiUrl(`/tr/${documentId}`)
+export async function GET(request: NextRequest) {
+  const targetUrl = buildPlanningApiUrl(`/templates${request.nextUrl.search}`)
 
   if (!targetUrl) {
     return planningApiNotConfiguredResponse()
@@ -40,7 +33,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return await buildProxyResponse(response)
   } catch (error) {
-    console.error(`Erro ao carregar TR ${documentId}`, error)
-    return proxyErrorResponse("Não foi possível carregar os dados do TR solicitado.")
+    console.error("Erro ao carregar templates disponíveis", error)
+    return proxyErrorResponse("Não foi possível carregar os templates disponíveis no momento.")
   }
 }
