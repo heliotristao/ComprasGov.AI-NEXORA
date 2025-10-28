@@ -2,6 +2,8 @@ import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 
 import { useAuthStore } from "@/stores/authStore"
+import { persistSession } from "@/lib/auth/session.client"
+import type { SessionPayload } from "@/lib/auth/session"
 
 interface LoginCredentials {
   email: string
@@ -10,6 +12,8 @@ interface LoginCredentials {
 
 interface LoginResponse {
   access_token?: string
+  token_type?: string
+  user?: Record<string, unknown>
   [key: string]: unknown
 }
 
@@ -48,7 +52,17 @@ export function useAuth() {
         return
       }
 
-      login(token)
+      const user = (data?.user && typeof data.user === "object" ? data.user : null) as
+        | Record<string, unknown>
+        | null
+
+      const sessionPayload: SessionPayload = {
+        token,
+        user: user as SessionPayload["user"],
+      }
+
+      persistSession(sessionPayload)
+      login(token, user ?? undefined)
       router.push("/dashboard")
     },
     onError: (error) => {

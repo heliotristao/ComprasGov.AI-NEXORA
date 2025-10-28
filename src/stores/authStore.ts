@@ -1,6 +1,8 @@
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 
+import { clearSessionCookie } from "@/lib/auth/session.client"
+
 type UserInfo = Record<string, unknown> | null
 
 interface AuthState {
@@ -29,6 +31,7 @@ export const useAuthStore = create<AuthState>()(
       login: (token, user = null) => set({ token, user }),
       logout: () => {
         set({ token: null, user: null })
+        clearSessionCookie()
         if (typeof window !== "undefined") {
           window.localStorage.removeItem("auth-storage")
         }
