@@ -1,0 +1,394 @@
+{
+  "nome": "Modelo TCU - TR Padrão",
+  "codigo": "TCU-TR-V2",
+  "descricao": "Modelo padrão do Tribunal de Contas da União para Termo de Referência, conforme Lei 14.133/2021",
+  "tipo_documento": "TR",
+  "tipo_contratacao": "Geral",
+  "versao": "2.0",
+  "ativo": true,
+  "orgao_origem": "TCU",
+  "estrutura": {
+    "secoes": [
+      {
+        "id": "secao_1",
+        "titulo": "1. DEFINIÇÃO DO OBJETO",
+        "ordem": 1,
+        "obrigatoria": true,
+        "codigo_lei": "TR-1",
+        "nota_explicativa": "Defina o objeto da contratação de forma precisa, suficiente e clara, evitando especificações excessivas que limitem a competição.",
+        "campos": [
+          {
+            "id": "descricao_objeto",
+            "label": "Descrição detalhada do objeto",
+            "tipo": "textarea",
+            "obrigatorio": true,
+            "ajuda": "Descreva o que será contratado de forma clara e objetiva",
+            "placeholder": "A contratação tem por objeto...",
+            "pode_gerar_ia": true
+          },
+          {
+            "id": "especificacoes_tecnicas",
+            "label": "Especificações técnicas",
+            "tipo": "textarea",
+            "obrigatorio": true,
+            "ajuda": "Detalhe as características técnicas mínimas necessárias",
+            "pode_gerar_ia": true
+          },
+          {
+            "id": "unidade_fornecimento",
+            "label": "Unidade de fornecimento/medida",
+            "tipo": "text",
+            "obrigatorio": true,
+            "placeholder": "Ex: unidade, metro, hora, etc."
+          }
+        ]
+      },
+      {
+        "id": "secao_2",
+        "titulo": "2. FUNDAMENTAÇÃO DA CONTRATAÇÃO",
+        "ordem": 2,
+        "obrigatoria": true,
+        "codigo_lei": "TR-2",
+        "nota_explicativa": "Faça referência ao ETP correspondente e fundamente a necessidade da contratação.",
+        "campos": [
+          {
+            "id": "referencia_etp",
+            "label": "Referência ao Estudo Técnico Preliminar",
+            "tipo": "text",
+            "obrigatorio": true,
+            "placeholder": "ETP nº ___/2024",
+            "vinculado_etp": true
+          },
+          {
+            "id": "justificativa_contratacao",
+            "label": "Justificativa da contratação",
+            "tipo": "textarea",
+            "obrigatorio": true,
+            "ajuda": "Com base no ETP, justifique a necessidade e relevância da contratação",
+            "pode_gerar_ia": true,
+            "herda_de_etp": "justificativa_necessidade"
+          }
+        ]
+      },
+      {
+        "id": "secao_3",
+        "titulo": "3. DESCRIÇÃO DA SOLUÇÃO",
+        "ordem": 3,
+        "obrigatoria": true,
+        "codigo_lei": "TR-3",
+        "nota_explicativa": "Descreva a solução escolhida considerando todo o ciclo de vida do objeto.",
+        "campos": [
+          {
+            "id": "solucao_escolhida",
+            "label": "Solução escolhida",
+            "tipo": "textarea",
+            "obrigatorio": true,
+            "ajuda": "Descreva qual solução foi escolhida para atender à necessidade",
+            "pode_gerar_ia": true,
+            "herda_de_etp": "solucao_escolhida"
+          },
+          {
+            "id": "ciclo_vida",
+            "label": "Considerações sobre o ciclo de vida",
+            "tipo": "textarea",
+            "obrigatorio": true,
+            "ajuda": "Aspectos de aquisição, operação, manutenção e descarte",
+            "pode_gerar_ia": true
+          }
+        ]
+      },
+      {
+        "id": "secao_4",
+        "titulo": "4. REQUISITOS DA CONTRATAÇÃO",
+        "ordem": 4,
+        "obrigatoria": true,
+        "codigo_lei": "TR-4",
+        "campos": [
+          {
+            "id": "requisitos_tecnicos",
+            "label": "Requisitos técnicos",
+            "tipo": "textarea",
+            "obrigatorio": true,
+            "pode_gerar_ia": true,
+            "herda_de_etp": "requisitos_solucao"
+          },
+          {
+            "id": "requisitos_seguranca",
+            "label": "Requisitos de segurança",
+            "tipo": "textarea",
+            "obrigatorio": true,
+            "pode_gerar_ia": true
+          },
+          {
+            "id": "requisitos_qualidade",
+            "label": "Requisitos de qualidade",
+            "tipo": "textarea",
+            "obrigatorio": false,
+            "pode_gerar_ia": true
+          }
+        ]
+      },
+      {
+        "id": "secao_5",
+        "titulo": "5. MODELO DE EXECUÇÃO DO OBJETO",
+        "ordem": 5,
+        "obrigatoria": true,
+        "codigo_lei": "TR-5",
+        "campos": [
+          {
+            "id": "forma_execucao",
+            "label": "Forma de execução",
+            "tipo": "select",
+            "obrigatorio": true,
+            "opcoes": [
+              "Execução direta",
+              "Execução indireta",
+              "Execução mista"
+            ]
+          },
+          {
+            "id": "metodologia",
+            "label": "Metodologia de execução",
+            "tipo": "textarea",
+            "obrigatorio": true,
+            "pode_gerar_ia": true
+          },
+          {
+            "id": "etapas_execucao",
+            "label": "Etapas de execução",
+            "tipo": "textarea",
+            "obrigatorio": true,
+            "pode_gerar_ia": true,
+            "herda_de_etp": "cronograma"
+          }
+        ]
+      },
+      {
+        "id": "secao_6",
+        "titulo": "6. MODELO DE GESTÃO CONTRATUAL",
+        "ordem": 6,
+        "obrigatoria": true,
+        "codigo_lei": "TR-6",
+        "campos": [
+          {
+            "id": "gestor_contrato",
+            "label": "Gestor do contrato",
+            "tipo": "text",
+            "obrigatorio": true,
+            "placeholder": "Nome e cargo"
+          },
+          {
+            "id": "fiscal_contrato",
+            "label": "Fiscal do contrato",
+            "tipo": "text",
+            "obrigatorio": true,
+            "placeholder": "Nome e cargo"
+          },
+          {
+            "id": "mecanismos_controle",
+            "label": "Mecanismos de controle e fiscalização",
+            "tipo": "textarea",
+            "obrigatorio": true,
+            "pode_gerar_ia": true
+          }
+        ]
+      },
+      {
+        "id": "secao_7",
+        "titulo": "7. CRITÉRIOS DE MEDIÇÃO E PAGAMENTO",
+        "ordem": 7,
+        "obrigatoria": true,
+        "codigo_lei": "TR-7",
+        "campos": [
+          {
+            "id": "forma_medicao",
+            "label": "Forma de medição",
+            "tipo": "textarea",
+            "obrigatorio": true,
+            "pode_gerar_ia": true
+          },
+          {
+            "id": "periodicidade_medicao",
+            "label": "Periodicidade da medição",
+            "tipo": "select",
+            "obrigatorio": true,
+            "opcoes": [
+              "Mensal",
+              "Quinzenal",
+              "Semanal",
+              "Por etapa",
+              "Outro"
+            ]
+          },
+          {
+            "id": "forma_pagamento",
+            "label": "Forma de pagamento",
+            "tipo": "textarea",
+            "obrigatorio": true,
+            "pode_gerar_ia": true
+          },
+          {
+            "id": "prazo_pagamento",
+            "label": "Prazo de pagamento",
+            "tipo": "text",
+            "obrigatorio": true,
+            "placeholder": "Ex: 30 dias após apresentação da nota fiscal"
+          }
+        ]
+      },
+      {
+        "id": "secao_8",
+        "titulo": "8. FORMA E CRITÉRIOS DE SELEÇÃO DO FORNECEDOR",
+        "ordem": 8,
+        "obrigatoria": true,
+        "codigo_lei": "TR-8",
+        "campos": [
+          {
+            "id": "modalidade_licitacao",
+            "label": "Modalidade de licitação",
+            "tipo": "select",
+            "obrigatorio": true,
+            "opcoes": [
+              "Pregão",
+              "Concorrência",
+              "Concurso",
+              "Leilão",
+              "Diálogo competitivo",
+              "Dispensa",
+              "Inexigibilidade"
+            ]
+          },
+          {
+            "id": "criterio_julgamento",
+            "label": "Critério de julgamento",
+            "tipo": "select",
+            "obrigatorio": true,
+            "opcoes": [
+              "Menor preço",
+              "Maior desconto",
+              "Melhor técnica ou conteúdo artístico",
+              "Técnica e preço",
+              "Maior retorno econômico"
+            ]
+          },
+          {
+            "id": "requisitos_habilitacao",
+            "label": "Requisitos de habilitação",
+            "tipo": "textarea",
+            "obrigatorio": true,
+            "pode_gerar_ia": true
+          }
+        ]
+      },
+      {
+        "id": "secao_9",
+        "titulo": "9. ESTIMATIVAS DO VALOR DA CONTRATAÇÃO",
+        "ordem": 9,
+        "obrigatoria": true,
+        "codigo_lei": "TR-9",
+        "campos": [
+          {
+            "id": "valor_estimado_total",
+            "label": "Valor estimado total",
+            "tipo": "currency",
+            "obrigatorio": true,
+            "placeholder": "R$ 0,00",
+            "herda_de_etp": "estimativa_valor"
+          },
+          {
+            "id": "precos_unitarios",
+            "label": "Preços unitários referenciais",
+            "tipo": "table",
+            "obrigatorio": true,
+            "colunas": [
+              {"id": "item", "label": "Item", "tipo": "text"},
+              {"id": "descricao", "label": "Descrição", "tipo": "text"},
+              {"id": "unidade", "label": "Unidade", "tipo": "text"},
+              {"id": "quantidade", "label": "Quantidade", "tipo": "number"},
+              {"id": "preco_unitario", "label": "Preço Unit.", "tipo": "currency"},
+              {"id": "preco_total", "label": "Preço Total", "tipo": "currency"}
+            ]
+          },
+          {
+            "id": "memoria_calculo",
+            "label": "Memória de cálculo",
+            "tipo": "textarea",
+            "obrigatorio": true,
+            "pode_gerar_ia": true
+          },
+          {
+            "id": "fontes_pesquisa",
+            "label": "Fontes de pesquisa de preços",
+            "tipo": "textarea",
+            "obrigatorio": true,
+            "pode_gerar_ia": true
+          }
+        ]
+      },
+      {
+        "id": "secao_10",
+        "titulo": "10. ADEQUAÇÃO ORÇAMENTÁRIA",
+        "ordem": 10,
+        "obrigatoria": true,
+        "codigo_lei": "TR-10",
+        "campos": [
+          {
+            "id": "programa_trabalho",
+            "label": "Programa de trabalho",
+            "tipo": "text",
+            "obrigatorio": true,
+            "placeholder": "Código do programa"
+          },
+          {
+            "id": "elemento_despesa",
+            "label": "Elemento de despesa",
+            "tipo": "text",
+            "obrigatorio": true,
+            "placeholder": "Código do elemento"
+          },
+          {
+            "id": "fonte_recursos",
+            "label": "Fonte de recursos",
+            "tipo": "text",
+            "obrigatorio": true,
+            "placeholder": "Código da fonte"
+          },
+          {
+            "id": "exercicio_financeiro",
+            "label": "Exercício(s) financeiro(s)",
+            "tipo": "text",
+            "obrigatorio": true,
+            "placeholder": "Ex: 2024, 2024/2025"
+          },
+          {
+            "id": "valor_previsto",
+            "label": "Valor previsto no orçamento",
+            "tipo": "currency",
+            "obrigatorio": true,
+            "placeholder": "R$ 0,00"
+          }
+        ]
+      }
+    ]
+  },
+  "mapeamento_lei": {
+    "TR-1": "secao_1",
+    "TR-2": "secao_2",
+    "TR-3": "secao_3",
+    "TR-4": "secao_4",
+    "TR-5": "secao_5",
+    "TR-6": "secao_6",
+    "TR-7": "secao_7",
+    "TR-8": "secao_8",
+    "TR-9": "secao_9",
+    "TR-10": "secao_10"
+  },
+  "mapeamento_etp_para_tr": {
+    "justificativa_necessidade": "justificativa_contratacao",
+    "solucao_escolhida": "solucao_escolhida",
+    "requisitos_solucao": "requisitos_tecnicos",
+    "cronograma": "etapas_execucao",
+    "estimativa_valor": "valor_estimado_total"
+  }
+}
+

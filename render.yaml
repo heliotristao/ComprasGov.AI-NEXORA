@@ -1,0 +1,43 @@
+services:
+  # Serviço de Governança (Autenticação, Usuários, Roles, Planos)
+  - type: web
+    name: governance-service
+    env: docker
+    rootDir: backend/governance-service
+    region: oregon
+    branch: main
+    plan: free
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+
+  # Serviço de Planejamento (ETPs, TRs, Documentos, IA)
+  - type: web
+    name: planning-service
+    env: docker
+    rootDir: backend/planning-service
+    region: oregon
+    branch: main
+    plan: free
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_API_BASE
+        value: https://api.openai.com/v1
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GOVERNANCE_SERVICE_URL
+        value: https://governance-service.onrender.com
+
