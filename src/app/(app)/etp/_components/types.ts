@@ -3,47 +3,56 @@ import { z } from "zod"
 export const etpFormSchema = z.object({
   general: z.object({
     title: z
-      .string({ required_error: "Informe o título do ETP." })
+      .string()
       .trim()
+      .min(1, { message: "Informe o título do ETP." })
       .min(3, "Informe um título com pelo menos 3 caracteres."),
     context: z
-      .string({ required_error: "Descreva o contexto atual." })
+      .string()
       .trim()
+      .min(1, { message: "Descreva o contexto atual." })
       .min(10, "Explique o contexto com pelo menos 10 caracteres."),
     justification: z
-      .string({ required_error: "Apresente a justificativa." })
+      .string()
       .trim()
+      .min(1, { message: "Apresente a justificativa." })
       .min(10, "Detalhe a justificativa com pelo menos 10 caracteres."),
   }),
   solution: z.object({
     alternatives: z
-      .string({ required_error: "Liste as alternativas avaliadas." })
+      .string()
       .trim()
+      .min(1, { message: "Liste as alternativas avaliadas." })
       .min(10, "Descreva as alternativas com pelo menos 10 caracteres."),
     recommended: z
-      .string({ required_error: "Informe a solução recomendada." })
+      .string()
       .trim()
+      .min(1, { message: "Informe a solução recomendada." })
       .min(10, "Explique a solução recomendada com pelo menos 10 caracteres."),
     scope: z
-      .string({ required_error: "Descreva o escopo." })
+      .string()
       .trim()
+      .min(1, { message: "Descreva o escopo." })
       .min(10, "Detalhe o escopo com pelo menos 10 caracteres."),
   }),
   viability: z.object({
     marketAnalysis: z
-      .string({ required_error: "Informe a análise de mercado." })
+      .string()
       .trim()
+      .min(1, { message: "Informe a análise de mercado." })
       .min(10, "Detalhe a análise com pelo menos 10 caracteres."),
     estimatedBudget: z.coerce
-      .number({ invalid_type_error: "Informe um valor numérico." })
+      .number({ message: "Informe um valor numérico." })
       .min(0, "O valor estimado deve ser igual ou maior que zero."),
     schedule: z
-      .string({ required_error: "Descreva o cronograma." })
+      .string()
       .trim()
+      .min(1, { message: "Descreva o cronograma." })
       .min(5, "Detalhe o cronograma com pelo menos 5 caracteres."),
     risks: z
-      .string({ required_error: "Informe os riscos identificados." })
+      .string()
       .trim()
+      .min(1, { message: "Informe os riscos identificados." })
       .min(5, "Descreva os riscos com pelo menos 5 caracteres."),
   }),
 })
