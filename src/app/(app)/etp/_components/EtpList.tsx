@@ -32,7 +32,8 @@ const STATUS_FILTERS: { label: string; value: string; badge?: StatusVariant }[] 
 
 const newEtpSchema = z.object({
   edocs: z
-    .string({ required_error: "Informe o código do E-Docs." })
+    .string()
+    .min(1, { message: "Informe o código do E-Docs." })
     .regex(/^[0-9A-Z]{4}-[0-9A-Z]{6}$/i, "Formato inválido. Use AAAA-XXXXXX."),
 })
 

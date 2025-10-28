@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FormProvider, useForm } from "react-hook-form"
+import { FormProvider, useForm, type Resolver } from "react-hook-form"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 
@@ -94,7 +94,7 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
   const defaultValues = React.useMemo(() => buildDefaultValues(etp), [etp])
 
   const methods = useForm<EtpFormValues>({
-    resolver: zodResolver(etpFormSchema),
+    resolver: zodResolver(etpFormSchema) as Resolver<EtpFormValues>,
     mode: "onChange",
     defaultValues,
   })

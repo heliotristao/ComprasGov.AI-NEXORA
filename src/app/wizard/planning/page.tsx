@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm, type Resolver } from "react-hook-form"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
@@ -25,7 +25,7 @@ const planningSchema = z.object({
     .trim()
     .min(1, "Descreva o objeto da contratação."),
   estimativaValor: z.coerce
-    .number({ invalid_type_error: "Informe um valor numérico." })
+    .number({ message: "Informe um valor numérico." })
     .nonnegative("Informe um valor igual ou superior a zero."),
 })
 
@@ -45,7 +45,7 @@ export default function PlanningWizardPage() {
     reset,
     setValue,
   } = useForm<PlanningFormValues>({
-    resolver: zodResolver(planningSchema),
+    resolver: zodResolver(planningSchema) as Resolver<PlanningFormValues>,
     mode: "onChange",
     defaultValues: {
       unidadeRequisitante: "",
@@ -192,7 +192,7 @@ export default function PlanningWizardPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {apiError && <p className="text-sm text-error-600">{apiError}</p>}
-            {apiResponse && (
+            {apiResponse != null && (
               <pre className="overflow-x-auto rounded-lg bg-white p-4 text-xs text-neutral-800 shadow-inner">
                 {JSON.stringify(apiResponse, null, 2)}
               </pre>
