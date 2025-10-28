@@ -19,7 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import { api } from "@/lib/axios"
 
-import { EdocsInput } from "./EdocsInput"
+import { EdocsInput } from "@/app/_shared/components/EdocsInput"
 import type { CreateEtpResponse, EtpListItem } from "./types"
 
 const STATUS_FILTERS: { label: string; value: string; badge?: StatusVariant }[] = [

@@ -5,19 +5,19 @@ import { Check } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-export interface EtpWizardStep {
+export interface WizardStep {
   id: number
   title: string
   description: string
 }
 
-export interface EtpStepperProps {
-  steps: EtpWizardStep[]
+export interface WizardStepperProps {
+  steps: WizardStep[]
   currentStep: number
   onStepChange?: (step: number) => void
 }
 
-export function EtpStepper({ steps, currentStep, onStepChange }: EtpStepperProps) {
+export function WizardStepper({ steps, currentStep, onStepChange }: WizardStepperProps) {
   return (
     <ol className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
       {steps.map((step, index) => {
