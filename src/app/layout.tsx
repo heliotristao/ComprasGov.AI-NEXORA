@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import type { ReactNode } from "react"
 import "./globals.css"
-import { Providers } from "@/components/providers"
+import { Providers } from "./providers"
 import { Toaster } from "@/components/ui/sonner"
 
 import favicon from "@/public/assets/images/favicon.svg"
@@ -32,9 +32,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className="antialiased font-sans">
+      <body className="min-h-screen bg-neutral-50 font-sans text-foreground antialiased">
         <Providers>
-          {children}
+          <div className="flex min-h-screen flex-col">
+            <header className="border-b border-border bg-white shadow-sm">
+              <div className="mx-auto flex w-full max-w-6xl items-center px-6 py-4">
+                <span className="text-lg font-semibold text-primary-700">
+                  ComprasGov.AI - NEXORA
+                </span>
+              </div>
+            </header>
+            <main className="flex-1">
+              <div className="mx-auto w-full max-w-6xl px-6 py-8">{children}</div>
+            </main>
+          </div>
           <Toaster />
         </Providers>
       </body>
