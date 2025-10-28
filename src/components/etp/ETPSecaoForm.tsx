@@ -221,7 +221,7 @@ export function ETPSecaoForm({
         {campo.tipo === "table" && (
           <Card className="p-4">
             <p className="text-sm text-muted-foreground">
-              Tipo "table" - Implementar componente de tabela
+              Tipo &quot;table&quot; - Implementar componente de tabela
             </p>
           </Card>
         )}
@@ -229,7 +229,7 @@ export function ETPSecaoForm({
         {campo.tipo === "repeater" && (
           <Card className="p-4">
             <p className="text-sm text-muted-foreground">
-              Tipo "repeater" - Implementar componente repetidor
+              Tipo &quot;repeater&quot; - Implementar componente repetidor
             </p>
           </Card>
         )}
@@ -237,7 +237,7 @@ export function ETPSecaoForm({
         {campo.tipo === "file_upload" && (
           <Card className="p-4">
             <p className="text-sm text-muted-foreground">
-              Tipo "file_upload" - Implementar upload de arquivos
+              Tipo &quot;file_upload&quot; - Implementar upload de arquivos
             </p>
           </Card>
         )}
