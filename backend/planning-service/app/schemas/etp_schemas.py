@@ -1,4 +1,4 @@
-from pydantic import BaseModel, StringConstraints
+from pydantic import BaseModel, StringConstraints, field_validator
 from typing import Optional, Dict, Any, Annotated
 from uuid import UUID
 from datetime import datetime
@@ -21,11 +21,25 @@ class ETPUpdate(ETPBase):
     pass
 
 
+class ETPPartialUpdate(BaseModel):
+    data: Optional[Dict[str, Any]] = None
+    step: Optional[int] = None
+    status: Optional[ETPStatus] = None
+
+    @field_validator('status')
+    def validate_status(cls, v):
+        if v not in [status for status in ETPStatus]:
+            raise ValueError(f"Invalid status: {v}")
+        return v
+
+
 class ETPOut(ETPBase):
     id: UUID
     created_by: str
+    updated_by: Optional[str] = None
     created_at: datetime
     updated_at: datetime
+    deleted_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

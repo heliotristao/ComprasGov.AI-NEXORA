@@ -2,15 +2,15 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 from jose import jwt
 from datetime import datetime, timedelta
-from app.core.config import SECRET_KEY, ALGORITHM
+from app.core import config
 from app.db.models.etp import ETP
 
 
 def create_test_token(user_email: str) -> str:
-    expires_delta = timedelta(minutes=30)
+    expires_delta = timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
     expire = datetime.utcnow() + expires_delta
     to_encode = {"sub": user_email, "exp": expire}
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, config.SECRET_KEY, algorithm=config.ALGORITHM)
     return encoded_jwt
 
 
