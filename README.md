@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-10-29] - Tarefa C2:** Implementado o motor de monitoramento de SLA e o serviço de notificações automáticas no `planning-service`, com APIs para configuração e consulta de status.
 * **[2025-10-29] - Tarefa C1:** Implementado o Módulo de Gestão com um dashboard unificado para visualização e filtragem de todos os processos da plataforma.
 * **[2025-10-29] - Tarefa B7:** Implementada a interface completa do wizard multietapas para ETP com auto-save, validação guiada e integração de geração de conteúdo por IA.
 * **[2025-10-29] - Tarefa B3:** Implementado o motor de validação de conformidade para ETPs no `planning-service`, com um endpoint que retorna um checklist de regras e sugestões de melhoria.
