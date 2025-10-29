@@ -48,6 +48,12 @@ async function fetchTrRecord(id: string): Promise<TrRecord> {
     updatedAt: data.updatedAt ?? data.updated_at ?? null,
     createdAt: data.createdAt ?? data.created_at ?? null,
     formData: data.formData ?? data.form_data ?? data.dados ?? {},
+    step:
+      data.step ??
+      data.current_step ??
+      (data as any)?.etapa_atual ??
+      (data as any)?.step_atual ??
+      null,
   }
 }
 

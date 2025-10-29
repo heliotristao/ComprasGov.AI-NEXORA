@@ -68,6 +68,7 @@ export interface EtpRecord {
   createdAt?: string | null
   formData?: Partial<EtpFormValues>
   title?: string | null
+  step?: number | null
 }
 
 export interface EtpListItem {
