@@ -16,3 +16,5 @@ SQLAlchemySession.execute = _execute_with_text
 
 Base = declarative_base()
 from app.models.plan import Plan
+
+from app.db.models import sla  # noqa: F401

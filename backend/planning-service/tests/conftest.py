@@ -1,8 +1,11 @@
+import os
 from typing import Generator
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
+
+os.environ.setdefault("DISABLE_SLA_SCHEDULER", "1")
 from app.main import app
 from app.api.deps import get_db
 from app.db.base import Base
