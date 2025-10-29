@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-10-29] - Tarefa B3:** Implementado o motor de validação de conformidade para ETPs no `planning-service`, com um endpoint que retorna um checklist de regras e sugestões de melhoria.
 * **[2025-10-29] - Tarefa B2:** Implementada a API de auto-save (`PATCH`) para a entidade ETP no `planning-service`, permitindo a atualização incremental de dados e o salvamento contínuo do progresso do usuário.
 * **[2025-10-29] - Tarefa B4:** Implementada a funcionalidade de geração de conteúdo por IA para campos do ETP no `planning-service`, incluindo rastreabilidade de cada execução e suporte a múltiplos provedores.
 * **[2025-10-29] - Tarefa B1:** Implementado o modelo de dados, migração e CRUD completo para a entidade ETP no `planning-service`, estabelecendo a base para a persistência dos Estudos Técnicos Preliminares.
