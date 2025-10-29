@@ -40,6 +40,12 @@ async function fetchEtpRecord(id: string): Promise<EtpRecord> {
     createdAt: data.createdAt ?? (data as any)?.created_at ?? null,
     formData: data.formData ?? (data as any)?.form_data ?? (data as any)?.dados ?? {},
     title: data.title ?? (data as any)?.nome ?? (data as any)?.descricao ?? null,
+    step:
+      data.step ??
+      (data as any)?.step ??
+      (data as any)?.current_step ??
+      (data as any)?.etapa_atual ??
+      null,
   }
 }
 

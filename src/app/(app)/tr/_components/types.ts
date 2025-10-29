@@ -10,6 +10,7 @@ export interface TrRecord {
   updatedAt?: string | null
   createdAt?: string | null
   formData?: Partial<Record<string, unknown>>
+  step?: number | null
 }
 
 export type { TrFormValues, TrType }

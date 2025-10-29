@@ -8,16 +8,13 @@ import { toast } from "sonner"
 
 import { AutosaveBadge, type AutosaveStatus } from "@/app/_shared/components/AutosaveBadge"
 import { WizardStepper, type WizardStep } from "@/app/_shared/components/WizardStepper"
+import { StatusBadge, type StatusVariant } from "@/components/data-display/status-badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { StatusBadge, type StatusVariant } from "@/components/data-display/status-badge"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useTr, type TrDocument } from "@/hooks/useTr"
 
-import {
-  trFormSchema,
-  trStepSchemas,
-  type TrFormValues,
-  type TrType,
-} from "../_schemas/trSchemas"
+import { trFormSchema, trStepSchemas, type TrFormValues, type TrType } from "../_schemas/trSchemas"
 import type { TrRecord } from "./types"
 import { TrBensEspecificacoesStep } from "./bens/TrBensEspecificacoesStep"
 import { TrBensGarantiaStep } from "./bens/TrBensGarantiaStep"
@@ -27,7 +24,7 @@ import { TrServicosDimensionamentoStep } from "./servicos/TrServicosDimensioname
 import { TrServicosEscopoStep } from "./servicos/TrServicosEscopoStep"
 import { TrServicosSlasStep } from "./servicos/TrServicosSlasStep"
 
-const AUTO_SAVE_DELAY = 1500
+const AUTO_SAVE_DELAY = 2000
 
 type StepConfig = WizardStep & {
   fields: string[]
@@ -169,8 +166,11 @@ const STEP_CONFIGS: Record<TrType, StepConfig[]> = {
   servicos: SERVICOS_STEP_CONFIGS,
 }
 
-function clampStep(step: number, total: number) {
-  return Math.min(Math.max(step, 1), total)
+function clampStep(step: number | null | undefined, total: number) {
+  if (!Number.isFinite(step)) return 1
+  const parsed = Number(step)
+  if (!Number.isFinite(parsed)) return 1
+  return Math.min(Math.max(parsed, 1), total)
 }
 
 function normalizeStatus(status: string | null | undefined): StatusVariant {
@@ -190,8 +190,12 @@ function toNumberOrNaN(value: unknown): number {
   return Number.isNaN(parsed) ? Number.NaN : parsed
 }
 
-function buildDefaultValues(tr: TrRecord, tipo: TrType): TrFormValues {
-  const formData = (tr.formData ?? {}) as Record<string, any>
+function buildDefaultValues(
+  tr: TrRecord,
+  tipo: TrType,
+  data?: Record<string, unknown> | Partial<Record<string, unknown>>
+): TrFormValues {
+  const formData = ((data ?? tr.formData ?? {}) as Record<string, any>) ?? {}
 
   if (tipo === "bens") {
     const bensForm: TrFormBensValues = {
@@ -200,21 +204,25 @@ function buildDefaultValues(tr: TrRecord, tipo: TrType): TrFormValues {
         objeto: formData?.identificacao?.objeto ?? "",
         justificativa: formData?.identificacao?.justificativa ?? "",
         setorRequisitante: formData?.identificacao?.setorRequisitante ?? "",
-        codigoEdocs:
-          formData?.identificacao?.codigoEdocs ?? tr.edocs ?? "",
+        codigoEdocs: formData?.identificacao?.codigoEdocs ?? formData?.identificacao?.codigo_edocs ?? tr.edocs ?? "",
       },
       especificacoes: {
-        descricaoTecnica: formData?.especificacoes?.descricaoTecnica ?? "",
-        requisitosMinimos: formData?.especificacoes?.requisitosMinimos ?? "",
-        normasReferencia: formData?.especificacoes?.normasReferencia ?? "",
+        descricaoTecnica: formData?.especificacoes?.descricaoTecnica ?? formData?.especificacoes?.descricao_tecnica ?? "",
+        requisitosMinimos:
+          formData?.especificacoes?.requisitosMinimos ?? formData?.especificacoes?.requisitos_minimos ?? "",
+        normasReferencia:
+          formData?.especificacoes?.normasReferencia ?? formData?.especificacoes?.normas_referencia ?? "",
       },
       quantidades: {
         quantidadeTotal: toNumberOrNaN(
           formData?.quantidades?.quantidadeTotal ?? formData?.quantidades?.quantidade_total
         ),
-        unidadeMedida: formData?.quantidades?.unidadeMedida ?? formData?.quantidades?.unidade_medida ?? "",
+        unidadeMedida:
+          formData?.quantidades?.unidadeMedida ?? formData?.quantidades?.unidade_medida ?? "",
         justificativaQuantidade:
-          formData?.quantidades?.justificativaQuantidade ?? formData?.quantidades?.justificativa_quantidade ?? "",
+          formData?.quantidades?.justificativaQuantidade ??
+          formData?.quantidades?.justificativa_quantidade ??
+          "",
         cronogramaEntrega:
           formData?.quantidades?.cronogramaEntrega ?? formData?.quantidades?.cronograma_entrega ?? "",
       },
@@ -234,7 +242,8 @@ function buildDefaultValues(tr: TrRecord, tipo: TrType): TrFormValues {
     escopo: {
       descricaoServico: formData?.escopo?.descricaoServico ?? formData?.escopo?.descricao_servico ?? "",
       objetivos: formData?.escopo?.objetivos ?? "",
-      requisitosTecnicos: formData?.escopo?.requisitosTecnicos ?? formData?.escopo?.requisitos_tecnicos ?? "",
+      requisitosTecnicos:
+        formData?.escopo?.requisitosTecnicos ?? formData?.escopo?.requisitos_tecnicos ?? "",
     },
     dimensionamento: {
       quantidadeProfissionais: toNumberOrNaN(
@@ -256,14 +265,32 @@ function buildDefaultValues(tr: TrRecord, tipo: TrType): TrFormValues {
   return servicosForm
 }
 
-function extractStepPayload(values: TrFormValues, tipo: TrType, stepIndex: number): Record<string, unknown> | null {
-  const config = STEP_CONFIGS[tipo][stepIndex - 1]
+function extractStepPayload(
+  configs: StepConfig[],
+  stepIndex: number,
+  values: TrFormValues
+): Record<string, unknown> | null {
+  const config = configs[stepIndex - 1]
   if (!config) return null
   return config.extractPayload(values)
 }
 
 function typeLabel(tipo: TrType) {
   return tipo === "bens" ? "Bens" : "Serviços"
+}
+
+function buildInitialDocument(tr: TrRecord, tipo: TrType, initialStep?: number): TrDocument {
+  const configs = STEP_CONFIGS[tipo]
+  const totalSteps = configs.length
+  return {
+    id: tr.id,
+    tipo,
+    step: clampStep(tr.step ?? initialStep ?? 1, totalSteps),
+    status: tr.status ?? null,
+    updatedAt: tr.updatedAt ?? null,
+    createdAt: tr.createdAt ?? null,
+    data: (tr.formData as Record<string, unknown>) ?? {},
+  }
 }
 
 export interface TrWizardProps {
@@ -277,10 +304,35 @@ export function TrWizard({ tr, initialStep = 1, tipo }: TrWizardProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const stepConfigs = STEP_CONFIGS[tipo]
+  const initialDocument = React.useMemo(() => buildInitialDocument(tr, tipo, initialStep), [tr, tipo, initialStep])
+
+  const { data: trDocument, error, isLoading, isFetching, saveStep, isSaving } = useTr(tr.id, {
+    initialData: initialDocument,
+  })
+
+  const documentData = trDocument ?? initialDocument
+
+  const [activeTipo, setActiveTipo] = React.useState<TrType>(documentData.tipo ?? tipo)
+
+  React.useEffect(() => {
+    if (tipo && tipo !== activeTipo) {
+      setActiveTipo(tipo)
+    }
+  }, [activeTipo, tipo])
+
+  React.useEffect(() => {
+    if (trDocument?.tipo && trDocument.tipo !== activeTipo) {
+      setActiveTipo(trDocument.tipo)
+    }
+  }, [activeTipo, trDocument?.tipo])
+
+  const stepConfigs = React.useMemo(() => STEP_CONFIGS[activeTipo], [activeTipo])
   const totalSteps = stepConfigs.length
 
-  const defaultValues = React.useMemo(() => buildDefaultValues(tr, tipo), [tr, tipo])
+  const defaultValues = React.useMemo(
+    () => buildDefaultValues(tr, activeTipo, documentData.data),
+    [activeTipo, documentData.data, tr]
+  )
 
   const methods = useForm<TrFormValues>({
     resolver: zodResolver(trFormSchema) as Resolver<TrFormValues>,
@@ -288,16 +340,29 @@ export function TrWizard({ tr, initialStep = 1, tipo }: TrWizardProps) {
     defaultValues,
   })
 
-  const [currentStep, setCurrentStep] = React.useState(() => clampStep(initialStep, totalSteps))
+  const [currentStep, setCurrentStep] = React.useState(() => clampStep(documentData.step, totalSteps))
   const [autosaveStatus, setAutosaveStatus] = React.useState<AutosaveStatus>("idle")
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(() =>
-    tr.updatedAt ? new Date(tr.updatedAt) : null
+    documentData.updatedAt ? new Date(documentData.updatedAt) : null
   )
 
   const autosaveTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
   const skipNextWatchRef = React.useRef(true)
 
-  const currentEdocs = tipo === "bens" ? methods.watch("identificacao.codigoEdocs" as const) : undefined
+  React.useEffect(() => {
+    if (trDocument?.updatedAt) {
+      setLastSavedAt(new Date(trDocument.updatedAt))
+    }
+  }, [trDocument?.updatedAt])
+
+  React.useEffect(() => {
+    if (!trDocument?.step) return
+    setCurrentStep((previous) => {
+      const next = clampStep(trDocument.step, totalSteps)
+      if (next === previous) return previous
+      return next
+    })
+  }, [totalSteps, trDocument?.step])
 
   React.useEffect(() => {
     methods.reset(defaultValues)
@@ -308,85 +373,66 @@ export function TrWizard({ tr, initialStep = 1, tipo }: TrWizardProps) {
     (nextStep: number) => {
       const params = new URLSearchParams(searchParams.toString())
       params.set("step", String(nextStep))
+      params.set("tipo", activeTipo)
       const query = params.toString()
       router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
     },
-    [pathname, router, searchParams]
-  )
-
-  const notifyStepChange = React.useCallback(
-    async (nextStep: number) => {
-      try {
-        await fetch(`/api/tr/${tr.id}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            step: nextStep,
-            tipo,
-          }),
-        })
-      } catch (error) {
-        console.error("Não foi possível sincronizar o passo do TR", error)
-      }
-    },
-    [tipo, tr.id]
+    [activeTipo, pathname, router, searchParams]
   )
 
   const goToStep = React.useCallback(
-    (nextStep: number, options?: { skipNotify?: boolean }) => {
+    (nextStep: number) => {
       const clamped = clampStep(nextStep, totalSteps)
       setCurrentStep(clamped)
       updateUrlStep(clamped)
-      if (!options?.skipNotify) {
-        void notifyStepChange(clamped)
-      }
     },
-    [notifyStepChange, totalSteps, updateUrlStep]
+    [totalSteps, updateUrlStep]
   )
 
-  const handleAutosave = React.useCallback(
-    async (values: TrFormValues) => {
-      if (!methods.formState.isDirty) {
-        setAutosaveStatus("idle")
-        return
+  const saveCurrentStep = React.useCallback(
+    async (
+      targetStep: number,
+      values: TrFormValues,
+      { force }: { force?: boolean } = {}
+    ) => {
+      const shouldPersistValues = force || methods.formState.isDirty
+      let patch = shouldPersistValues
+        ? extractStepPayload(stepConfigs, currentStep, values) ?? { tipo: values.tipo }
+        : undefined
+
+      if (patch && !("tipo" in patch) && values.tipo) {
+        patch = { tipo: values.tipo, ...patch }
       }
 
-      const patch = extractStepPayload(values, tipo, currentStep)
-      if (!patch) {
+      if (!patch && targetStep === currentStep && !shouldPersistValues) {
         setAutosaveStatus("idle")
-        return
+        return true
       }
 
       try {
         setAutosaveStatus("saving")
-        const response = await fetch(`/api/tr/${tr.id}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            step: currentStep,
-            patch,
-          }),
-        })
-
-        if (!response.ok) {
-          throw new Error(`Auto-save do TR retornou status ${response.status}`)
-        }
-
-        setLastSavedAt(new Date())
+        const updated = await saveStep(targetStep, patch)
+        const updatedAt = updated?.updatedAt ?? (updated as any)?.updated_at ?? null
+        setLastSavedAt(updatedAt ? new Date(updatedAt) : new Date())
         setAutosaveStatus("saved")
         skipNextWatchRef.current = true
         methods.reset(values)
-      } catch (error) {
-        console.error("Falha no auto-save do TR", error)
+        return true
+      } catch (err) {
+        console.error("Falha ao salvar etapa do TR", err)
         setAutosaveStatus("error")
         toast.error("Não foi possível salvar automaticamente. Tente novamente.")
+        return false
       }
     },
-    [currentStep, methods, tipo, tr.id]
+    [currentStep, methods, saveStep, stepConfigs]
+  )
+
+  const handleAutosave = React.useCallback(
+    async (values: TrFormValues) => {
+      await saveCurrentStep(currentStep, values, { force: true })
+    },
+    [currentStep, saveCurrentStep]
   )
 
   React.useEffect(() => {
@@ -421,11 +467,20 @@ export function TrWizard({ tr, initialStep = 1, tipo }: TrWizardProps) {
     }
   }, [])
 
+  React.useEffect(() => {
+    if (!error) {
+      return
+    }
+
+    console.error("Falha ao carregar TR", error)
+    toast.error("Não foi possível carregar os dados mais recentes do TR.")
+  }, [error])
+
   const validateStep = React.useCallback(
     async (stepIndex: number) => {
-      const schema = trStepSchemas[tipo][stepIndex]
+      const schema = trStepSchemas[activeTipo][stepIndex]
       const values = methods.getValues()
-      const payload = extractStepPayload(values, tipo, stepIndex)
+      const payload = extractStepPayload(stepConfigs, stepIndex, values)
 
       if (!schema || !payload) {
         return true
@@ -448,7 +503,7 @@ export function TrWizard({ tr, initialStep = 1, tipo }: TrWizardProps) {
 
       return true
     },
-    [methods, stepConfigs, tipo]
+    [activeTipo, methods, stepConfigs]
   )
 
   const handleNext = React.useCallback(async () => {
@@ -462,15 +517,24 @@ export function TrWizard({ tr, initialStep = 1, tipo }: TrWizardProps) {
       return
     }
 
-    goToStep(currentStep + 1)
-  }, [currentStep, goToStep, totalSteps, validateStep])
+    const values = methods.getValues()
+    const saved = await saveCurrentStep(currentStep + 1, values)
+    if (saved) {
+      goToStep(currentStep + 1)
+    }
+  }, [currentStep, goToStep, methods, saveCurrentStep, totalSteps, validateStep])
 
-  const handlePrevious = React.useCallback(() => {
+  const handlePrevious = React.useCallback(async () => {
     if (currentStep <= 1) {
       return
     }
-    goToStep(currentStep - 1)
-  }, [currentStep, goToStep])
+
+    const values = methods.getValues()
+    const saved = await saveCurrentStep(currentStep - 1, values)
+    if (saved) {
+      goToStep(currentStep - 1)
+    }
+  }, [currentStep, goToStep, methods, saveCurrentStep])
 
   const handleStepClick = React.useCallback(
     async (targetStep: number) => {
@@ -484,13 +548,38 @@ export function TrWizard({ tr, initialStep = 1, tipo }: TrWizardProps) {
         }
       }
 
-      goToStep(targetStep)
+      const values = methods.getValues()
+      const saved = await saveCurrentStep(targetStep, values)
+      if (saved) {
+        goToStep(targetStep)
+      }
     },
-    [currentStep, goToStep, validateStep]
+    [currentStep, goToStep, methods, saveCurrentStep, validateStep]
   )
 
-  const statusVariant = normalizeStatus(tr.status)
+  const statusVariant = normalizeStatus(trDocument?.status ?? tr.status)
   const activeStep = stepConfigs[currentStep - 1]
+  const currentEdocs = activeTipo === "bens" ? methods.watch("identificacao.codigoEdocs" as const) : undefined
+
+  if (isLoading && !trDocument) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-14 w-full rounded-xl" />
+        <Skeleton className="h-[420px] w-full rounded-xl" />
+      </div>
+    )
+  }
+
+  if (error && !trDocument) {
+    return (
+      <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-6 text-destructive">
+        <h2 className="text-lg font-semibold">Falha ao carregar o Termo de Referência</h2>
+        <p className="mt-2 text-sm text-destructive/80">
+          Atualize a página ou tente novamente. Persistindo o erro, contate o suporte técnico.
+        </p>
+      </div>
+    )
+  }
 
   return (
     <FormProvider {...methods}>
@@ -500,14 +589,19 @@ export function TrWizard({ tr, initialStep = 1, tipo }: TrWizardProps) {
             <div className="flex flex-wrap items-center gap-3 text-sm text-neutral-500">
               <span>TR #{tr.id}</span>
               <span className="h-1 w-1 rounded-full bg-neutral-300" aria-hidden />
-              <span>Tipo: {typeLabel(tipo)}</span>
+              <span>Tipo: {typeLabel(activeTipo)}</span>
               <span className="h-1 w-1 rounded-full bg-neutral-300" aria-hidden />
               <span>Código E-Docs: {currentEdocs || tr.edocs || "—"}</span>
               <span className="h-1 w-1 rounded-full bg-neutral-300" aria-hidden />
               <StatusBadge status={statusVariant} />
+              {isFetching || isSaving ? (
+                <span className="flex items-center gap-2 text-xs text-neutral-400">
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-primary" /> Atualizando dados
+                </span>
+              ) : null}
             </div>
             <h1 className="text-2xl font-semibold text-neutral-900">
-              {tr.title || `Termo de Referência - ${typeLabel(tipo)}`}
+              {tr.title || `Termo de Referência - ${typeLabel(activeTipo)}`}
             </h1>
             <p className="text-sm text-neutral-500">
               Preencha todas as etapas para consolidar o Termo de Referência com rastreabilidade completa.
@@ -528,9 +622,7 @@ export function TrWizard({ tr, initialStep = 1, tipo }: TrWizardProps) {
 
         <Card className="border border-neutral-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-neutral-900">
-              {activeStep?.title}
-            </CardTitle>
+            <CardTitle className="text-lg font-semibold text-neutral-900">{activeStep?.title}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">{activeStep?.component}</CardContent>
           <CardFooter className="flex flex-col gap-3 border-t border-neutral-100 pt-6 md:flex-row md:items-center md:justify-between">
@@ -538,10 +630,19 @@ export function TrWizard({ tr, initialStep = 1, tipo }: TrWizardProps) {
               Última atualização: {lastSavedAt ? lastSavedAt.toLocaleString("pt-BR") : "—"}
             </div>
             <div className="flex w-full gap-3 md:w-auto">
-              <Button variant="outline" type="button" onClick={handlePrevious} disabled={currentStep === 1}>
+              <Button
+                variant="outline"
+                type="button"
+                onClick={handlePrevious}
+                disabled={currentStep === 1 || autosaveStatus === "saving" || autosaveStatus === "scheduled"}
+              >
                 Voltar
               </Button>
-              <Button type="button" onClick={handleNext}>
+              <Button
+                type="button"
+                onClick={handleNext}
+                disabled={autosaveStatus === "saving" || autosaveStatus === "scheduled"}
+              >
                 {currentStep === totalSteps ? "Finalizar" : "Avançar"}
               </Button>
             </div>
@@ -551,3 +652,4 @@ export function TrWizard({ tr, initialStep = 1, tipo }: TrWizardProps) {
     </FormProvider>
   )
 }
+

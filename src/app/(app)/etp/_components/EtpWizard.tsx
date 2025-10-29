@@ -6,19 +6,20 @@ import { FormProvider, useForm, type Resolver } from "react-hook-form"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 
+import { AutosaveBadge, type AutosaveStatus } from "@/app/_shared/components/AutosaveBadge"
+import { WizardStepper, type WizardStep } from "@/app/_shared/components/WizardStepper"
+import { StatusBadge, type StatusVariant } from "@/components/data-display/status-badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { StatusBadge, type StatusVariant } from "@/components/data-display/status-badge"
-import { api } from "@/lib/axios"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useEtp, type EtpDocument } from "@/hooks/useEtp"
 
-import { AutosaveBadge, type AutosaveStatus } from "@/app/_shared/components/AutosaveBadge"
 import { EtpFormStep1 } from "./EtpFormStep1"
 import { EtpFormStep2 } from "./EtpFormStep2"
 import { EtpFormStep3 } from "./EtpFormStep3"
-import { WizardStepper, type WizardStep } from "@/app/_shared/components/WizardStepper"
 import { etpFormSchema, type EtpFormValues, type EtpRecord } from "./types"
 
-const AUTO_SAVE_DELAY = 1500
+const AUTO_SAVE_DELAY = 2000
 const TOTAL_STEPS = 3
 
 const WIZARD_STEPS: (WizardStep & { fields: (keyof EtpFormValues | `${keyof EtpFormValues}.${string}`)[] })[] = [
@@ -60,30 +61,78 @@ function normalizeStatus(status: string | undefined | null): StatusVariant {
   return "DRAFT"
 }
 
-function buildDefaultValues(etp: EtpRecord): EtpFormValues {
-  const base: EtpFormValues = {
+function clampStep(step: number | null | undefined, total = TOTAL_STEPS) {
+  if (!Number.isFinite(step)) return 1
+  const parsed = Number(step)
+  if (!Number.isFinite(parsed)) return 1
+  return Math.min(Math.max(parsed, 1), total)
+}
+
+function resolveFormData(
+  etp: EtpRecord,
+  data?: Record<string, unknown> | Partial<EtpFormValues>
+): Partial<EtpFormValues> {
+  if (!data || typeof data !== "object") {
+    return (etp.formData ?? {}) as Partial<EtpFormValues>
+  }
+  return (data as Partial<EtpFormValues>) ?? {}
+}
+
+function buildDefaultValues(
+  etp: EtpRecord,
+  data?: Record<string, unknown> | Partial<EtpFormValues>
+): EtpFormValues {
+  const formData = resolveFormData(etp, data)
+
+  const general = (formData.general ?? {}) as Partial<EtpFormValues["general"]>
+  const solution = (formData.solution ?? {}) as Partial<EtpFormValues["solution"]>
+  const viability = (formData.viability ?? {}) as Partial<EtpFormValues["viability"]>
+
+  return {
     general: {
-      title: etp.formData?.general?.title ?? etp.title ?? "",
-      context: etp.formData?.general?.context ?? "",
-      justification: etp.formData?.general?.justification ?? "",
+      title: general.title ?? etp.title ?? "",
+      context: general.context ?? "",
+      justification: general.justification ?? "",
     },
     solution: {
-      alternatives: etp.formData?.solution?.alternatives ?? "",
-      recommended: etp.formData?.solution?.recommended ?? "",
-      scope: etp.formData?.solution?.scope ?? "",
+      alternatives: solution.alternatives ?? "",
+      recommended: solution.recommended ?? "",
+      scope: solution.scope ?? "",
     },
     viability: {
-      marketAnalysis: etp.formData?.viability?.marketAnalysis ?? "",
+      marketAnalysis: viability.marketAnalysis ?? "",
       estimatedBudget:
-        typeof etp.formData?.viability?.estimatedBudget === "number"
-          ? etp.formData.viability.estimatedBudget
-          : Number(etp.formData?.viability?.estimatedBudget ?? 0),
-      schedule: etp.formData?.viability?.schedule ?? "",
-      risks: etp.formData?.viability?.risks ?? "",
+        typeof viability.estimatedBudget === "number"
+          ? viability.estimatedBudget
+          : Number(viability.estimatedBudget ?? 0),
+      schedule: viability.schedule ?? "",
+      risks: viability.risks ?? "",
     },
   }
+}
 
-  return base
+function extractStepPatch(step: number, values: EtpFormValues): Record<string, unknown> | undefined {
+  if (step === 1) {
+    return { general: values.general }
+  }
+  if (step === 2) {
+    return { solution: values.solution }
+  }
+  if (step === 3) {
+    return { viability: values.viability }
+  }
+  return undefined
+}
+
+function buildInitialDocument(etp: EtpRecord, initialStep?: number): EtpDocument {
+  return {
+    id: etp.id,
+    step: clampStep(etp.step ?? initialStep ?? 1),
+    status: etp.status,
+    updatedAt: etp.updatedAt ?? null,
+    createdAt: etp.createdAt ?? null,
+    data: (etp.formData as Record<string, unknown>) ?? {},
+  }
 }
 
 export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
@@ -91,7 +140,25 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const defaultValues = React.useMemo(() => buildDefaultValues(etp), [etp])
+  const initialDocument = React.useMemo(() => buildInitialDocument(etp, initialStep), [etp, initialStep])
+
+  const {
+    data: etpDocument,
+    error,
+    isLoading,
+    isFetching,
+    saveStep,
+    isSaving,
+  } = useEtp(etp.id, {
+    initialData: initialDocument,
+  })
+
+  const documentData = etpDocument ?? initialDocument
+
+  const defaultValues = React.useMemo(
+    () => buildDefaultValues(etp, documentData.data as Partial<EtpFormValues>),
+    [documentData.data, etp]
+  )
 
   const methods = useForm<EtpFormValues>({
     resolver: zodResolver(etpFormSchema) as Resolver<EtpFormValues>,
@@ -99,48 +166,93 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
     defaultValues,
   })
 
-  const [currentStep, setCurrentStep] = React.useState(() => {
-    if (Number.isNaN(initialStep)) return 1
-    return Math.min(Math.max(initialStep, 1), TOTAL_STEPS)
-  })
-
+  const [currentStep, setCurrentStep] = React.useState(() => clampStep(documentData.step, TOTAL_STEPS))
   const [autosaveStatus, setAutosaveStatus] = React.useState<AutosaveStatus>("idle")
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(() =>
-    etp.updatedAt ? new Date(etp.updatedAt) : null
+    documentData.updatedAt ? new Date(documentData.updatedAt) : null
   )
 
   const autosaveTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
   const skipNextWatchRef = React.useRef(true)
 
-  const handleAutosave = React.useCallback(
-    async (values: EtpFormValues) => {
-      if (!methods.formState.isDirty) {
-        setAutosaveStatus("idle")
-        return
-      }
+  React.useEffect(() => {
+    if (etpDocument?.updatedAt) {
+      setLastSavedAt(new Date(etpDocument.updatedAt))
+    }
+  }, [etpDocument?.updatedAt])
 
-      try {
-        setAutosaveStatus("saving")
-        await api.patch(`/api/etp/${etp.id}`, {
-          formData: values,
-        })
-        setLastSavedAt(new Date())
-        setAutosaveStatus("saved")
-        skipNextWatchRef.current = true
-        methods.reset(values)
-      } catch (error) {
-        console.error("Falha no auto-save do ETP", error)
-        setAutosaveStatus("error")
-        toast.error("Não foi possível salvar automaticamente. Tente novamente.")
-      }
-    },
-    [etp.id, methods]
-  )
+  React.useEffect(() => {
+    if (!etpDocument?.step) return
+    setCurrentStep((prev) => {
+      const next = clampStep(etpDocument.step, TOTAL_STEPS)
+      if (prev === next) return prev
+      return next
+    })
+  }, [etpDocument?.step])
 
   React.useEffect(() => {
     methods.reset(defaultValues)
     skipNextWatchRef.current = true
   }, [defaultValues, methods])
+
+  const updateUrlStep = React.useCallback(
+    (nextStep: number) => {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set("step", String(nextStep))
+      const query = params.toString()
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+    },
+    [pathname, router, searchParams]
+  )
+
+  const goToStep = React.useCallback(
+    (nextStep: number) => {
+      const clamped = clampStep(nextStep, TOTAL_STEPS)
+      setCurrentStep(clamped)
+      updateUrlStep(clamped)
+    },
+    [updateUrlStep]
+  )
+
+  const saveCurrentStep = React.useCallback(
+    async (
+      targetStep: number,
+      values: EtpFormValues,
+      { force }: { force?: boolean } = {}
+    ) => {
+      const shouldPersistValues = force || methods.formState.isDirty
+      const patch = shouldPersistValues ? extractStepPatch(currentStep, values) : undefined
+
+      if (!patch && targetStep === currentStep && !shouldPersistValues) {
+        setAutosaveStatus("idle")
+        return true
+      }
+
+      try {
+        setAutosaveStatus("saving")
+        const updated = await saveStep(targetStep, patch)
+        const updatedAt = updated?.updatedAt ?? (updated as any)?.updated_at ?? null
+        setLastSavedAt(updatedAt ? new Date(updatedAt) : new Date())
+        setAutosaveStatus("saved")
+        skipNextWatchRef.current = true
+        methods.reset(values)
+        return true
+      } catch (err) {
+        console.error("Falha ao salvar etapa do ETP", err)
+        setAutosaveStatus("error")
+        toast.error("Não foi possível salvar automaticamente. Tente novamente.")
+        return false
+      }
+    },
+    [currentStep, methods, saveStep]
+  )
+
+  const handleAutosave = React.useCallback(
+    async (values: EtpFormValues) => {
+      await saveCurrentStep(currentStep, values, { force: true })
+    },
+    [currentStep, saveCurrentStep]
+  )
 
   React.useEffect(() => {
     const subscription = methods.watch((values) => {
@@ -174,24 +286,14 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
     }
   }, [])
 
-  const updateUrlStep = React.useCallback(
-    (nextStep: number) => {
-      const params = new URLSearchParams(searchParams.toString())
-      params.set("step", String(nextStep))
-      const query = params.toString()
-      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
-    },
-    [pathname, router, searchParams]
-  )
+  React.useEffect(() => {
+    if (!error) {
+      return
+    }
 
-  const goToStep = React.useCallback(
-    (nextStep: number) => {
-      const clamped = Math.min(Math.max(nextStep, 1), TOTAL_STEPS)
-      setCurrentStep(clamped)
-      updateUrlStep(clamped)
-    },
-    [updateUrlStep]
-  )
+    console.error("Falha ao carregar ETP", error)
+    toast.error("Não foi possível carregar os dados mais recentes do ETP.")
+  }, [error])
 
   const validateStep = React.useCallback(
     async (stepIndex: number) => {
@@ -212,17 +314,27 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
       toast.error("Revise os campos obrigatórios antes de avançar.")
       return
     }
-    goToStep(currentStep + 1)
-  }, [currentStep, goToStep, validateStep])
 
-  const handlePrevious = React.useCallback(() => {
+    const values = methods.getValues()
+    const saved = await saveCurrentStep(currentStep + 1, values)
+    if (saved) {
+      goToStep(currentStep + 1)
+    }
+  }, [currentStep, goToStep, methods, saveCurrentStep, validateStep])
+
+  const handlePrevious = React.useCallback(async () => {
     if (currentStep <= 1) return
-    goToStep(currentStep - 1)
-  }, [currentStep, goToStep])
+    const values = methods.getValues()
+    const saved = await saveCurrentStep(currentStep - 1, values)
+    if (saved) {
+      goToStep(currentStep - 1)
+    }
+  }, [currentStep, goToStep, methods, saveCurrentStep])
 
   const handleStepClick = React.useCallback(
     async (targetStep: number) => {
       if (targetStep === currentStep) return
+
       if (targetStep > currentStep) {
         const isValid = await validateStep(currentStep)
         if (!isValid) {
@@ -230,12 +342,37 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
           return
         }
       }
-      goToStep(targetStep)
+
+      const values = methods.getValues()
+      const saved = await saveCurrentStep(targetStep, values)
+      if (saved) {
+        goToStep(targetStep)
+      }
     },
-    [currentStep, goToStep, validateStep]
+    [currentStep, goToStep, methods, saveCurrentStep, validateStep]
   )
 
-  const statusVariant = normalizeStatus(etp.status)
+  const statusVariant = normalizeStatus(etpDocument?.status ?? etp.status)
+
+  if (isLoading && !etpDocument) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-14 w-full rounded-xl" />
+        <Skeleton className="h-[420px] w-full rounded-xl" />
+      </div>
+    )
+  }
+
+  if (error && !etpDocument) {
+    return (
+      <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-6 text-destructive">
+        <h2 className="text-lg font-semibold">Falha ao carregar o Estudo Técnico Preliminar</h2>
+        <p className="mt-2 text-sm text-destructive/80">
+          Atualize a página ou tente novamente em instantes. Persistindo o erro, contate o suporte técnico.
+        </p>
+      </div>
+    )
+  }
 
   return (
     <FormProvider {...methods}>
@@ -248,6 +385,11 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
               <span>Código E-Docs: {etp.edocs || "—"}</span>
               <span className="h-1 w-1 rounded-full bg-neutral-300" aria-hidden />
               <StatusBadge status={statusVariant} />
+              {isFetching || isSaving ? (
+                <span className="flex items-center gap-2 text-xs text-neutral-400">
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-primary" /> Atualizando dados
+                </span>
+              ) : null}
             </div>
             <h1 className="text-2xl font-semibold text-neutral-900">
               {etp.title || defaultValues.general.title || "Estudo Técnico Preliminar"}
@@ -285,10 +427,19 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
               Última atualização: {lastSavedAt ? lastSavedAt.toLocaleString("pt-BR") : "—"}
             </div>
             <div className="flex w-full gap-3 md:w-auto">
-              <Button variant="outline" type="button" onClick={handlePrevious} disabled={currentStep === 1}>
+              <Button
+                variant="outline"
+                type="button"
+                onClick={handlePrevious}
+                disabled={currentStep === 1 || autosaveStatus === "saving" || autosaveStatus === "scheduled"}
+              >
                 Voltar
               </Button>
-              <Button type="button" onClick={handleNext}>
+              <Button
+                type="button"
+                onClick={handleNext}
+                disabled={autosaveStatus === "saving" || autosaveStatus === "scheduled"}
+              >
                 {currentStep === TOTAL_STEPS ? "Finalizar" : "Avançar"}
               </Button>
             </div>
@@ -298,3 +449,4 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
     </FormProvider>
   )
 }
+
