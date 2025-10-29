@@ -52,3 +52,6 @@ next-env.d.ts
 
 # Local environment variables
 .env.local
+
+# Test databases
+test.db
