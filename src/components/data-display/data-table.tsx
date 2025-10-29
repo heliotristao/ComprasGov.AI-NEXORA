@@ -72,6 +72,10 @@ export interface DataTableProps<T> {
   initialPageSize?: number
   /** Classes CSS adicionais */
   className?: string
+  /** Callback disparado ao clicar em uma linha */
+  onRowClick?: (row: T) => void
+  /** Função opcional para definir a chave da linha */
+  getRowKey?: (row: T, index: number) => string | number
 }
 
 /**
@@ -100,6 +104,8 @@ export function DataTable<T>({
   showPagination = true,
   initialPageSize = 10,
   className,
+  onRowClick,
+  getRowKey,
 }: DataTableProps<T>) {
   const [sortColumn, setSortColumn] = React.useState<string | null>(null)
   const [sortDirection, setSortDirection] = React.useState<"asc" | "desc">("asc")
@@ -199,8 +205,19 @@ export function DataTable<T>({
                 </TableCell>
               </TableRow>
             ) : (
-              paginatedData.map((row, rowIndex) => (
-                <TableRow key={rowIndex}>
+              paginatedData.map((row, rowIndex) => {
+                const key = getRowKey ? getRowKey(row, rowIndex) : rowIndex
+                const isInteractive = typeof onRowClick === "function"
+
+                return (
+                  <TableRow
+                    key={key}
+                    className={cn(
+                      isInteractive && "cursor-pointer transition hover:bg-slate-50",
+                      onRowClick && "data-[state=selected]:bg-slate-100"
+                    )}
+                    onClick={() => onRowClick?.(row)}
+                  >
                   {columns.map((column) => (
                     <TableCell
                       key={column.id}
@@ -212,8 +229,9 @@ export function DataTable<T>({
                       {column.accessor(row)}
                     </TableCell>
                   ))}
-                </TableRow>
-              ))
+                  </TableRow>
+                )
+              })
             )}
           </TableBody>
         </Table>

@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-10-29] - Tarefa C1:** Implementado o Módulo de Gestão com um dashboard unificado para visualização e filtragem de todos os processos da plataforma.
 * **[2025-10-29] - Tarefa B7:** Implementada a interface completa do wizard multietapas para ETP com auto-save, validação guiada e integração de geração de conteúdo por IA.
 * **[2025-10-29] - Tarefa B3:** Implementado o motor de validação de conformidade para ETPs no `planning-service`, com um endpoint que retorna um checklist de regras e sugestões de melhoria.
 * **[2025-10-29] - Tarefa B2:** Implementada a API de auto-save (`PATCH`) para a entidade ETP no `planning-service`, permitindo a atualização incremental de dados e o salvamento contínuo do progresso do usuário.

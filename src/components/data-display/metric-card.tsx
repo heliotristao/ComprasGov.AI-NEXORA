@@ -28,6 +28,8 @@ export interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
   iconColor?: string
   /** Cor de fundo do ícone (classe Tailwind) */
   iconBgColor?: string
+  /** Conteúdo adicional renderizado no rodapé */
+  children?: React.ReactNode
 }
 
 /**
@@ -69,6 +71,7 @@ export function MetricCard({
   iconColor = "text-primary",
   iconBgColor = "bg-primary/10",
   className,
+  children,
   ...props
 }: MetricCardProps) {
   const trendConfig = trend ? TREND_CONFIG[trend] : null
@@ -105,6 +108,8 @@ export function MetricCard({
             <span className="text-body-small text-muted-foreground">vs. período anterior</span>
           </div>
         )}
+
+        {children ? <div className="mt-4">{children}</div> : null}
       </CardContent>
     </Card>
   )
