@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-10-29] - Tarefa ATOM-008:** Implementada a interface administrativa para listagem e criação de templates de documentos (ETP/TR), estabelecendo a base para personalização institucional.
 * **[2025-10-30] - Tarefa ATOM-007:** Implementada a persistência de dados com auto-save e carregamento automático nos wizards de ETP e TR, conectando a UI aos endpoints de salvamento do backend.
 * **[2025-10-29] - Tarefa ATOM-006:** Implementadas as telas de consolidação para ETP e TR, permitindo validação de conformidade, seleção de template e geração dos documentos finais (DOCX/PDF).
 * **[2024-10-28] - Tarefa ATOM-005:** Implementadas as telas de listagem e detalhe de processos, com busca, filtros, paginação server-side e visualização de timeline e vínculos.
