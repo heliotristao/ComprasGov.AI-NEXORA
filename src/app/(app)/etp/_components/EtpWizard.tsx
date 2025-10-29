@@ -213,7 +213,7 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
       return
     }
     goToStep(currentStep + 1)
-  }, [currentStep, goToStep, toast, validateStep])
+  }, [currentStep, goToStep, validateStep])
 
   const handlePrevious = React.useCallback(() => {
     if (currentStep <= 1) return
@@ -232,7 +232,7 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
       }
       goToStep(targetStep)
     },
-    [currentStep, goToStep, toast, validateStep]
+    [currentStep, goToStep, validateStep]
   )
 
   const statusVariant = normalizeStatus(etp.status)
