@@ -7,23 +7,19 @@ import {
   ensureSessionOrUnauthorized,
   planningApiNotConfiguredResponse,
   proxyErrorResponse,
-} from "../../../processes/_utils"
+} from "../../../../processes/_utils"
 
 interface RouteParams {
   params: {
     id: string
+    fieldKey: string
   }
 }
 
-type HttpMethod = "GET" | "POST"
-
-async function proxyValidation(
-  request: NextRequest,
-  { params }: RouteParams,
-  method: HttpMethod
-) {
+export async function POST(request: NextRequest, { params }: RouteParams) {
   const documentId = params.id
-  const targetUrl = buildPlanningApiUrl(`/etp/${documentId}/validate`)
+  const fieldKey = params.fieldKey
+  const targetUrl = buildPlanningApiUrl(`/etp/${documentId}/generate/${fieldKey}`)
 
   if (!targetUrl) {
     return planningApiNotConfiguredResponse()
@@ -36,11 +32,11 @@ async function proxyValidation(
   }
 
   const session = sessionOrResponse
-  const body = method === "GET" ? undefined : await request.text()
+  const body = await request.text()
 
   try {
     const response = await fetch(targetUrl, {
-      method,
+      method: "POST",
       headers: buildAuthProxyHeaders(request.headers, session.token),
       body: body || undefined,
       cache: "no-store",
@@ -48,15 +44,7 @@ async function proxyValidation(
 
     return await buildProxyResponse(response)
   } catch (error) {
-    console.error(`Erro ao validar conformidade do ETP ${documentId}`, error)
-    return proxyErrorResponse("Não foi possível validar a conformidade do documento.")
+    console.error(`Erro ao gerar conteúdo de ${fieldKey} para o ETP ${documentId}`, error)
+    return proxyErrorResponse("Não foi possível gerar o conteúdo com IA.")
   }
-}
-
-export async function GET(request: NextRequest, context: RouteParams) {
-  return proxyValidation(request, context, "GET")
-}
-
-export async function POST(request: NextRequest, context: RouteParams) {
-  return proxyValidation(request, context, "POST")
 }
