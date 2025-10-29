@@ -15,15 +15,9 @@ interface RouteParams {
   }
 }
 
-type HttpMethod = "GET" | "POST"
-
-async function proxyValidation(
-  request: NextRequest,
-  { params }: RouteParams,
-  method: HttpMethod
-) {
+export async function PATCH(request: NextRequest, { params }: RouteParams) {
   const documentId = params.id
-  const targetUrl = buildPlanningApiUrl(`/etp/${documentId}/validate`)
+  const targetUrl = buildPlanningApiUrl(`/etp/${documentId}/autosave`)
 
   if (!targetUrl) {
     return planningApiNotConfiguredResponse()
@@ -36,11 +30,11 @@ async function proxyValidation(
   }
 
   const session = sessionOrResponse
-  const body = method === "GET" ? undefined : await request.text()
+  const body = await request.text()
 
   try {
     const response = await fetch(targetUrl, {
-      method,
+      method: "PATCH",
       headers: buildAuthProxyHeaders(request.headers, session.token),
       body: body || undefined,
       cache: "no-store",
@@ -48,15 +42,7 @@ async function proxyValidation(
 
     return await buildProxyResponse(response)
   } catch (error) {
-    console.error(`Erro ao validar conformidade do ETP ${documentId}`, error)
-    return proxyErrorResponse("Não foi possível validar a conformidade do documento.")
+    console.error(`Erro ao realizar autosave do ETP ${documentId}`, error)
+    return proxyErrorResponse("Não foi possível salvar automaticamente as alterações do ETP.")
   }
-}
-
-export async function GET(request: NextRequest, context: RouteParams) {
-  return proxyValidation(request, context, "GET")
-}
-
-export async function POST(request: NextRequest, context: RouteParams) {
-  return proxyValidation(request, context, "POST")
 }
