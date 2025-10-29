@@ -14,6 +14,7 @@ from app.db.base import Base
 from app.db.models import ETP
 from app.models.etp_ai_trace import ETPAITrace
 from app.db.models import etp_modular
+from app.db.models import etp_validation
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

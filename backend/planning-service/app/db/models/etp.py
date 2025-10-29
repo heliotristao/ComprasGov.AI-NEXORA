@@ -46,6 +46,10 @@ class ETP(Base):
     )
     deleted_at = Column(DateTime(timezone=True), nullable=True)
 
+    validations = relationship(
+        "ETPValidation", back_populates="etp", cascade="all, delete-orphan"
+    )
+
     __table_args__ = (
         Index("ix_etps_edocs_number", "edocs_number"),
         Index("ix_etps_status", "status"),
