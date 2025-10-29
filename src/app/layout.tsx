@@ -34,18 +34,7 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className="min-h-screen bg-neutral-50 font-sans text-foreground antialiased">
         <Providers>
-          <div className="flex min-h-screen flex-col">
-            <header className="border-b border-border bg-white shadow-sm">
-              <div className="mx-auto flex w-full max-w-6xl items-center px-6 py-4">
-                <span className="text-lg font-semibold text-primary-700">
-                  ComprasGov.AI - NEXORA
-                </span>
-              </div>
-            </header>
-            <main className="flex-1">
-              <div className="mx-auto w-full max-w-6xl px-6 py-8">{children}</div>
-            </main>
-          </div>
+          {children}
           <Toaster />
         </Providers>
       </body>
