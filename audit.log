@@ -1,0 +1,29 @@
+INFO:httpx:HTTP Request: POST http://testserver/api/v1/etp/1/generate/justificativa "HTTP/1.1 500 Internal Server Error"
+INFO:httpx:HTTP Request: POST http://testserver/api/v1/etp/999/generate/justificativa "HTTP/1.1 404 Not Found"
+INFO:root:user_id=test_user, action='autosave_etp', details='ETP 720973d1-49d3-451e-83fc-941c7e66f603 autosaved'
+INFO:httpx:HTTP Request: PATCH http://testserver/api/v1/etp/720973d1-49d3-451e-83fc-941c7e66f603/autosave "HTTP/1.1 200 OK"
+INFO:root:user_id=test_user, action='autosave_etp', details='ETP 39fb4fcd-4a98-491c-b702-049555d98209 autosaved'
+INFO:httpx:HTTP Request: PATCH http://testserver/api/v1/etp/39fb4fcd-4a98-491c-b702-049555d98209/autosave "HTTP/1.1 200 OK"
+INFO:root:user_id=test_user, action='autosave_etp', details='ETP 8e4d9e81-20fc-44bc-9232-4c98a2733ca6 autosaved'
+INFO:httpx:HTTP Request: PATCH http://testserver/api/v1/etp/8e4d9e81-20fc-44bc-9232-4c98a2733ca6/autosave "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: PATCH http://testserver/api/v1/etp/16377944-22f0-4699-952a-65fa846438ff/autosave "HTTP/1.1 422 Unprocessable Entity"
+INFO:httpx:HTTP Request: PATCH http://testserver/api/v1/etp/877177e8-864a-403d-902f-630e88307198/autosave "HTTP/1.1 404 Not Found"
+INFO:httpx:HTTP Request: POST http://testserver/api/v1/etp "HTTP/1.1 201 Created"
+INFO:httpx:HTTP Request: GET http://testserver/api/v1/etp/07ce6b58-2ee6-4a2f-88a3-5e561f22847d "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: PATCH http://testserver/api/v1/etp/c4647b89-ee59-4498-aec5-fe041aac06c1 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: DELETE http://testserver/api/v1/etp/33de7220-e801-4ace-84de-7e10ff5bc40a "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST http://testserver/api/v1/etp/1/generate/justificativa "HTTP/1.1 500 Internal Server Error"
+INFO:httpx:HTTP Request: POST http://testserver/api/v1/etp/999/generate/justificativa "HTTP/1.1 404 Not Found"
+INFO:root:user_id=test_user, action='autosave_etp', details='ETP 3c59e755-d4b6-41a6-b815-2535f6c708b7 autosaved'
+INFO:httpx:HTTP Request: PATCH http://testserver/api/v1/etp/3c59e755-d4b6-41a6-b815-2535f6c708b7/autosave "HTTP/1.1 200 OK"
+INFO:root:user_id=test_user, action='autosave_etp', details='ETP e4ca685b-553d-48bf-8d6a-0d3ba5efdc10 autosaved'
+INFO:httpx:HTTP Request: PATCH http://testserver/api/v1/etp/e4ca685b-553d-48bf-8d6a-0d3ba5efdc10/autosave "HTTP/1.1 200 OK"
+INFO:root:user_id=test_user, action='autosave_etp', details='ETP 51e520d0-c54c-4ef9-830c-d4efdf8ffebd autosaved'
+INFO:httpx:HTTP Request: PATCH http://testserver/api/v1/etp/51e520d0-c54c-4ef9-830c-d4efdf8ffebd/autosave "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: PATCH http://testserver/api/v1/etp/42cc66e4-8ae4-45a6-90d4-86352ce7be78/autosave "HTTP/1.1 422 Unprocessable Entity"
+INFO:httpx:HTTP Request: PATCH http://testserver/api/v1/etp/afa62803-c986-48ec-9cf6-72dfe8b6b1a1/autosave "HTTP/1.1 404 Not Found"
+INFO:httpx:HTTP Request: POST http://testserver/api/v1/etp "HTTP/1.1 201 Created"
+INFO:httpx:HTTP Request: GET http://testserver/api/v1/etp/373ea21e-a9ba-4375-ab97-373768ca96ec "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: PATCH http://testserver/api/v1/etp/f80c179d-86a6-4f0f-b23f-5812b49c66ea "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: DELETE http://testserver/api/v1/etp/0756bf9c-38ac-4d88-8f0d-2e44d7c33e02 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://testserver/api/v1/etp/0756bf9c-38ac-4d88-8f0d-2e44d7c33e02 "HTTP/1.1 404 Not Found"

@@ -3,9 +3,10 @@ from typing import Optional
 from uuid import UUID
 
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.attributes import flag_modified
 
 from app.db.models.etp import ETP
-from app.schemas.etp_schemas import ETPCreate, ETPUpdate
+from app.schemas.etp_schemas import ETPCreate, ETPUpdate, ETPPartialUpdate
 
 
 def create_etp(db: Session, *, etp_in: ETPCreate, created_by: str) -> ETP:
@@ -13,6 +14,31 @@ def create_etp(db: Session, *, etp_in: ETPCreate, created_by: str) -> ETP:
     Create a new ETP.
     """
     db_obj = ETP(**etp_in.dict(exclude_unset=True), created_by=created_by)
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
+
+
+def patch_etp(db: Session, *, etp_id: UUID, patch: ETPPartialUpdate, user_id: str) -> Optional[ETP]:
+    """
+    Partially update an ETP.
+    """
+    db_obj = get_etp(db=db, etp_id=etp_id)
+    if not db_obj:
+        return None
+
+    patch_data = patch.dict(exclude_unset=True)
+    for field, value in patch_data.items():
+        if field == "data":
+            if db_obj.data is None:
+                db_obj.data = {}
+            db_obj.data.update(value)
+            flag_modified(db_obj, "data")
+        else:
+            setattr(db_obj, field, value)
+
+    db_obj.updated_by = user_id
     db.add(db_obj)
     db.commit()
     db.refresh(db_obj)

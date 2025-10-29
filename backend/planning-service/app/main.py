@@ -1,6 +1,9 @@
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.endpoints import health, planning, market_ai, etp_ai, tr_ai, rag, dashboard, plans, etp
+
+logging.basicConfig(filename='audit.log', level=logging.INFO)
 
 app = FastAPI(title="NEXORA Planning Service")
 

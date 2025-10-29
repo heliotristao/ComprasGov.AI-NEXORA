@@ -33,6 +33,7 @@ class ETP(Base):
     step = Column(Integer, default=1, nullable=False)
     data = Column(JSON, nullable=True)
     created_by = Column(String, nullable=False)
+    updated_by = Column(String, nullable=True)
 
     created_at = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
