@@ -12,6 +12,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from alembic import context
 from app.db.base import Base
 from app.db.models import ETP
+from app.models.etp_ai_trace import ETPAITrace
+from app.db.models import etp_modular
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

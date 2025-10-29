@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-10-29] - Tarefa B4:** Implementada a funcionalidade de geração de conteúdo por IA para campos do ETP no `planning-service`, incluindo rastreabilidade de cada execução e suporte a múltiplos provedores.
 * **[2025-10-29] - Tarefa B1:** Implementado o modelo de dados, migração e CRUD completo para a entidade ETP no `planning-service`, estabelecendo a base para a persistência dos Estudos Técnicos Preliminares.
 * **[2025-10-29] - Tarefa ATOM-008:** Implementada a interface administrativa para listagem e criação de templates de documentos (ETP/TR), estabelecendo a base para personalização institucional.
 * **[2025-10-30] - Tarefa ATOM-007:** Implementada a persistência de dados com auto-save e carregamento automático nos wizards de ETP e TR, conectando a UI aos endpoints de salvamento do backend.
