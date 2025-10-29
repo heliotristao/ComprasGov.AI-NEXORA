@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -32,16 +32,43 @@ export function TRWizard({ documentoId, etpId }: TRWizardProps) {
     validarConformidade
   } = useTRDocument(documentoId)
 
+  const handleSalvar = useCallback(
+    async (automatico = false) => {
+      if (!documento) return
+
+      try {
+        if (automatico) {
+          setSalvandoAutomatico(true)
+        }
+
+        await atualizarDados(documento.dados)
+
+        if (!automatico) {
+          toast.success("Progresso salvo com sucesso!")
+        }
+      } catch (error) {
+        if (!automatico) {
+          toast.error("Erro ao salvar progresso")
+        }
+      } finally {
+        if (automatico) {
+          setSalvandoAutomatico(false)
+        }
+      }
+    },
+    [atualizarDados, documento]
+  )
+
   // Auto-save a cada 30 segundos
   useEffect(() => {
     if (!documento) return
 
     const interval = setInterval(() => {
-      handleSalvar(true)
+      void handleSalvar(true)
     }, 30000)
 
     return () => clearInterval(interval)
-  }, [documento])
+  }, [documento, handleSalvar])
 
   if (isLoading || !documento || !template) {
     return (
@@ -72,28 +99,6 @@ export function TRWizard({ documentoId, etpId }: TRWizardProps) {
     if (secaoAtual > 0) {
       setSecaoAtual(secaoAtual - 1)
       window.scrollTo({ top: 0, behavior: "smooth" })
-    }
-  }
-
-  const handleSalvar = async (automatico = false) => {
-    try {
-      if (automatico) {
-        setSalvandoAutomatico(true)
-      }
-
-      await atualizarDados(documento.dados)
-
-      if (!automatico) {
-        toast.success("Progresso salvo com sucesso!")
-      }
-    } catch (error) {
-      if (!automatico) {
-        toast.error("Erro ao salvar progresso")
-      }
-    } finally {
-      if (automatico) {
-        setSalvandoAutomatico(false)
-      }
     }
   }
 

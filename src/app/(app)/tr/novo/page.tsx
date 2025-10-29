@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, Suspense } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -18,15 +18,7 @@ function NovoTRContent() {
   const [criando, setCriando] = useState(false)
   const [etpInfo, setEtpInfo] = useState<any>(null)
 
-  useEffect(() => {
-    if (etpId) {
-      carregarETP()
-    } else {
-      setLoading(false)
-    }
-  }, [etpId])
-
-  const carregarETP = async () => {
+  const carregarETP = useCallback(async () => {
     try {
       const response = await api.get(`/api/v1/etp/${etpId}`)
       setEtpInfo(response.data)
@@ -36,7 +28,15 @@ function NovoTRContent() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [etpId])
+
+  useEffect(() => {
+    if (etpId) {
+      void carregarETP()
+    } else {
+      setLoading(false)
+    }
+  }, [carregarETP, etpId])
 
   const handleCriarTR = async () => {
     if (!etpId) {
