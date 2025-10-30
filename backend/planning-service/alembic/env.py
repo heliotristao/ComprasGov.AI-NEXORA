@@ -10,11 +10,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 
 from alembic import context
+
+# Import the Base and all models for autogenerate
 from app.db.base import Base
-from app.db.models import ETP, audit_log
+from app.models.etp import ETP
+# Assuming other models are also necessary for the database schema
 from app.models.etp_ai_trace import ETPAITrace
-from app.db.models import etp_modular
-from app.db.models import etp_validation
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
