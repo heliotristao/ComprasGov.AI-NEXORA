@@ -44,6 +44,7 @@ services:
       context: ./backend/api-gateway
     environment:
       REDIS_HOST: redis
+      GOVERNANCE_JWKS_URL: "http://governance-service:8000/.well-known/jwks.json"
     depends_on:
       - redis
     networks:
@@ -65,9 +66,15 @@ services:
       - nexora-net
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.governance.rule=PathPrefix(`/governance`)"
-      - "traefik.http.routers.governance.middlewares=forward-auth"
-      - "traefik.http.services.governance.loadbalancer.server.port=8000"
+      # Public routes (no auth)
+      - "traefik.http.routers.governance-public.rule=PathPrefix(`/governance/api/v1/token`) || PathPrefix(`/governance/.well-known/jwks.json`)"
+      - "traefik.http.routers.governance-public.service=governance-svc"
+      # Protected routes
+      - "traefik.http.routers.governance-protected.rule=PathPrefix(`/governance`)"
+      - "traefik.http.routers.governance-protected.middlewares=forward-auth"
+      - "traefik.http.routers.governance-protected.service=governance-svc"
+
+      - "traefik.http.services.governance-svc.loadbalancer.server.port=8000"
 
   planning-service:
     build:
