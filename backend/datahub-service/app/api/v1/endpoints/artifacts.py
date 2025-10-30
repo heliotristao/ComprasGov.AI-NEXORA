@@ -1,13 +1,14 @@
 import uuid
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from app.api import deps
 from app.api.v1 import dependencies
 from app.crud import crud_artifact
 from app.schemas import artifact as artifact_schema
+from app.tasks.catalog_job import add_artifact_to_index
 from app.core.storage import (
     upload_file_to_s3,
     get_presigned_download_url,
@@ -23,6 +24,7 @@ router = APIRouter()
 def upload_artifact(
     *,
     db: Session = Depends(deps.get_db),
+    background_tasks: BackgroundTasks,
     current_user: dict = Depends(dependencies.get_current_user),
     process_id: str = Form(...),
     doc_type: DocType = Form(...),
@@ -68,6 +70,9 @@ def upload_artifact(
         user=current_user["username"],
         details={"artifact_id": str(artifact.id), "s3_key": artifact.s3_key},
     )
+
+    # 6. Trigger background task to index the artifact
+    add_artifact_to_index(background_tasks, artifact.id)
 
     return artifact
 
