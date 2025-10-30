@@ -55,3 +55,6 @@ next-env.d.ts
 
 # Test databases
 test.db
+
+# Log files
+audit.log

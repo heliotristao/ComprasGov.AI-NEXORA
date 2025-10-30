@@ -3,6 +3,7 @@ uvicorn[standard]
 sqlalchemy
 psycopg2-binary
 pydantic[email]
+pydantic-settings
 python-dotenv
 alembic
 boto3
@@ -12,3 +13,4 @@ python-multipart
 pytest
 moto[s3]
 httpx
+pgvector
