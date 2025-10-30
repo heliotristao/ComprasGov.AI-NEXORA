@@ -13,13 +13,19 @@ import {
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
-import type { EtpValidationResult } from "./etp.zod"
-
 interface ValidationPanelProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  result: EtpValidationResult | null
+  result: ValidationResult | null
   isLoading?: boolean
+  documentLabel?: string
+}
+
+export interface ValidationResult {
+  errors?: string[]
+  warnings?: string[]
+  infos?: string[]
+  checkedAt?: string | null
 }
 
 function renderList(items: string[], emptyMessage: string, icon: React.ReactNode, accentClass: string) {
@@ -39,7 +45,13 @@ function renderList(items: string[], emptyMessage: string, icon: React.ReactNode
   )
 }
 
-export function ValidationPanel({ open, onOpenChange, result, isLoading = false }: ValidationPanelProps) {
+export function ValidationPanel({
+  open,
+  onOpenChange,
+  result,
+  isLoading = false,
+  documentLabel = "Estudo Técnico Preliminar",
+}: ValidationPanelProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl space-y-6">
@@ -51,7 +63,7 @@ export function ValidationPanel({ open, onOpenChange, result, isLoading = false 
         </DialogHeader>
 
         {isLoading ? (
-          <p className="text-sm text-neutral-600">Validando informações do ETP...</p>
+          <p className="text-sm text-neutral-600">Validando informações do {documentLabel}...</p>
         ) : (
           <ScrollArea className="max-h-[420px] space-y-6 pr-4">
             <section className="space-y-3">

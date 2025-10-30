@@ -1,10 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { ShieldCheck, ChevronLeft, ChevronRight, Bot } from "lucide-react"
+import { ShieldCheck, ChevronLeft, ChevronRight, Bot, FileInput, Layers } from "lucide-react"
 
 import { AutosaveBadge } from "@/app/_shared/components/AutosaveBadge"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 import type { AutosaveStatus } from "./use-autosave"
 
@@ -20,6 +21,11 @@ interface FormActionsProps {
   isValidating?: boolean
   autosaveStatus: AutosaveStatus
   lastSavedAt: Date | null
+  onImportFromEtp?: () => void
+  isImportEnabled?: boolean
+  importTooltip?: string
+  onConsolidate?: () => void
+  isConsolidateEnabled?: boolean
 }
 
 export function FormActions({
@@ -34,60 +40,101 @@ export function FormActions({
   isValidating = false,
   autosaveStatus,
   lastSavedAt,
+  onImportFromEtp,
+  isImportEnabled = false,
+  importTooltip = "Em breve",
+  onConsolidate,
+  isConsolidateEnabled = false,
 }: FormActionsProps) {
   const isFirstStep = currentStep === 1
   const isLastStep = currentStep === totalSteps
 
   return (
-    <div className="flex flex-col gap-4 border-t border-neutral-200 pt-4 md:flex-row md:items-center md:justify-between">
-      <div className="flex flex-wrap items-center gap-3">
-        <AutosaveBadge status={autosaveStatus} lastSavedAt={lastSavedAt} />
+    <TooltipProvider>
+      <div className="flex flex-col gap-4 border-t border-neutral-200 pt-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-wrap items-center gap-3">
+          <AutosaveBadge status={autosaveStatus} lastSavedAt={lastSavedAt} />
 
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={onValidate}
-          disabled={isValidating}
-          className="inline-flex items-center gap-2 border-primary-200 text-primary-700 hover:bg-primary-50"
-        >
-          <ShieldCheck className="h-4 w-4" aria-hidden />
-          {isValidating ? "Validando..." : "Validar"}
-        </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onImportFromEtp}
+                disabled={!isImportEnabled}
+                className="inline-flex items-center gap-2 border-primary-200 text-primary-700 hover:bg-primary-50"
+              >
+                <FileInput className="h-4 w-4" aria-hidden />
+                Importar de ETP
+              </Button>
+            </TooltipTrigger>
+            {importTooltip ? <TooltipContent>{importTooltip}</TooltipContent> : null}
+          </Tooltip>
 
-        <Button type="button" variant="outline" size="sm" disabled className="inline-flex items-center gap-2">
-          <Bot className="h-4 w-4" aria-hidden />
-          Aceitar IA (em breve)
-        </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onValidate}
+            disabled={isValidating}
+            className="inline-flex items-center gap-2 border-primary-200 text-primary-700 hover:bg-primary-50"
+          >
+            <ShieldCheck className="h-4 w-4" aria-hidden />
+            {isValidating ? "Validando..." : "Validar"}
+          </Button>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onConsolidate}
+                disabled={!isConsolidateEnabled}
+                className="inline-flex items-center gap-2"
+              >
+                <Layers className="h-4 w-4" aria-hidden />
+                Consolidar
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Em breve</TooltipContent>
+          </Tooltip>
+
+          <Button type="button" variant="outline" size="sm" disabled className="inline-flex items-center gap-2">
+            <Bot className="h-4 w-4" aria-hidden />
+            Aceitar IA (em breve)
+          </Button>
+        </div>
+
+        <div className="flex items-center justify-end gap-3">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onPrevious}
+            disabled={isFirstStep || isPreviousDisabled}
+            className="inline-flex items-center gap-2 text-neutral-600 hover:text-primary-700"
+          >
+            <ChevronLeft className="h-4 w-4" aria-hidden />
+            Voltar
+          </Button>
+          <Button
+            type="button"
+            onClick={onNext}
+            disabled={isNextDisabled}
+            className="inline-flex items-center gap-2"
+          >
+            {isNextLoading ? (
+              <span>Processando...</span>
+            ) : (
+              <>
+                {isLastStep ? "Finalizar" : "Avançar"}
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </>
+            )}
+          </Button>
+        </div>
       </div>
-
-      <div className="flex items-center justify-end gap-3">
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={onPrevious}
-          disabled={isFirstStep || isPreviousDisabled}
-          className="inline-flex items-center gap-2 text-neutral-600 hover:text-primary-700"
-        >
-          <ChevronLeft className="h-4 w-4" aria-hidden />
-          Voltar
-        </Button>
-        <Button
-          type="button"
-          onClick={onNext}
-          disabled={isNextDisabled}
-          className="inline-flex items-center gap-2"
-        >
-          {isNextLoading ? (
-            <span>Processando...</span>
-          ) : (
-            <>
-              {isLastStep ? "Finalizar" : "Avançar"}
-              <ChevronRight className="h-4 w-4" aria-hidden />
-            </>
-          )}
-        </Button>
-      </div>
-    </div>
+    </TooltipProvider>
   )
 }
