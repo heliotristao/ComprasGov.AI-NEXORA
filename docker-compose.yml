@@ -1,6 +1,21 @@
 version: '3.8'
 
 services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - nexora-net
+
   postgres:
     image: postgres:15-alpine
     environment:
@@ -19,12 +34,28 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    networks:
+      - nexora-net
+
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+    environment:
+      REDIS_HOST: redis
+    depends_on:
+      - redis
+    networks:
+      - nexora-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.api-gateway-svc.loadbalancer.server.port=8000"
+      - "traefik.http.middlewares.forward-auth.forwardauth.address=http://api-gateway:8000/auth"
+
   governance-service:
-    # Port mapping verified for frontend communication
     build:
       context: ./backend/governance-service
-    ports:
-      - "8001:8000"
     environment:
       DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
     depends_on:
@@ -32,12 +63,15 @@ services:
         condition: service_healthy
     networks:
       - nexora-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.governance.rule=PathPrefix(`/governance`)"
+      - "traefik.http.routers.governance.middlewares=forward-auth"
+      - "traefik.http.services.governance.loadbalancer.server.port=8000"
 
   planning-service:
     build:
       context: ./backend/planning-service
-    ports:
-      - "8002:8000"
     environment:
       DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
     depends_on:
@@ -45,6 +79,11 @@ services:
         condition: service_healthy
     networks:
       - nexora-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.planning.rule=PathPrefix(`/planning`)"
+      - "traefik.http.routers.planning.middlewares=forward-auth"
+      - "traefik.http.services.planning.loadbalancer.server.port=8000"
 
   frontend:
     build:
@@ -52,16 +91,13 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - governance-service
-      - planning-service
+      - traefik
     networks:
       - nexora-net
 
   datahub-service:
     build:
       context: ./backend/datahub-service
-    ports:
-      - "8003:8000"
     environment:
       DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
       S3_ENDPOINT_URL: "http://minio:9000"
@@ -75,6 +111,11 @@ services:
         condition: service_healthy
     networks:
       - nexora-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.datahub.rule=PathPrefix(`/datahub`)"
+      - "traefik.http.routers.datahub.middlewares=forward-auth"
+      - "traefik.http.services.datahub.loadbalancer.server.port=8000"
 
   minio:
     image: minio/minio
