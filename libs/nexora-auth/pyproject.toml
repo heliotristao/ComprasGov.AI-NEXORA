@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "nexora-auth"
+version = "0.1.0"
+description = "Shared authentication and authorization library for NEXORA microservices."
+authors = ["Jules, Principal Software Engineer"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.110.0"
+pyjwt = {extras = ["crypto"], version = "^2.8.0"}
+requests = "^2.31.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -11,7 +11,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from alembic import context
 from app.db.base import Base
-from app.db.models import ETP
+from app.db.models import ETP, audit_log
 from app.models.etp_ai_trace import ETPAITrace
 from app.db.models import etp_modular
 from app.db.models import etp_validation

@@ -3,3 +3,4 @@ uvicorn
 redis
 requests
 prometheus-fastapi-instrumentator
+-e ../../libs/nexora-auth
