@@ -13,6 +13,7 @@ interface WizardShellProps {
   onStepChange?: (step: number) => void
   actions: React.ReactNode
   children: React.ReactNode
+  badgeLabel?: string
 }
 
 export function WizardShell({
@@ -24,6 +25,7 @@ export function WizardShell({
   onStepChange,
   actions,
   children,
+  badgeLabel = "Planeja.AI • Estudo Técnico Preliminar",
 }: WizardShellProps) {
   const activeStep = steps[currentStep - 1]
 
@@ -32,7 +34,7 @@ export function WizardShell({
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 md:px-6">
         <header className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
           <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary-600">Planeja.AI • Estudo Técnico Preliminar</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary-600">{badgeLabel}</p>
             <h1 className="text-3xl font-bold text-neutral-900">{title}</h1>
             <p className="text-sm text-neutral-600">{description}</p>
           </div>

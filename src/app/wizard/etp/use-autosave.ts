@@ -3,18 +3,25 @@
 import * as React from "react"
 import type { UseFormReturn } from "react-hook-form"
 
-import type { AutosavePayload, AutosaveResponse } from "./_api/etp.client"
-import type { EtpFormValues } from "./etp.zod"
-
 export type AutosaveStatus = "idle" | "scheduled" | "saving" | "saved" | "error"
 
-interface UseAutosaveOptions {
-  form: UseFormReturn<EtpFormValues>
+export interface AutosavePayload<TFormValues> {
+  step: number
+  data: Partial<TFormValues>
+}
+
+export interface AutosaveResponse<TFormValues> {
+  updatedAt: string | null
+  data: Partial<TFormValues>
+}
+
+interface UseAutosaveOptions<TFormValues extends Record<string, any>> {
+  form: UseFormReturn<TFormValues>
   enabled: boolean
   step: number
-  save: (payload: AutosavePayload) => Promise<AutosaveResponse>
+  save: (payload: AutosavePayload<TFormValues>) => Promise<AutosaveResponse<TFormValues>>
   debounceMs?: number
-  initialSnapshot?: EtpFormValues
+  initialSnapshot?: TFormValues
   initialSavedAt?: Date | string | null
 }
 
@@ -72,14 +79,14 @@ function normalizeTimestamp(value: Date | string | null | undefined): Date | nul
   return Number.isNaN(parsed.getTime()) ? null : parsed
 }
 
-export interface UseAutosaveResult {
+export interface UseAutosaveResult<TFormValues> {
   status: AutosaveStatus
   lastSavedAt: Date | null
   flush: () => Promise<void>
-  syncSnapshot: (values: EtpFormValues, savedAt?: Date | string | null) => void
+  syncSnapshot: (values: TFormValues, savedAt?: Date | string | null) => void
 }
 
-export function useAutosave({
+export function useAutosave<TFormValues extends Record<string, any>>({
   form,
   enabled,
   step,
@@ -87,11 +94,11 @@ export function useAutosave({
   debounceMs = 700,
   initialSnapshot,
   initialSavedAt = null,
-}: UseAutosaveOptions): UseAutosaveResult {
+}: UseAutosaveOptions<TFormValues>): UseAutosaveResult<TFormValues> {
   const [status, setStatus] = React.useState<AutosaveStatus>("idle")
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(() => normalizeTimestamp(initialSavedAt))
 
-  const snapshotRef = React.useRef<EtpFormValues>(deepClone(initialSnapshot ?? form.getValues()))
+  const snapshotRef = React.useRef<TFormValues>(deepClone(initialSnapshot ?? form.getValues()))
   const timerRef = React.useRef<NodeJS.Timeout | null>(null)
   const skipNextWatchRef = React.useRef(true)
 
@@ -103,7 +110,7 @@ export function useAutosave({
   }, [])
 
   const syncSnapshot = React.useCallback(
-    (values: EtpFormValues, savedAt?: Date | string | null) => {
+    (values: TFormValues, savedAt?: Date | string | null) => {
       snapshotRef.current = deepClone(values)
       skipNextWatchRef.current = true
       setStatus("idle")
@@ -123,7 +130,7 @@ export function useAutosave({
 
     const currentValues = form.getValues()
     const snapshot = snapshotRef.current
-    const diff = computeDiff(currentValues, snapshot) as Partial<EtpFormValues>
+    const diff = computeDiff(currentValues, snapshot) as Partial<TFormValues>
 
     if (!diff || Object.keys(diff).length === 0) {
       setStatus((prev) => (prev === "error" ? prev : "idle"))
@@ -142,7 +149,7 @@ export function useAutosave({
       setLastSavedAt(normalizeTimestamp(response.updatedAt) ?? new Date())
       setStatus("saved")
     } catch (error) {
-      console.error("Falha ao executar autosave do ETP", error)
+      console.error("Falha ao executar autosave do documento", error)
       setStatus("error")
     }
   }, [clearTimer, enabled, form, save, step])
