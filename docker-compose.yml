@@ -85,6 +85,25 @@ services:
       - "traefik.http.routers.planning.middlewares=forward-auth"
       - "traefik.http.services.planning.loadbalancer.server.port=8000"
 
+  metrics-service:
+    build:
+      context: ./backend/metrics-service
+    environment:
+      DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
+      REDIS_URL: "redis://redis:6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - nexora-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.metrics.rule=PathPrefix(`/metrics`)"
+      - "traefik.http.routers.metrics.middlewares=forward-auth"
+      - "traefik.http.services.metrics.loadbalancer.server.port=8000"
+
   frontend:
     build:
       context: ./src

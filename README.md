@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-10-30] - Tarefa A5:** Criado o `metrics-service`, responsável por agregar e expor métricas operacionais consolidadas para o Dashboard Preditivo.
 * **[2025-10-30] - Tarefa A4:** Criada a biblioteca `nexora-auth` e implementado o sistema de RBAC e auditoria cross-service, padronizando a segurança e a rastreabilidade em todo o ecossistema.
 * **[2025-10-30] - Tarefa A3:** Criado o `api-gateway`, um ponto de entrada único para todos os microsserviços, centralizando autenticação, roteamento, rate limiting e logging.
 * **[2025-10-29] - Tarefa C3:** Implementado o serviço "transformer" no `planning-service` para criar rascunhos de Termos de Referência (TR) a partir de ETPs existentes, com mapeamento automático de campos e relatório de gaps.
