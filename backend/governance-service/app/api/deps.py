@@ -4,6 +4,20 @@ from sqlalchemy.orm import Session
 from app.db.session import SessionLocal
 from nexora_auth.audit import AuditLogger
 from app.db.models.audit_log import AuditLog
+from nexora_auth.security import get_current_user_factory
+from nexora_auth.jwt import JWTValidator
+from app.core.config import JWKS_URL, ALGORITHM, AUDIENCE, ISSUER
+
+# Create a JWT validator instance for the governance service
+jwt_validator = JWTValidator(
+    jwks_url=JWKS_URL,
+    algorithm=ALGORITHM,
+    audience=AUDIENCE,
+    issuer=ISSUER,
+)
+
+# Create the get_current_user dependency using the factory
+get_current_user = get_current_user_factory(jwt_validator)
 
 def get_db() -> Generator:
     db = SessionLocal()

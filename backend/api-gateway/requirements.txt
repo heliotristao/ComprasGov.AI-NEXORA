@@ -1,6 +1,6 @@
-fastapi
-uvicorn
-redis
+fastapi==0.110.0
+uvicorn[standard]==0.29.0
 requests
+redis
 prometheus-fastapi-instrumentator
--e ../../libs/nexora-auth
+-e libs/nexora-auth
