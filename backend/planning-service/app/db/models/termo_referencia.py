@@ -264,6 +264,8 @@ class TermoReferencia(Base):
     # Template institucional aplicado ao gerar documento
     template_id = Column(Integer, nullable=True)
     template_version = Column(String(50), nullable=True)
+
+    versions = relationship("TRVersion", back_populates="tr", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<TR(id={self.id}, etp_id={self.etp_id}, plan_id={self.plan_id}, status={self.status}, versao={self.versao})>"

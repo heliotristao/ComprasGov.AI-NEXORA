@@ -2,7 +2,7 @@ import logging
 from fastapi import FastAPI
 from app.core.sla.schedules import start_sla_scheduler, shutdown_sla_scheduler
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1.endpoints import health, planning, market_ai, etp_ai, tr_ai, rag, dashboard, plans, etp, etp_validation, sla, tr_transform
+from app.api.v1.endpoints import health, planning, market_ai, etp_ai, tr_ai, rag, dashboard, plans, etp, etp_validation, sla, tr_transform, tr_consolidate
 
 logging.basicConfig(filename='audit.log', level=logging.INFO)
 
@@ -32,6 +32,7 @@ app.include_router(plans.router, prefix="/api/v1", tags=["plans"])
 app.include_router(etp.router, prefix="/api/v1", tags=["etp"])
 app.include_router(etp_validation.router, prefix="/api/v1/etp", tags=["etp_validation"])
 app.include_router(tr_transform.router, prefix="/api/v1/tr", tags=["tr_transform"])
+app.include_router(tr_consolidate.router, prefix="/api/v1/tr", tags=["tr_consolidate"])
 
 app.include_router(sla.router, prefix="/api/v1")
 
