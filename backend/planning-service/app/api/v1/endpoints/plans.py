@@ -1,11 +1,14 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from app import schemas
 from app.api import deps
 from app.crud import crud_plan
+from nexora_auth.decorators import require_role
+from nexora_auth.audit import AuditLogger
 
 router = APIRouter()
+
 
 @router.get("/", response_model=List[schemas.Plan])
 def read_plans(
@@ -22,19 +25,24 @@ def read_plans(
 
 
 @router.post("/", response_model=schemas.Plan, status_code=201)
+@require_role({"Admin", "Planejador"})
 def create_plan(
     *,
+    request: Request,
     db: Session = Depends(deps.get_db),
     plan_in: schemas.PlanCreate,
-    current_user: dict = Depends(deps.get_current_user)
+    current_user: dict = Depends(deps.get_current_user),
+    audit_logger: AuditLogger = Depends(deps.get_audit_logger)
 ):
     """
     Create new plan.
     """
-    if not current_user:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-
     plan = crud_plan.create_plan(db=db, obj_in=plan_in)
+    audit_logger.log(
+        action="CREATE_PLAN",
+        request=request,
+        details={"plan_id": str(plan.id), "title": plan.title}
+    )
     return plan
 
 
@@ -55,12 +63,15 @@ def read_plan(
 
 
 @router.put("/{plan_id}", response_model=schemas.Plan)
+@require_role({"Admin", "Planejador"})
 def update_plan(
     *,
+    request: Request,
     db: Session = Depends(deps.get_db),
     plan_id: str,
     plan_in: schemas.PlanUpdate,
-    current_user: dict = Depends(deps.get_current_user)
+    current_user: dict = Depends(deps.get_current_user),
+    audit_logger: AuditLogger = Depends(deps.get_audit_logger)
 ):
     """
     Update a plan.
@@ -70,4 +81,9 @@ def update_plan(
         raise HTTPException(status_code=404, detail="Plan not found")
 
     plan = crud_plan.update_plan(db=db, db_obj=plan, obj_in=plan_in)
+    audit_logger.log(
+        action="UPDATE_PLAN",
+        request=request,
+        details={"plan_id": str(plan.id), "updated_fields": plan_in.dict(exclude_unset=True)}
+    )
     return plan

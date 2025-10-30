@@ -1,7 +1,7 @@
 import uuid
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, BackgroundTasks, Request
 from sqlalchemy.orm import Session
 
 from app.api import deps
@@ -14,18 +14,22 @@ from app.core.storage import (
     get_presigned_download_url,
     generate_s3_key,
 )
-from app.core.audit import log_action
 from app.models.artifact import DocType
+from nexora_auth.decorators import require_role
+from nexora_auth.audit import AuditLogger
 
 router = APIRouter()
 
 
 @router.post("/", response_model=artifact_schema.Artifact)
+@require_role({"Admin", "Planejador"})
 def upload_artifact(
     *,
+    request: Request,
     db: Session = Depends(deps.get_db),
     background_tasks: BackgroundTasks,
     current_user: dict = Depends(dependencies.get_current_user),
+    audit_logger: AuditLogger = Depends(deps.get_audit_logger),
     process_id: str = Form(...),
     doc_type: DocType = Form(...),
     org_id: str = Form(...),
@@ -65,9 +69,9 @@ def upload_artifact(
     )
 
     # 5. Log the audit event
-    log_action(
-        action="CREATE_ARTIFACT",
-        user=current_user["username"],
+    audit_logger.log(
+        action="UPLOAD_ARTIFACT",
+        request=request,
         details={"artifact_id": str(artifact.id), "s3_key": artifact.s3_key},
     )
 
