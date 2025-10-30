@@ -27,3 +27,49 @@ INFO:httpx:HTTP Request: GET http://testserver/api/v1/etp/373ea21e-a9ba-4375-ab9
 INFO:httpx:HTTP Request: PATCH http://testserver/api/v1/etp/f80c179d-86a6-4f0f-b23f-5812b49c66ea "HTTP/1.1 200 OK"
 INFO:httpx:HTTP Request: DELETE http://testserver/api/v1/etp/0756bf9c-38ac-4d88-8f0d-2e44d7c33e02 "HTTP/1.1 200 OK"
 INFO:httpx:HTTP Request: GET http://testserver/api/v1/etp/0756bf9c-38ac-4d88-8f0d-2e44d7c33e02 "HTTP/1.1 404 Not Found"
+2025-10-30 11:33:56,380 - Found credentials in environment variables.
+2025-10-30 11:33:56,681 - File uploaded to S3 with key: org-abc/process-123/ETP/v1/test.txt
+2025-10-30 11:33:56,688 - Action: CREATE_ARTIFACT, User: stubuser, Details: {'artifact_id': '23f2105e-db93-4526-a004-190999b20686', 's3_key': 'org-abc/process-123/ETP/v1/test.txt'}
+2025-10-30 11:33:56,692 - HTTP Request: POST http://testserver/api/v1/artifacts/ "HTTP/1.1 200 OK"
+2025-10-30 11:33:56,729 - Found credentials in environment variables.
+2025-10-30 11:33:56,873 - File uploaded to S3 with key: org-def/process-456/TR/v1/report.pdf
+2025-10-30 11:33:56,876 - Action: CREATE_ARTIFACT, User: stubuser, Details: {'artifact_id': 'c047ca0a-6100-4a26-9936-f353f532fbd0', 's3_key': 'org-def/process-456/TR/v1/report.pdf'}
+2025-10-30 11:33:56,880 - HTTP Request: POST http://testserver/api/v1/artifacts/ "HTTP/1.1 200 OK"
+2025-10-30 11:33:56,888 - HTTP Request: GET http://testserver/api/v1/artifacts/c047ca0a-6100-4a26-9936-f353f532fbd0 "HTTP/1.1 200 OK"
+2025-10-30 11:33:56,918 - Found credentials in environment variables.
+2025-10-30 11:33:57,086 - File uploaded to S3 with key: org-ghi/process-789/LOG/v1/log.csv
+2025-10-30 11:33:57,088 - Action: CREATE_ARTIFACT, User: stubuser, Details: {'artifact_id': '54864783-cb42-4356-8f6a-04a75b0c356b', 's3_key': 'org-ghi/process-789/LOG/v1/log.csv'}
+2025-10-30 11:33:57,092 - HTTP Request: POST http://testserver/api/v1/artifacts/ "HTTP/1.1 200 OK"
+2025-10-30 11:33:57,101 - HTTP Request: GET http://testserver/api/v1/artifacts/54864783-cb42-4356-8f6a-04a75b0c356b/download-url "HTTP/1.1 200 OK"
+2025-10-30 11:33:57,305 - Found credentials in environment variables.
+2025-10-30 11:33:57,449 - File uploaded to S3 with key: search-org-1/search-proc-1/ETP/v1/file1.txt
+2025-10-30 11:33:57,451 - Action: CREATE_ARTIFACT, User: stubuser, Details: {'artifact_id': '1bdbdb1c-4734-4edf-a33b-feca7d47ec57', 's3_key': 'search-org-1/search-proc-1/ETP/v1/file1.txt'}
+2025-10-30 11:33:57,455 - HTTP Request: POST http://testserver/api/v1/artifacts/ "HTTP/1.1 200 OK"
+2025-10-30 11:33:57,466 - File uploaded to S3 with key: search-org-1/search-proc-1/TR/v1/file2.txt
+2025-10-30 11:33:57,469 - Action: CREATE_ARTIFACT, User: stubuser, Details: {'artifact_id': 'c03e7a46-39b0-4e48-8461-6110fa967b51', 's3_key': 'search-org-1/search-proc-1/TR/v1/file2.txt'}
+2025-10-30 11:33:57,472 - HTTP Request: POST http://testserver/api/v1/artifacts/ "HTTP/1.1 200 OK"
+2025-10-30 11:33:57,481 - HTTP Request: GET http://testserver/api/v1/artifacts/search/?process_id=search-proc-1 "HTTP/1.1 200 OK"
+2025-10-30 11:33:57,490 - HTTP Request: GET http://testserver/api/v1/artifacts/search/?doc_type=ETP "HTTP/1.1 200 OK"
+2025-10-30 11:56:27,551 - Found credentials in environment variables.
+2025-10-30 11:56:28,078 - File uploaded to S3 with key: org-abc/process-123/ETP/v1/test.txt
+2025-10-30 11:56:28,085 - Action: CREATE_ARTIFACT, User: stubuser, Details: {'artifact_id': '2ed8a90b-59c2-4666-a09a-d1a24a8eb9a6', 's3_key': 'org-abc/process-123/ETP/v1/test.txt'}
+2025-10-30 11:56:28,088 - HTTP Request: POST http://testserver/api/v1/artifacts/ "HTTP/1.1 200 OK"
+2025-10-30 11:56:28,121 - Found credentials in environment variables.
+2025-10-30 11:56:28,358 - File uploaded to S3 with key: org-def/process-456/TR/v1/report.pdf
+2025-10-30 11:56:28,360 - Action: CREATE_ARTIFACT, User: stubuser, Details: {'artifact_id': 'b580d5a4-75f5-416c-95c8-58c51d557453', 's3_key': 'org-def/process-456/TR/v1/report.pdf'}
+2025-10-30 11:56:28,363 - HTTP Request: POST http://testserver/api/v1/artifacts/ "HTTP/1.1 200 OK"
+2025-10-30 11:56:28,369 - HTTP Request: GET http://testserver/api/v1/artifacts/b580d5a4-75f5-416c-95c8-58c51d557453 "HTTP/1.1 200 OK"
+2025-10-30 11:56:28,394 - Found credentials in environment variables.
+2025-10-30 11:56:28,627 - File uploaded to S3 with key: org-ghi/process-789/LOG/v1/log.csv
+2025-10-30 11:56:28,629 - Action: CREATE_ARTIFACT, User: stubuser, Details: {'artifact_id': 'f2a62d32-9cf4-4e92-bb4e-6f55a503207e', 's3_key': 'org-ghi/process-789/LOG/v1/log.csv'}
+2025-10-30 11:56:28,632 - HTTP Request: POST http://testserver/api/v1/artifacts/ "HTTP/1.1 200 OK"
+2025-10-30 11:56:28,638 - HTTP Request: GET http://testserver/api/v1/artifacts/f2a62d32-9cf4-4e92-bb4e-6f55a503207e/download-url "HTTP/1.1 200 OK"
+2025-10-30 11:56:28,793 - Found credentials in environment variables.
+2025-10-30 11:56:28,914 - File uploaded to S3 with key: search-org-1/search-proc-1/ETP/v1/file1.txt
+2025-10-30 11:56:28,916 - Action: CREATE_ARTIFACT, User: stubuser, Details: {'artifact_id': 'fee3a320-17b7-40ee-98e6-2126fc50f8d7', 's3_key': 'search-org-1/search-proc-1/ETP/v1/file1.txt'}
+2025-10-30 11:56:28,918 - HTTP Request: POST http://testserver/api/v1/artifacts/ "HTTP/1.1 200 OK"
+2025-10-30 11:56:28,928 - File uploaded to S3 with key: search-org-1/search-proc-1/TR/v1/file2.txt
+2025-10-30 11:56:28,929 - Action: CREATE_ARTIFACT, User: stubuser, Details: {'artifact_id': 'c4145c70-ae64-453f-b446-af6006552e12', 's3_key': 'search-org-1/search-proc-1/TR/v1/file2.txt'}
+2025-10-30 11:56:28,932 - HTTP Request: POST http://testserver/api/v1/artifacts/ "HTTP/1.1 200 OK"
+2025-10-30 11:56:28,938 - HTTP Request: GET http://testserver/api/v1/artifacts/search/?process_id=search-proc-1 "HTTP/1.1 200 OK"
+2025-10-30 11:56:28,945 - HTTP Request: GET http://testserver/api/v1/artifacts/search/?doc_type=ETP "HTTP/1.1 200 OK"
