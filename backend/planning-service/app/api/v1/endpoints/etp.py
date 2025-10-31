@@ -5,8 +5,8 @@ from sqlalchemy.orm import Session
 from app import crud
 from app.api.deps import get_db
 from app.schemas.etp import ETPSchema, ETPCreate, ETPUpdate
-from nexora_auth.auth import require_scope
-from nexora_auth.audit import audited
+from nexora_auth.decorators import require_scope
+from nexora_auth.audit import audit as audited
 from app.api.v1.dependencies import get_current_user
 
 router = APIRouter()

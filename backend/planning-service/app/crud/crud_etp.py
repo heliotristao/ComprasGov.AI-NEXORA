@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 
@@ -18,6 +19,19 @@ def create_etp(db: Session, *, etp_in: ETPCreate, created_by: str) -> ETP:
     db.commit()
     db.refresh(db_obj)
     return db_obj
+
+
+def increment_version(db: Session, *, etp_id: UUID) -> ETP:
+    """
+    Atomically increments the version of an ETP document.
+    """
+    etp = db.query(ETP).filter(ETP.id == etp_id).with_for_update().first()
+    if not etp:
+        raise HTTPException(status_code=404, detail="ETP not found")
+    etp.version += 1
+    db.commit()
+    db.refresh(etp)
+    return etp
 
 
 def patch_etp(db: Session, *, etp_id: UUID, patch: ETPPartialUpdate, user_id: str) -> Optional[ETP]:
