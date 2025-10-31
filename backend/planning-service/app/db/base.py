@@ -16,6 +16,7 @@ SQLAlchemySession.execute = _execute_with_text
 
 Base = declarative_base()
 from app.models.plan import Plan
-
+from app.models.etp import ETP # noqa
+from app.models.etp_ai_trace import ETPAITrace # noqa
 from app.db.models import sla  # noqa: F401
 from app.models.etp_section_accepts import ETPSectionAccepts  # noqa: F401
