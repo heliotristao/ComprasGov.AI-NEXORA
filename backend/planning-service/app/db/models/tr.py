@@ -25,6 +25,7 @@ class TRType(str, enum.Enum):
 
 class TRStatus(str, enum.Enum):
     DRAFT = "draft"
+    IN_REVIEW = "in_review"
     PUBLISHED = "published"
     ARCHIVED = "archived"
 
@@ -59,6 +60,7 @@ class TR(Base):
     deleted_at = Column(DateTime(timezone=True), nullable=True)
 
     etp = relationship("ETP", backref="trs")
+    versions = relationship("TRVersion", back_populates="tr")
 
     __table_args__ = (
         Index("ix_trs_edocs_number", "edocs_number"),

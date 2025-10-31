@@ -13,9 +13,9 @@ from alembic import context
 
 # Import the Base and all models for autogenerate
 from app.db.base import Base
-from app.models.etp import ETP
-# Assuming other models are also necessary for the database schema
-from app.models.etp_ai_trace import ETPAITrace
+from app.db.models.etp import ETP
+from app.db.models.tr import TR
+from app.db.models.tr_version import TRVersion
 
 
 # this is the Alembic Config object, which provides

@@ -3,7 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 from app.api.v1.endpoints import (
     health, planning, plans, etp, etp_ai, etp_validation,
-    tr, tr_ai, tr_transform, templates, dashboard, market_ai, rag, sla
+    tr, tr_ai, tr_transform, templates, dashboard, market_ai, rag, sla,
+    tr_consolidation
 )
 from nexora_auth.middlewares import TraceMiddleware, TrustedHeaderMiddleware
 
@@ -71,3 +72,4 @@ app.include_router(dashboard.router, prefix="/api/v1/dashboard", tags=["Dashboar
 app.include_router(market_ai.router, prefix="/api/v1/market-ai", tags=["Market AI"])
 app.include_router(rag.router, prefix="/api/v1/rag", tags=["RAG"])
 app.include_router(sla.router, prefix="/api/v1/sla", tags=["SLA"])
+app.include_router(tr_consolidation.router, prefix="/api/v1", tags=["TR Consolidation"])
