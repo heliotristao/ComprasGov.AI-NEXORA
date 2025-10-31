@@ -18,3 +18,4 @@ Base = declarative_base()
 from app.models.plan import Plan
 
 from app.db.models import sla  # noqa: F401
+from app.models.etp_section_accepts import ETPSectionAccepts  # noqa: F401
