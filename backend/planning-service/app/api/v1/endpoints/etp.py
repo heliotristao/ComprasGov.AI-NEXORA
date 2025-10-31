@@ -1,13 +1,16 @@
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Any, Dict, Optional
+
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app import crud
 from app.api.deps import get_db
-from app.schemas.etp import ETPSchema, ETPCreate, ETPUpdate
-from nexora_auth.decorators import require_scope
-from nexora_auth.audit import audit as audited
 from app.api.v1.dependencies import get_current_user
+from app.schemas.etp import ETPCreate, ETPSchema
+from app.services import etp_auto_save_service
+from nexora_auth.audit import audited
+from nexora_auth.decorators import require_scope
 
 router = APIRouter()
 
@@ -57,25 +60,27 @@ def read_etp(
     response_model=ETPSchema,
     dependencies=[Depends(require_scope("etp:write"))],
 )
-@audited("etp:update")
-def update_etp(
+@audited(action="ETP_PARTIAL_UPDATE")
+def patch_etp_auto_save(
     etp_id: uuid.UUID,
-    etp_in: ETPUpdate,
+    patch_data: Dict[str, Any],
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+    if_match: Optional[str] = Header(None, alias="If-Match"),
+    validate_step: Optional[str] = Query(None, alias="validate_step"),
 ):
     """
-    Update an ETP incrementally.
-    Requires scope: etp:write
+    Perform a partial update (auto-save) on an ETP, with version control.
+    - Requires scope: `etp:write`
+    - Requires `If-Match` header for concurrency control.
+    - Optionally validates payload against a step schema via `validate_step` query param.
     """
-    etp = crud.etp.get(db=db, id=etp_id)
-    if not etp or etp.deleted_at:
-        raise HTTPException(status_code=404, detail="ETP not found")
-
-    etp_in.updated_by = current_user.get("sub")
-    update_data = etp_in.dict(exclude_unset=True)
-
-    updated_etp = crud.etp.update(db=db, db_obj=etp, obj_in=update_data)
+    updated_etp = etp_auto_save_service.orchestrate_etp_auto_save(
+        db=db,
+        etp_id=etp_id,
+        patch_data=patch_data,
+        if_match=if_match,
+        validate_step=validate_step,
+    )
     return updated_etp
 
 
