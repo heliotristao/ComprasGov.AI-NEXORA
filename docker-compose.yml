@@ -39,42 +39,42 @@ services:
     networks:
       - nexora-net
 
-  api-gateway:
-    build:
-      context: ./backend/api-gateway
-    environment:
-      REDIS_HOST: redis
-      GOVERNANCE_JWKS_URL: "http://governance-service:8000/.well-known/jwks.json"
-    depends_on:
-      - redis
-    networks:
-      - nexora-net
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.services.api-gateway-svc.loadbalancer.server.port=8000"
-      - "traefik.http.middlewares.forward-auth.forwardauth.address=http://api-gateway:8000/auth"
+  # api-gateway:
+  #   build:
+  #     context: ./backend/api-gateway
+  #   environment:
+  #     REDIS_HOST: redis
+  #     GOVERNANCE_JWKS_URL: "http://governance-service:8000/.well-known/jwks.json"
+  #   depends_on:
+  #     - redis
+  #   networks:
+  #     - nexora-net
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.services.api-gateway-svc.loadbalancer.server.port=8000"
+  #     - "traefik.http.middlewares.forward-auth.forwardauth.address=http://api-gateway:8000/auth"
 
-  governance-service:
-    build:
-      context: ./backend/governance-service
-    environment:
-      DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - nexora-net
-    labels:
-      - "traefik.enable=true"
-      # Public routes (no auth)
-      - "traefik.http.routers.governance-public.rule=PathPrefix(`/governance/api/v1/token`) || PathPrefix(`/governance/.well-known/jwks.json`)"
-      - "traefik.http.routers.governance-public.service=governance-svc"
-      # Protected routes
-      - "traefik.http.routers.governance-protected.rule=PathPrefix(`/governance`)"
-      - "traefik.http.routers.governance-protected.middlewares=forward-auth"
-      - "traefik.http.routers.governance-protected.service=governance-svc"
-
-      - "traefik.http.services.governance-svc.loadbalancer.server.port=8000"
+  # governance-service:
+  #   build:
+  #     context: ./backend/governance-service
+  #   environment:
+  #     DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - nexora-net
+  #   labels:
+  #     - "traefik.enable=true"
+  #     # Public routes (no auth)
+  #     - "traefik.http.routers.governance-public.rule=PathPrefix(`/governance/api/v1/token`) || PathPrefix(`/governance/.well-known/jwks.json`)"
+  #     - "traefik.http.routers.governance-public.service=governance-svc"
+  #     # Protected routes
+  #     - "traefik.http.routers.governance-protected.rule=PathPrefix(`/governance`)"
+  #     - "traefik.http.routers.governance-protected.middlewares=forward-auth"
+  #     - "traefik.http.routers.governance-protected.service=governance-svc"
+  #
+  #     - "traefik.http.services.governance-svc.loadbalancer.server.port=8000"
 
   planning-service:
     build:
@@ -111,15 +111,15 @@ services:
       - "traefik.http.routers.metrics.middlewares=forward-auth"
       - "traefik.http.services.metrics.loadbalancer.server.port=8000"
 
-  frontend:
-    build:
-      context: ./src
-    ports:
-      - "3000:3000"
-    depends_on:
-      - traefik
-    networks:
-      - nexora-net
+  # frontend:
+  #   build:
+  #     context: ./src
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - traefik
+  #   networks:
+  #     - nexora-net
 
   datahub-service:
     build:
@@ -162,33 +162,33 @@ services:
       timeout: 20s
       retries: 3
 
-  milvus:
-    image: milvusdb/milvus:v2.4.4-standalone
-    ports:
-      - "19530:19530"
-      - "9091:9091"
-    volumes:
-      - ./volumes/milvus:/var/lib/milvus
-    environment:
-      ETCD_USE_EMBED: "true"
-      ETCD_DATA_DIR: "/var/lib/milvus/etcd"
-      COMMON_STORAGETYPE: "local"
-    networks:
-      - nexora-net
+  # milvus:
+  #   image: milvusdb/milvus:v2.4.4-standalone
+  #   ports:
+  #     - "19530:19530"
+  #     - "9091:9091"
+  #   volumes:
+  #     - ./volumes/milvus:/var/lib/milvus
+  #   environment:
+  #     ETCD_USE_EMBED: "true"
+  #     ETCD_DATA_DIR: "/var/lib/milvus/etcd"
+  #     COMMON_STORAGETYPE: "local"
+  #   networks:
+  #     - nexora-net
 
-  create-user:
-    build:
-      context: ./backend/governance-service
-    command: >
-      sh -c "
-        alembic upgrade head &&
-        python app/scripts/create_user.py
-      "
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - nexora-net
+  # create-user:
+  #   build:
+  #     context: ./backend/governance-service
+  #   command: >
+  #     sh -c "
+  #       alembic upgrade head &&
+  #       python app/scripts/create_user.py
+  #     "
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - nexora-net
 
 networks:
   nexora-net:

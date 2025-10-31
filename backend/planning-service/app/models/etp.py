@@ -1,7 +1,7 @@
 import enum
 import uuid
 
-from sqlalchemy import (Column, DateTime, Enum, Index, String, text)
+from sqlalchemy import (Column, DateTime, Enum, Index, String, text, Integer)
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.sql import func
@@ -28,6 +28,7 @@ class ETP(Base):
     created_by = Column(String)
     updated_by = Column(String)
     org_id = Column(String, index=True)
+    version = Column(Integer, nullable=False, default=1, server_default='1')
 
     created_at = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
