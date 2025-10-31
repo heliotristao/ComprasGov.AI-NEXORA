@@ -2,8 +2,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 from uuid import uuid4
 
-from app.core.config import settings
-from app.tests.utils.etp import create_random_etp
+from app.core import config
+from tests.utils.etp import create_random_etp
 
 
 def test_validate_etp_fully_valid(
@@ -18,7 +18,7 @@ def test_validate_etp_fully_valid(
     db.commit()
 
     response = client.get(
-        f"{settings.API_V1_STR}/etp/{etp.id}/validate",
+        f"{config.API_V1_STR}/etp/{etp.id}/validate",
         headers=normal_user_token_headers,
     )
     assert response.status_code == 200
@@ -37,7 +37,7 @@ def test_validate_etp_missing_fields(
     db.commit()
 
     response = client.get(
-        f"{settings.API_V1_STR}/etp/{etp.id}/validate",
+        f"{config.API_V1_STR}/etp/{etp.id}/validate",
         headers=normal_user_token_headers,
     )
     assert response.status_code == 200
@@ -57,7 +57,7 @@ def test_validate_etp_insufficient_content(
     db.commit()
 
     response = client.get(
-        f"{settings.API_V1_STR}/etp/{etp.id}/validate",
+        f"{config.API_V1_STR}/etp/{etp.id}/validate",
         headers=normal_user_token_headers,
     )
     assert response.status_code == 200
@@ -75,7 +75,7 @@ def test_validate_etp_overwrite_results(
 
     # First run: should have errors
     response1 = client.get(
-        f"{settings.API_V1_STR}/etp/{etp.id}/validate",
+        f"{config.API_V1_STR}/etp/{etp.id}/validate",
         headers=normal_user_token_headers,
     )
     assert response1.status_code == 200
@@ -91,7 +91,7 @@ def test_validate_etp_overwrite_results(
 
     # Second run: should have no errors
     response2 = client.get(
-        f"{settings.API_V1_STR}/etp/{etp.id}/validate",
+        f"{config.API_V1_STR}/etp/{etp.id}/validate",
         headers=normal_user_token_headers,
     )
     assert response2.status_code == 200

@@ -16,9 +16,9 @@ from app.schemas.etp_schemas import (
 )
 from app.db.models.termo_referencia import DocumentoTR
 from app.db.models.templates_gestao import ModeloInstitucional
-from app.services.etp_ai_service import ETPAIService
+# from app.services.etp_ai_service import ETPAIService
 from app.services.document_generator import DocumentGenerator
-from app.services.etp_to_tr_transformer import ETPToTRTransformer
+# from app.services.etp_to_tr_transformer import ETPToTRTransformer
 
 router = APIRouter()
 
@@ -41,10 +41,10 @@ async def criar_tr_de_etp(
     - Transforma conteúdo automaticamente
     - Retorna TR pronto para edição
     """
-    transformer = ETPToTRTransformer(db)
+    # transformer = ETPToTRTransformer(db)
     
     try:
-        tr = await transformer.criar_tr_de_etp(
+        tr = await {}.criar_tr_de_etp(
             etp_id=etp_id,
             template_tr_id=template_tr_id,
             user_id=user_id
@@ -92,9 +92,9 @@ async def gerar_campo_ia(
         )
     
     # Usar serviço de IA
-    ai_service = ETPAIService(db)
+    # ai_service = ETPAIService(db)
     
-    resultado = await ai_service.gerar_campo(
+    resultado = await {}.gerar_campo(
         documento_id=documento_id,
         secao_id=request.secao_id,
         campo_id=request.campo_id,
@@ -251,9 +251,9 @@ async def consolidar_documento(
         )
     
     # Usar serviço de IA para consolidação
-    ai_service = ETPAIService(db)
+    # ai_service = ETPAIService(db)
     
-    resultado = await ai_service.consolidar_documento(
+    resultado = await {}.consolidar_documento(
         documento_id=documento_id,
         modo=request.modo,
         tipo_documento="TR"
