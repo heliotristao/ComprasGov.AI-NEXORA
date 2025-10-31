@@ -8,6 +8,8 @@ from app import crud
 from app.api.deps import get_db
 from app.api.v1.dependencies import get_current_user
 from app.schemas.etp import ETPCreate, ETPSchema
+from app.schemas.compliance import ComplianceReport
+from app.core.compliance import compliance_engine
 from app.services import etp_auto_save_service
 from nexora_auth.audit import audited
 from nexora_auth.decorators import require_scope
@@ -53,6 +55,27 @@ def read_etp(
     if not etp or etp.deleted_at:
         raise HTTPException(status_code=404, detail="ETP not found")
     return etp
+
+
+@router.post(
+    "/{etp_id}/validate",
+    response_model=ComplianceReport,
+    dependencies=[Depends(require_scope("etp:read"))],
+)
+def validate_etp(
+    etp_id: uuid.UUID,
+    db: Session = Depends(get_db),
+):
+    """
+    Validate an ETP and return a compliance report.
+    Requires scope: etp:read
+    """
+    etp = crud.etp.get_etp(db=db, etp_id=etp_id)
+    if not etp or etp.deleted_at:
+        raise HTTPException(status_code=404, detail="ETP not found")
+
+    report = compliance_engine.validate_etp(etp)
+    return report
 
 
 @router.patch(

@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-10-30] - Tarefa B3:** Implementado o motor de validação de conformidade no `planning-service`, permitindo a verificação de regras de negócio em documentos ETP.
 * **[2025-10-30] - Tarefa B2.3:** Exposta a API PATCH no `planning-service` para suportar o auto-save de ETPs, completando a funcionalidade de atualização parcial.
 * **[2025-10-30] - Tarefa B2.2:** Implementada a lógica de serviço para atualizações parciais (merge-patch) de ETPs.
 * **[2025-10-30] - Tarefa A5:** Criado o `metrics-service`, responsável por agregar e expor métricas operacionais consolidadas para o Dashboard Preditivo.
