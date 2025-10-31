@@ -12,6 +12,13 @@ from app.schemas.compliance import ComplianceReport
 from app.core.compliance import compliance_engine
 from app.services import etp_auto_save_service
 from nexora_auth.decorators import require_scope
+from app.schemas.etp import ETPAcceptIA
+from app.services import etp_accept_ia_service
+from nexora_auth.audit import audited
+from app.core.exceptions import TraceNotFoundException, ETPNotFoundException
+from app.schemas.pagination import PaginatedResponse
+from app.schemas.etp_accept_ia import ETPAcceptanceLogSchema
+
 
 router = APIRouter()
 
@@ -92,7 +99,8 @@ def patch_etp_auto_save(
     Perform a partial update (auto-save) on an ETP, with version control.
     - Requires scope: `etp:write`
     - Requires `If-Match` header for concurrency control.
-    - Optionally validates payload against a step schema via `validate_step` query param.
+    - Optionally validates payload against a step schema via `validate_step`
+      query param.
     """
     updated_etp = etp_auto_save_service.orchestrate_etp_auto_save(
         db=db,
@@ -123,3 +131,103 @@ def delete_etp(
 
     crud.etp.remove(db=db, id=etp_id)
     return None
+
+
+@router.post(
+    "/{etp_id}/accept-ia/{section}",
+    response_model=ETPSchema,
+    status_code=status.HTTP_200_OK,
+)
+@audited(action="ETP_AI_ACCEPT")
+@require_scope("etp:write")
+def accept_etp_ia(
+    etp_id: uuid.UUID,
+    section: str,
+    payload: ETPAcceptIA,
+    db: Session = Depends(get_db),
+    if_match: str = Header(..., alias="If-Match"),
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Accept an AI suggestion for an ETP section.
+    - Requires scope: `etp:write`
+    - Requires `If-Match` header for concurrency control.
+    """
+    try:
+        updated_etp = etp_accept_ia_service.accept_suggestion(
+            db=db,
+            etp_id=etp_id,
+            section=section,
+            trace_id=payload.trace_id,
+            if_match=if_match,
+            user_id=current_user.get("sub"),
+        )
+        return updated_etp
+    except ETPNotFoundException:
+        raise HTTPException(status_code=404, detail="ETP not found")
+    except TraceNotFoundException:
+        raise HTTPException(status_code=404, detail="Trace not found")
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+
+
+# Legacy endpoint alias for frontend compatibility
+@router.post(
+    "/{etp_id}/aceitar-ia/{campoId}",
+    response_model=ETPSchema,
+    status_code=status.HTTP_200_OK,
+    deprecated=True,
+)
+@audited(action="ETP_AI_ACCEPT")
+@require_scope("etp:write")
+def accept_etp_ia_legacy(
+    etp_id: uuid.UUID,
+    campoId: str,
+    payload: ETPAcceptIA,
+    db: Session = Depends(get_db),
+    if_match: str = Header(..., alias="If-Match"),
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    (Legacy) Accept an AI suggestion for an ETP section.
+    """
+    return accept_etp_ia(
+        etp_id=etp_id,
+        section=campoId,
+        payload=payload,
+        db=db,
+        if_match=if_match,
+        current_user=current_user,
+    )
+
+
+@router.get(
+    "/{etp_id}/sections/{section}/accepts",
+    response_model=PaginatedResponse[ETPAcceptanceLogSchema],
+    dependencies=[Depends(require_scope("etp:read"))],
+)
+def list_etp_ia_accepts(
+    etp_id: uuid.UUID,
+    section: str,
+    db: Session = Depends(get_db),
+    page: int = Query(1, ge=1),
+    size: int = Query(10, ge=1, le=100),
+):
+    """
+    List AI suggestion acceptances for an ETP section.
+    Requires scope: etp:read
+    """
+    total, accepts = etp_accept_ia_service.list_acceptances(
+        db=db,
+        etp_id=etp_id,
+        section=section,
+        page=page,
+        size=size,
+    )
+    return {
+        "items": accepts,
+        "total": total,
+        "page": page,
+        "size": size,
+        "pages": (total + size - 1) // size,
+    }
