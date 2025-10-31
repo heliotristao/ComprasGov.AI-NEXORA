@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.api.deps import get_db
 from app.services.tr_consolidation_service import TRConsolidationService
-from nexora.auth import require_scope
+from nexora_auth.decorators import require_scope
 
 router = APIRouter()
 

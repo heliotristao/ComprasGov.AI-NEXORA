@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.db.models.etp import ETP
-from app.tests.utils.planning import create_random_planning
+from tests.utils.planning import create_random_planning
 import uuid
 
 def create_random_etp(db: Session) -> ETP:

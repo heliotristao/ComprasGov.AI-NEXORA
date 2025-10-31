@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 from app.db.models.tr import TR, TRType, TRStatus
-from app.tests.utils.tr import create_random_tr
+from tests.utils.tr import create_random_tr
 
 def test_consolidate_tr(client: TestClient, db: Session) -> None:
     # 1. Create a TR of type "bem"

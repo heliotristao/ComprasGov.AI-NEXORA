@@ -11,7 +11,6 @@ from app.schemas.etp import ETPCreate, ETPSchema
 from app.schemas.compliance import ComplianceReport
 from app.core.compliance import compliance_engine
 from app.services import etp_auto_save_service
-from nexora_auth.audit import audited
 from nexora_auth.decorators import require_scope
 
 router = APIRouter()
@@ -23,7 +22,6 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(require_scope("etp:write"))],
 )
-@audited("etp:create")
 def create_etp(
     etp_in: ETPCreate,
     db: Session = Depends(get_db),
@@ -83,7 +81,6 @@ def validate_etp(
     response_model=ETPSchema,
     dependencies=[Depends(require_scope("etp:write"))],
 )
-@audited(action="ETP_PARTIAL_UPDATE")
 def patch_etp_auto_save(
     etp_id: uuid.UUID,
     patch_data: Dict[str, Any],
@@ -112,7 +109,6 @@ def patch_etp_auto_save(
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(require_scope("etp:delete"))],
 )
-@audited("etp:delete")
 def delete_etp(
     etp_id: uuid.UUID,
     db: Session = Depends(get_db),

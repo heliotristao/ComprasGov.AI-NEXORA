@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
-from app.db.base import get_db
+from app.api.deps import get_db
 from app.schemas.etp_schemas import (
     ModeloSuperiorCreate,
     ModeloSuperiorUpdate,
