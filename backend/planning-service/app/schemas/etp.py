@@ -57,3 +57,8 @@ class ETPSchema(BaseModel):
     class Config:
         from_attributes = True
         use_enum_values = True
+
+
+# Schema for accepting an AI suggestion
+class ETPAcceptIA(BaseModel):
+    trace_id: uuid.UUID
