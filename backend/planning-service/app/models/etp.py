@@ -1,12 +1,10 @@
 import enum
 import uuid
 
-from sqlalchemy import (Column, DateTime, Enum, Index, String, text, Integer)
-from sqlalchemy.dialects.postgresql import JSONB, UUID
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import (Column, DateTime, Enum, Index, String, text, Integer, JSON)
+from sqlalchemy.dialects.postgresql import UUID
+from app.db.base import Base
 from sqlalchemy.sql import func
-
-Base = declarative_base()
 
 
 class ETPStatus(enum.Enum):
@@ -23,7 +21,7 @@ class ETP(Base):
     process_id = Column(String, index=True)
     status = Column(Enum(ETPStatus), default=ETPStatus.DRAFT, index=True)
     step = Column(String)
-    data = Column(JSONB)
+    data = Column(JSON)
     edocs = Column(String, unique=True)
     created_by = Column(String)
     updated_by = Column(String)
