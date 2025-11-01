@@ -4,7 +4,7 @@ from fastapi.openapi.utils import get_openapi
 from app.api.v1.endpoints import (
     health, planning, plans, etp, etp_ai, etp_validation,
     tr, tr_ai, tr_transform, templates, dashboard, market_ai, rag, sla,
-    tr_consolidation, etp_consolidation, etp_workflow, risk
+    tr_consolidation, etp_consolidation, etp_workflow, risk, template_analyzer
 )
 from nexora_auth.middlewares import TraceMiddleware, TrustedHeaderMiddleware
 from app.core.logging_config import setup_logging
@@ -80,3 +80,4 @@ app.include_router(tr_consolidation.router, prefix="/api/v1", tags=["TR Consolid
 app.include_router(etp_consolidation.router, prefix="/api/v1", tags=["ETP Consolidation"])
 app.include_router(etp_workflow.router, prefix="/api/v1/etp", tags=["ETP Workflow"])
 app.include_router(risk.router, prefix="/api/v1/risk", tags=["Risk"])
+app.include_router(template_analyzer.router, prefix="/api/v1", tags=["Templates"])
