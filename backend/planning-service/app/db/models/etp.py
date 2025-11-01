@@ -24,6 +24,7 @@ class ETPStatus(enum.Enum):
     rejected = "rejected"
     published = "published"
     archived = "archived"
+    signed = "signed"
 
 
 class ETP(Base):

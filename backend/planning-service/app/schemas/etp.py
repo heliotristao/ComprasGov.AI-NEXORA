@@ -16,6 +16,7 @@ class ETPStatus(str, enum.Enum):
     rejected = "rejected"
     published = "published"
     archived = "archived"
+    signed = "signed"
 
 
 EdocsType = Annotated[str, StringConstraints(pattern=r"^\d{4}-\d{6}$")]

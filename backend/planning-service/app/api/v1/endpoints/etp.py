@@ -1,13 +1,14 @@
 import uuid
 from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, status, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status, Request, File, UploadFile
 from sqlalchemy.orm import Session
 
 from app import crud
 from app.api.deps import get_db
 from app.api.v1.dependencies import get_current_user
-from app.schemas.etp import ETPCreate, ETPSchema
+from app.schemas.etp import ETPCreate, ETPSchema, ETPStatus
+from app.schemas.signed_document import SignedDocumentCreate, SignedDocumentSchema
 from app.schemas.compliance import ComplianceReport
 from app.core.compliance import compliance_engine
 from app.services import etp_auto_save_service
@@ -232,3 +233,48 @@ def list_etp_ia_accepts(
         "size": size,
         "pages": (total + size - 1) // size,
     }
+
+@router.post(
+    "/{etp_id}/upload-signed",
+    response_model=SignedDocumentSchema,
+    status_code=status.HTTP_201_CREATED,
+)
+@audited(action="ETP_SIGNED")
+@require_scope("etp:sign")
+async def upload_signed_etp(
+    etp_id: uuid.UUID,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Upload a signed ETP document.
+    - Requires scope: `etp:sign`
+    """
+    etp = crud.etp.get(db=db, id=etp_id)
+    if not etp:
+        raise HTTPException(status_code=404, detail="ETP not found")
+
+    if etp.status != ETPStatus.approved:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"ETP must be in 'approved' status to upload a signed document. Current status: {etp.status}",
+        )
+
+    # Mock datahub-service interaction
+    # In a real implementation, this would be an HTTP client call
+    # that uploads the file.content and returns a real artifact_id.
+    artifact_id = uuid.uuid4()
+
+    signed_doc_in = SignedDocumentCreate(
+        document_id=etp_id,
+        document_type="etp",
+        signed_by_id=current_user.get("sub"),
+        artifact_id=artifact_id,
+    )
+    signed_document = crud.signed_document.create(db=db, obj_in=signed_doc_in)
+
+    # Update ETP status
+    crud.etp.update(db=db, db_obj=etp, obj_in={"status": ETPStatus.signed})
+
+    return signed_document
