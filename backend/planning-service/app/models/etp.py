@@ -3,6 +3,7 @@ import uuid
 
 from sqlalchemy import (Column, DateTime, Enum, Index, String, text, Integer, JSON)
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 from app.db.base import Base
 from sqlalchemy.sql import func
 
@@ -38,6 +39,8 @@ class ETP(Base):
         nullable=False,
     )
     deleted_at = Column(DateTime(timezone=True))
+
+    consolidation_jobs = relationship("app.models.etp_consolidation_job.ETPConsolidationJob", back_populates="etp", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index('ix_etp_status', 'status'),

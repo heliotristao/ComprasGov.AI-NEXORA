@@ -2,6 +2,12 @@
 
 from .plan import Plan, PlanCreate, PlanUpdate
 from .compliance import ComplianceReport, ComplianceItem
+from .etp_consolidation import (
+    ETPConsolidationJobCreate,
+    ETPConsolidationJobRead,
+    ETPConsolidationJobStatus,
+)
+
 
 __all__ = [
     "Plan",
@@ -9,4 +15,7 @@ __all__ = [
     "PlanUpdate",
     "ComplianceReport",
     "ComplianceItem",
+    "ETPConsolidationJobCreate",
+    "ETPConsolidationJobRead",
+    "ETPConsolidationJobStatus",
 ]

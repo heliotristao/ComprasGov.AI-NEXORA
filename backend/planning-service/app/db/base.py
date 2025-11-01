@@ -1,22 +1,8 @@
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session as SQLAlchemySession
-from sqlalchemy import text
-
-
-_original_execute = SQLAlchemySession.execute
-
-
-def _execute_with_text(session: SQLAlchemySession, statement, *args, **kwargs):
-    if isinstance(statement, str):
-        statement = text(statement)
-    return _original_execute(session, statement, *args, **kwargs)
-
-
-SQLAlchemySession.execute = _execute_with_text
-
-Base = declarative_base()
-from app.models.plan import Plan
-from app.models.etp import ETP # noqa
-from app.models.etp_ai_trace import ETPAITrace # noqa
+from app.db.base_class import Base  # noqa
+from app.models.plan import Plan  # noqa
+from app.models.etp import ETP  # noqa
+from app.models.etp_ai_trace import ETPAITrace  # noqa
 from app.db.models import sla  # noqa: F401
 from app.models.etp_section_accepts import ETPSectionAccepts  # noqa: F401
+from app.models.etp_consolidation_job import ETPConsolidationJob # noqa
+from app.models.user import User # noqa
