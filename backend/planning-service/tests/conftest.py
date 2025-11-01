@@ -22,7 +22,7 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 # Mock the get_current_user dependency
 def get_current_user_override():
-    return {"sub": "test@example.com", "scopes": ["etp:read", "etp:write", "etp:delete"]}
+    return {"sub": "test@example.com", "scopes": ["etp:read", "etp:write", "etp:delete", "etp:sign"]}
 
 app.dependency_overrides[get_current_user] = get_current_user_override
 

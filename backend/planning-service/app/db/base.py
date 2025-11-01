@@ -9,3 +9,4 @@ from app.models.user import User # noqa
 from app.db.models.template import Template # noqa
 from app.db.models.etp_workflow_history import ETPWorkflowHistory # noqa
 from app.db.models.audit_log import AuditLog # noqa
+from app.db.models.signed_document import SignedDocument # noqa
