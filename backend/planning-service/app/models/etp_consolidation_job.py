@@ -9,7 +9,7 @@ class ETPConsolidationJob(Base):
     __tablename__ = "etp_consolidation_jobs"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    etp_id = Column(UUID(as_uuid=True), ForeignKey("etp.id"), nullable=False, index=True)
+    etp_id = Column(UUID(as_uuid=True), ForeignKey("etps.id"), nullable=False, index=True)
     job_id = Column(UUID(as_uuid=True), unique=True, nullable=False, index=True, default=uuid.uuid4)
 
     status = Column(String, nullable=False, default="queued")
@@ -23,4 +23,4 @@ class ETPConsolidationJob(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
-    etp = relationship("app.models.etp.ETP", back_populates="consolidation_jobs")
+    etp = relationship("ETP", back_populates="consolidation_jobs")

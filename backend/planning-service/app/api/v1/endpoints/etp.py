@@ -1,7 +1,7 @@
 import uuid
 from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status, Request
 from sqlalchemy.orm import Session
 
 from app import crud
@@ -86,9 +86,10 @@ def validate_etp(
 @router.patch(
     "/{etp_id}",
     response_model=ETPSchema,
-    dependencies=[Depends(require_scope("etp:write"))],
 )
+@require_scope("etp:write")
 def patch_etp_auto_save(
+    request: Request,
     etp_id: uuid.UUID,
     patch_data: Dict[str, Any],
     db: Session = Depends(get_db),

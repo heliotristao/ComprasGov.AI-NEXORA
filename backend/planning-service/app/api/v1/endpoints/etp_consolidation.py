@@ -2,7 +2,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app import crud, models, schemas
-from nexora_auth.auth import require_scope
+from nexora_auth.decorators import require_scope
 from app.api import deps
 from app.tasks.consolidation_worker import consolidate_etp_task
 
@@ -18,7 +18,7 @@ def consolidate_etp(
     id: uuid.UUID,
     *,
     db: Session = Depends(deps.get_db),
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: dict = Depends(deps.get_current_user),
 ):
     """
     Initiate an asynchronous ETP consolidation job.
@@ -52,7 +52,7 @@ def get_consolidation_status(
     job_id: uuid.UUID,
     *,
     db: Session = Depends(deps.get_db),
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: dict = Depends(deps.get_current_user),
 ):
     """
     Get the status of an ETP consolidation job.

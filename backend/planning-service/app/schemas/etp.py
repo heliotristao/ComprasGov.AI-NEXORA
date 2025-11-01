@@ -10,46 +10,40 @@ from pydantic import StringConstraints
 
 # Replicating Enum from model
 class ETPStatus(str, enum.Enum):
-    DRAFT = "DRAFT"
-    IN_REVIEW = "IN_REVIEW"
-    APPROVED = "APPROVED"
-    REJECTED = "REJECTED"
+    draft = "draft"
+    in_review = "in_review"
+    approved = "approved"
+    rejected = "rejected"
+    published = "published"
+    archived = "archived"
 
 
 EdocsType = Annotated[str, StringConstraints(pattern=r"^\d{4}-\d{6}$")]
 
 # Schema for creating an ETP
 class ETPCreate(BaseModel):
-    process_id: Optional[str] = None
-    status: Optional[ETPStatus] = ETPStatus.DRAFT
-    step: Optional[str] = None
+    title: str
     data: Optional[dict[str, Any]] = None
-    edocs: EdocsType
     created_by: Optional[str] = None
-    org_id: Optional[str] = None
 
 
 # Schema for updating an ETP
 class ETPUpdate(BaseModel):
-    process_id: Optional[str] = None
-    status: Optional[ETPStatus] = None
-    step: Optional[str] = None
+    title: Optional[str] = None
     data: Optional[dict[str, Any]] = None
-    edocs: Optional[EdocsType] = None
     updated_by: Optional[str] = None
 
 
 # The main schema for returning ETP data
 class ETPSchema(BaseModel):
     id: uuid.UUID
-    process_id: Optional[str]
+    title: str
     status: ETPStatus
-    step: Optional[str]
+    step: int
     data: Optional[dict[str, Any]]
-    edocs: EdocsType
-    created_by: Optional[str]
+    created_by: str
     updated_by: Optional[str]
-    org_id: Optional[str]
+    current_approver_id: Optional[str] = None
     created_at: datetime
     updated_at: datetime
     deleted_at: Optional[datetime] = None
