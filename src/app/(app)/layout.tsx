@@ -5,10 +5,10 @@ import { usePathname, useRouter } from "next/navigation"
 import type { ReactNode } from "react"
 import { useMemo, useState } from "react"
 import { 
-  LayoutDashboard, 
-  FileText, 
-  ClipboardList, 
-  Gavel, 
+  LayoutDashboard,
+  FileText,
+  ClipboardList,
+  Gavel,
   FileSignature,
   Settings,
   Users,
@@ -18,7 +18,8 @@ import {
   ChevronDown,
   ChevronRight,
   Menu,
-  X
+  X,
+  ShieldCheck
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -65,10 +66,19 @@ const navigationItems: NavigationItem[] = [
     href: "/licitacoes", 
     icon: Gavel 
   },
-  { 
-    label: "Contratos", 
-    href: "/contracts", 
-    icon: FileSignature 
+  {
+    label: "Contratos",
+    href: "/contracts",
+    icon: FileSignature
+  },
+  {
+    label: "Gestão",
+    icon: ShieldCheck,
+    items: [
+      { label: "Painel de Governança", href: "/gestao", icon: LayoutDashboard },
+      { label: "Usuários", href: "/gestao/usuarios", icon: Users },
+      { label: "Órgãos", href: "/gestao/orgaos", icon: Building2 },
+    ],
   },
   {
     label: "Administração",
