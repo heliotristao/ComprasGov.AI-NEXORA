@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-01] - Tarefa F4:** Adicionadas buscas, estados de vazio/erro e modal de criação às telas de gestão de usuários e órgãos.
 * **[2025-11-01] - Tarefa E1:** Implementado o motor de geração de Matriz de Riscos (Risco.AI), combinando regras e IA.
 * **[2025-11-01] - Tarefa F3:** Implementada a funcionalidade de upload e vínculo de documentos PDF assinados para ETPs.
 * **[2025-11-01] - Tarefa FIX-TEST-BASE-02:** Corrigidos problemas estruturais no ambiente de teste do `planning-service` relacionados a migrações idempotentes (Alembic) e substituição de dependências de autenticação.
