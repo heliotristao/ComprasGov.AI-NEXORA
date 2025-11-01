@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, Numeric, Date
 from sqlalchemy.sql import func
-from app.db.base import Base
+from app.db.base_class import Base
 
 class MarketPrice(Base):
     __tablename__ = 'market_prices'
