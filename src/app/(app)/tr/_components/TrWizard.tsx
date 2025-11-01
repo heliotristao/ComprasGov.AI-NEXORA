@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useTr, type TrDocument } from "@/hooks/useTr"
+import { buildEdocsUrl, isValidEdocs, normalizeEdocsValue } from "@/lib/edocs"
 
 import { trFormSchema, trStepSchemas, type TrFormValues, type TrType } from "../_schemas/trSchemas"
 import type { TrRecord } from "./types"
@@ -560,6 +561,8 @@ export function TrWizard({ tr, initialStep = 1, tipo }: TrWizardProps) {
   const statusVariant = normalizeStatus(trDocument?.status ?? tr.status)
   const activeStep = stepConfigs[currentStep - 1]
   const currentEdocs = activeTipo === "bens" ? methods.watch("identificacao.codigoEdocs" as const) : undefined
+  const normalizedHeaderEdocs = normalizeEdocsValue(currentEdocs ?? tr.edocs)
+  const hasValidHeaderEdocs = isValidEdocs(normalizedHeaderEdocs)
 
   if (isLoading && !trDocument) {
     return (
@@ -591,7 +594,21 @@ export function TrWizard({ tr, initialStep = 1, tipo }: TrWizardProps) {
               <span className="h-1 w-1 rounded-full bg-neutral-300" aria-hidden />
               <span>Tipo: {typeLabel(activeTipo)}</span>
               <span className="h-1 w-1 rounded-full bg-neutral-300" aria-hidden />
-              <span>Código E-Docs: {currentEdocs || tr.edocs || "—"}</span>
+              <span>
+                Código E-Docs:
+                {hasValidHeaderEdocs ? (
+                  <a
+                    href={buildEdocsUrl(normalizedHeaderEdocs)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-1 inline-flex items-center gap-1 text-primary-600 underline-offset-2 hover:text-primary-700 hover:underline"
+                  >
+                    {normalizedHeaderEdocs}
+                  </a>
+                ) : (
+                  <span className="ml-1">—</span>
+                )}
+              </span>
               <span className="h-1 w-1 rounded-full bg-neutral-300" aria-hidden />
               <StatusBadge status={statusVariant} />
               {isFetching || isSaving ? (

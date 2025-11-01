@@ -7,6 +7,7 @@ import { Clock, ExternalLink, Loader2 } from "lucide-react"
 import { DataTable, type DataTableColumn } from "@/components/data-display/data-table"
 import { StatusBadge, type StatusVariant } from "@/components/data-display/status-badge"
 import { Badge } from "@/components/ui/badge"
+import { buildEdocsUrl, normalizeEdocsValue } from "@/lib/edocs"
 
 import type { ProcessListMeta, ProcessSummary } from "../types"
 
@@ -54,19 +55,28 @@ function buildColumns(): DataTableColumn<ProcessSummary>[] {
     {
       id: "edocsNumber",
       label: "Nº Edocs",
-      accessor: (row) => (
-        <Link
-          href={row.edocsUrl ?? `https://www.edocs.gov.br/${encodeURIComponent(row.edocsNumber)}`}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-1 text-primary underline-offset-4 hover:underline"
-          onClick={(event) => event.stopPropagation()}
-        >
-          {row.edocsNumber}
-          <ExternalLink className="h-3.5 w-3.5" aria-hidden />
-          <span className="sr-only">Abrir processo no portal E-Docs</span>
-        </Link>
-      ),
+      accessor: (row) => {
+        const normalizedEdocs = normalizeEdocsValue(row.edocsNumber)
+        if (!normalizedEdocs) {
+          return <span className="text-sm text-slate-500">—</span>
+        }
+
+        const href = row.edocsUrl ?? buildEdocsUrl(normalizedEdocs)
+
+        return (
+          <Link
+            href={href}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 text-primary underline-offset-4 hover:underline"
+            onClick={(event) => event.stopPropagation()}
+          >
+            {normalizedEdocs}
+            <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+            <span className="sr-only">Abrir processo no portal E-Docs</span>
+          </Link>
+        )
+      },
       width: "w-40",
       sortable: true,
     },

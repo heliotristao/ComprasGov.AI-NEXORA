@@ -2,6 +2,8 @@
 
 import { Building2, CalendarRange, DownloadCloud, FileText, LinkIcon, Loader2, UserCircle2 } from "lucide-react"
 
+import { buildEdocsUrl, normalizeEdocsValue } from "@/lib/edocs"
+
 import {
   Dialog,
   DialogClose,
@@ -136,15 +138,22 @@ export function ProcessDrawer({ open, onOpenChange, process, isLoading = false, 
                   <div className="mt-4 grid gap-4 md:grid-cols-2">
                     <div className="space-y-1">
                       <p className="text-caption text-muted-foreground">Número E-Docs</p>
-                      <a
-                        href={process?.edocsUrl ?? `https://www.edocs.gov.br/${process?.edocsNumber ?? ""}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-2 font-semibold text-primary underline-offset-4 hover:underline"
-                      >
-                        <FileText className="h-4 w-4" />
-                        {process?.edocsNumber}
-                      </a>
+                      {process?.edocsNumber ? (
+                        <a
+                          href={
+                            process?.edocsUrl ??
+                            buildEdocsUrl(normalizeEdocsValue(process.edocsNumber))
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 font-semibold text-primary underline-offset-4 hover:underline"
+                        >
+                          <FileText className="h-4 w-4" />
+                          {normalizeEdocsValue(process.edocsNumber)}
+                        </a>
+                      ) : (
+                        <span className="font-semibold text-neutral-500">—</span>
+                      )}
                     </div>
                     {process?.responsible ? (
                       <div className="space-y-1">

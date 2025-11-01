@@ -470,7 +470,7 @@ function TrWizardPageContent() {
             totalSteps={totalSteps}
             onPrevious={handlePrevious}
             onNext={handleNext}
-            isNextDisabled={form.formState.isSubmitting}
+            isNextDisabled={form.formState.isSubmitting || !form.formState.isValid}
             isNextLoading={form.formState.isSubmitting}
             onValidate={handleValidate}
             isValidating={isValidating}

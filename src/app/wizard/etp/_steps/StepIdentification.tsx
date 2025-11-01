@@ -18,6 +18,7 @@ export function StepIdentification({ etpId, getContext }: StepIdentificationProp
   const {
     register,
     control,
+    trigger,
     formState: { errors },
   } = useFormContext<EtpFormValues>()
 
@@ -47,7 +48,10 @@ export function StepIdentification({ etpId, getContext }: StepIdentificationProp
             id="identification.edocsNumber"
             value={field.value ?? ""}
             onChange={field.onChange}
-            onBlur={field.onBlur}
+            onBlur={() => {
+              field.onBlur()
+              void trigger("identification.edocsNumber")
+            }}
             error={fieldState.error?.message}
           />
         )}

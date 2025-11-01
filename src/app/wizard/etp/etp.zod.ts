@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const edocsRegex = /^[A-Z0-9]{4}-[A-Z0-9]{6}$/
+import { EDOCS_REGEX } from "@/lib/edocs"
 
 export const identificationSchema = z.object({
   requestingUnit: z
@@ -11,7 +11,7 @@ export const identificationSchema = z.object({
     .string()
     .trim()
     .min(1, "Informe o código E-Docs.")
-    .regex(edocsRegex, "Informe um código E-Docs válido no formato AAAA-XXXXXX."),
+    .regex(EDOCS_REGEX, "Informe um código E-Docs válido no formato AAAA-XXXXXX."),
   processTitle: z
     .string()
     .trim()
