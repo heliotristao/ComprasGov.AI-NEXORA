@@ -16,7 +16,14 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 @pytest.fixture(scope="session", autouse=True)
 def create_test_db():
-    Base.metadata.create_all(bind=engine)
+    from sqlalchemy.exc import OperationalError
+    try:
+        Base.metadata.create_all(bind=engine)
+    except OperationalError as e:
+        if "index" in str(e) and "already exists" in str(e):
+            pass
+        else:
+            raise
     yield
     Base.metadata.drop_all(bind=engine)
 
