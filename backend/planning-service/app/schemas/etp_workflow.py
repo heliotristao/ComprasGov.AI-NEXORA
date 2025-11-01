@@ -1,6 +1,7 @@
 from pydantic import BaseModel
-from typing import Optional
 
+class ETPRejection(BaseModel):
+    comments: str
 
-class ETPComment(BaseModel):
-    comments: Optional[str] = None
+class ETPStatusUpdate(BaseModel):
+    status: str

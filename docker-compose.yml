@@ -114,9 +114,6 @@ services:
     networks:
       - nexora-net
 
-  metrics-service:
-    build:
-      context: ./backend/metrics-service
   prediction-service:
     build:
       context: ./backend/prediction-service
@@ -134,8 +131,6 @@ services:
       - "traefik.http.routers.prediction.rule=PathPrefix(`/prediction`)"
       - "traefik.http.routers.prediction.middlewares=forward-auth"
       - "traefik.http.services.prediction.loadbalancer.server.port=8000"
-    environment:
-      DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
 
   metrics-service:
     build:
