@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils"
 import { api } from "@/lib/axios"
 
 import { EdocsInput } from "@/app/_shared/components/EdocsInput"
+import { EDOCS_REGEX, buildEdocsUrl, isValidEdocs, normalizeEdocsValue } from "@/lib/edocs"
 import type { CreateEtpResponse, EtpListItem } from "./types"
 
 const STATUS_FILTERS: { label: string; value: string; badge?: StatusVariant }[] = [
@@ -34,7 +35,7 @@ const newEtpSchema = z.object({
   edocs: z
     .string()
     .min(1, { message: "Informe o código do E-Docs." })
-    .regex(/^[0-9A-Z]{4}-[0-9A-Z]{6}$/i, "Formato inválido. Use AAAA-XXXXXX."),
+    .regex(EDOCS_REGEX, "Formato inválido. Use AAAA-XXXXXX."),
 })
 
 interface NewEtpFormValues {
@@ -49,7 +50,9 @@ interface NewEtpModalProps {
 
 function mapToListItem(rawItem: any): EtpListItem {
   const id = String(rawItem?.id ?? "")
-  const edocs = rawItem?.edocs ?? rawItem?.codigo_edocs ?? "—"
+  const edocs = normalizeEdocsValue(
+    rawItem?.edocs ?? rawItem?.codigo_edocs ?? rawItem?.numeroEdocs ?? rawItem?.numero_edocs ?? "",
+  )
   const status = String(rawItem?.status ?? "draft")
   const owner =
     rawItem?.owner?.name ||
@@ -114,6 +117,7 @@ function NewEtpModal({ open, onOpenChange, onCreated }: NewEtpModalProps) {
     control,
     handleSubmit,
     reset,
+    trigger,
     formState: { isSubmitting, isValid },
   } = useForm<NewEtpFormValues>({
     resolver: zodResolver(newEtpSchema),
@@ -167,7 +171,10 @@ function NewEtpModal({ open, onOpenChange, onCreated }: NewEtpModalProps) {
                 label="Código E-Docs"
                 value={field.value}
                 onChange={field.onChange}
-                onBlur={field.onBlur}
+                onBlur={() => {
+                  field.onBlur()
+                  void trigger("edocs")
+                }}
                 error={fieldState.error?.message}
                 required
               />
@@ -261,12 +268,29 @@ export function EtpList() {
       {
         id: "title",
         label: "Título",
-        accessor: (row) => (
-          <div className="flex flex-col gap-1">
-            <span className="text-sm font-semibold text-neutral-900">{row.title}</span>
-            <span className="text-xs text-neutral-500">E-Docs: {row.edocs || "—"}</span>
-          </div>
-        ),
+        accessor: (row) => {
+          const hasValidEdocs = row.edocs && isValidEdocs(row.edocs)
+          return (
+            <div className="flex flex-col gap-1">
+              <span className="text-sm font-semibold text-neutral-900">{row.title}</span>
+              <span className="text-xs text-neutral-500">
+                E-Docs:
+                {hasValidEdocs ? (
+                  <a
+                    href={buildEdocsUrl(row.edocs)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-1 inline-flex items-center gap-1 text-primary-600 underline-offset-2 hover:text-primary-700 hover:underline"
+                  >
+                    {row.edocs}
+                  </a>
+                ) : (
+                  <span className="ml-1">—</span>
+                )}
+              </span>
+            </div>
+          )
+        },
         width: "min-w-[220px]",
       },
       {

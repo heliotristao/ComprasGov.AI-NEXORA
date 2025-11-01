@@ -16,10 +16,16 @@ const LIST_ENDPOINT = "**/api/gestao/processos"
 const METRICS_ENDPOINT = "**/api/gestao/processos/metrics"
 const DETAILS_ENDPOINT = "**/api/gestao/processos/*"
 
+const EDOCS_BASE_URL = (process.env.NEXT_PUBLIC_EDOCS_BASE_URL ?? "https://www.gov.br/compras/edocs").replace(/\/+$/, "")
+
+function buildEdocsUrl(code: string) {
+  return `${EDOCS_BASE_URL}/${code}`
+}
+
 const ALL_PROCESSES = [
   {
     id: "PROC-001",
-    numero_edocs: "E-2024-0001",
+    numero_edocs: "ABCD-123456",
     title: "Aquisição de plataforma analítica",
     status: "Pendente",
     status_label: "Pendente",
@@ -27,11 +33,11 @@ const ALL_PROCESSES = [
     responsavel: "Ana Souza",
     unidade: "Diretoria de TI",
     updated_at: "2025-02-10T13:45:00Z",
-    url: "https://edocs.gov.br/processo/PROC-001",
+    url: buildEdocsUrl("ABCD-123456"),
   },
   {
     id: "PROC-002",
-    numero_edocs: "E-2024-0002",
+    numero_edocs: "WXYZ-654321",
     title: "Contrato de suporte cloud",
     status: "Aprovado",
     status_label: "Aprovado",
@@ -39,7 +45,7 @@ const ALL_PROCESSES = [
     responsavel: "Bruno Lima",
     unidade: "Superintendência de Operações",
     updated_at: "2025-02-12T09:15:00Z",
-    url: "https://edocs.gov.br/processo/PROC-002",
+    url: buildEdocsUrl("WXYZ-654321"),
   },
 ]
 
@@ -116,7 +122,7 @@ test("renders management dashboard with filters, table and drawer interactions",
       contentType: "application/json",
       body: JSON.stringify({
         id: processId,
-        numero_edocs: "E-2024-0001",
+        numero_edocs: "ABCD-123456",
         title: "Aquisição de plataforma analítica",
         status: "Pendente",
         status_label: "Em avaliação",
@@ -169,8 +175,8 @@ test("renders management dashboard with filters, table and drawer interactions",
   await expect(page.getByText("32")).toBeVisible()
   await expect(page.getByText("78.2%")).toBeVisible()
 
-  const edocsLink = page.locator("a", { hasText: "E-2024-0001" })
-  await expect(edocsLink).toHaveAttribute("href", "https://edocs.gov.br/processo/PROC-001")
+  const edocsLink = page.locator("a", { hasText: "ABCD-123456" })
+  await expect(edocsLink).toHaveAttribute("href", buildEdocsUrl("ABCD-123456"))
 
   await expect(page.getByText("Aquisição de plataforma analítica")).toBeVisible()
   await expect(page.getByText("Ana Souza")).toBeVisible()

@@ -12,6 +12,7 @@ import type { TrFormValues } from "../types"
 export function TrBensIdentificacaoStep() {
   const {
     control,
+    trigger,
     formState: { errors },
   } = useFormContext<TrFormValues>()
 
@@ -28,6 +29,10 @@ export function TrBensIdentificacaoStep() {
             label="Código E-Docs"
             value={field.value}
             onChange={field.onChange}
+            onBlur={() => {
+              field.onBlur()
+              void trigger("identificacao.codigoEdocs")
+            }}
             required
             helperText="Informe o identificador oficial do processo no ComprasGov."
             error={identificacaoErrors?.codigoEdocs?.message as string | undefined}

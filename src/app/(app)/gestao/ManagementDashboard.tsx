@@ -3,6 +3,8 @@
 import { useCallback, useMemo, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 
+import { buildEdocsUrl, normalizeEdocsValue } from "@/lib/edocs"
+
 import { DashboardShell } from "./_components/DashboardShell"
 import { FiltersPanel } from "./_components/FiltersPanel"
 import { MetricsCards } from "./_components/MetricsCards"
@@ -27,7 +29,10 @@ function mergeProcessDetails(
   if (!summary && !details) return undefined
 
   if (details) {
-    const fallbackLinks = summary?.edocsUrl ? [{ label: "Portal E-Docs", url: summary.edocsUrl }] : undefined
+    const normalizedEdocs = normalizeEdocsValue(summary?.edocsNumber ?? details.edocsNumber)
+    const fallbackUrl =
+      details.edocsUrl ?? summary?.edocsUrl ?? (normalizedEdocs ? buildEdocsUrl(normalizedEdocs) : undefined)
+    const fallbackLinks = fallbackUrl ? [{ label: "Portal E-Docs", url: fallbackUrl }] : undefined
 
     return {
       ...summary,

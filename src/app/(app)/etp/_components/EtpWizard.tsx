@@ -14,6 +14,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Skeleton } from "@/components/ui/skeleton"
 import { useEtp, type EtpDocument } from "@/hooks/useEtp"
 
+import { buildEdocsUrl, isValidEdocs, normalizeEdocsValue } from "@/lib/edocs"
+
 import { EtpFormStep1 } from "./EtpFormStep1"
 import { EtpFormStep2 } from "./EtpFormStep2"
 import { EtpFormStep3 } from "./EtpFormStep3"
@@ -154,6 +156,9 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
   })
 
   const documentData = etpDocument ?? initialDocument
+
+  const normalizedEdocs = React.useMemo(() => normalizeEdocsValue(etp.edocs), [etp.edocs])
+  const hasValidEdocs = React.useMemo(() => isValidEdocs(normalizedEdocs), [normalizedEdocs])
 
   const defaultValues = React.useMemo(
     () => buildDefaultValues(etp, documentData.data as Partial<EtpFormValues>),
@@ -382,7 +387,21 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
             <div className="flex flex-wrap items-center gap-3 text-sm text-neutral-500">
               <span>ETP #{etp.id}</span>
               <span className="h-1 w-1 rounded-full bg-neutral-300" aria-hidden />
-              <span>Código E-Docs: {etp.edocs || "—"}</span>
+              <span>
+                Código E-Docs:
+                {hasValidEdocs ? (
+                  <a
+                    href={buildEdocsUrl(normalizedEdocs)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-1 inline-flex items-center gap-1 text-primary-600 underline-offset-2 hover:text-primary-700 hover:underline"
+                  >
+                    {normalizedEdocs}
+                  </a>
+                ) : (
+                  <span className="ml-1">—</span>
+                )}
+              </span>
               <span className="h-1 w-1 rounded-full bg-neutral-300" aria-hidden />
               <StatusBadge status={statusVariant} />
               {isFetching || isSaving ? (

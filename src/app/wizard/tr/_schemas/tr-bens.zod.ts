@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+import { EDOCS_REGEX } from "@/lib/edocs"
+
 export const trBensSchema = z.object({
   tipo: z.literal("bens"),
   identificacao: z.object({
@@ -7,7 +9,7 @@ export const trBensSchema = z.object({
       .string()
       .trim()
       .min(1, "Informe o código E-Docs.")
-      .regex(/^[0-9]{4}-[A-Z0-9]{6}$/i, "Informe o código no formato AAAA-XXXXXX."),
+      .regex(EDOCS_REGEX, "Informe o código no formato AAAA-XXXXXX."),
     objeto: z
       .string()
       .trim()

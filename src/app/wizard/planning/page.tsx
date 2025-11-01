@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, type Resolver } from "react-hook-form"
+import { Controller, useForm, type Resolver } from "react-hook-form"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
@@ -10,6 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+
+import { EdocsInput } from "@/app/_shared/components/EdocsInput"
+import { EDOCS_REGEX } from "@/lib/edocs"
 
 const planningSchema = z.object({
   unidadeRequisitante: z
@@ -19,7 +22,7 @@ const planningSchema = z.object({
   eDocs: z
     .string()
     .min(1, "Informe o código do E-Docs.")
-    .regex(/^[0-9]{4}-[A-Z0-9]{6}$/, "Formato inválido. Use AAAA-XXXXXX."),
+    .regex(EDOCS_REGEX, "Formato inválido. Use AAAA-XXXXXX."),
   descricaoObjeto: z
     .string()
     .trim()
@@ -40,10 +43,11 @@ export default function PlanningWizardPage() {
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
     reset,
-    setValue,
+    trigger,
   } = useForm<PlanningFormValues>({
     resolver: zodResolver(planningSchema) as Resolver<PlanningFormValues>,
     mode: "onChange",
@@ -125,24 +129,25 @@ export default function PlanningWizardPage() {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="eDocs">E-Docs</Label>
-                <Input
-                  id="eDocs"
-                  placeholder="0000-XXXXXX"
-                  maxLength={11}
-                  {...register("eDocs", {
-                    onChange: (event) => {
-                      const uppercaseValue = event.target.value.toUpperCase()
-                      event.target.value = uppercaseValue
-                      setValue("eDocs", uppercaseValue, { shouldValidate: true })
-                    },
-                  })}
-                />
-                {errors.eDocs && (
-                  <p className="text-sm text-error-600">{errors.eDocs.message}</p>
+              <Controller
+                control={control}
+                name="eDocs"
+                render={({ field, fieldState }) => (
+                  <EdocsInput
+                    id="eDocs"
+                    label="E-Docs"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={() => {
+                      field.onBlur()
+                      void trigger("eDocs")
+                    }}
+                    error={fieldState.error?.message}
+                    helperText="Informe o código oficial no formato AAAA-123456."
+                    required
+                  />
                 )}
-              </div>
+              />
             </div>
 
             <div className="space-y-2">

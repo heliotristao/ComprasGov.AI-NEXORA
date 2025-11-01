@@ -9,7 +9,7 @@ interface EdocsFieldProps {
   label?: string
   value: string
   onChange: (value: string) => void
-  onBlur?: () => void
+  onBlur?: React.FocusEventHandler<HTMLInputElement>
   helperText?: string
   error?: string
   required?: boolean

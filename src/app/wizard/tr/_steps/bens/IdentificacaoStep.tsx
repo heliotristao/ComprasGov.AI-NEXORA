@@ -16,6 +16,7 @@ interface IdentificacaoStepProps {
 export function IdentificacaoStep({ trId, getContext }: IdentificacaoStepProps) {
   const {
     control,
+    trigger,
     formState: { errors },
   } = useFormContext<TrFormValues>()
 
@@ -32,7 +33,10 @@ export function IdentificacaoStep({ trId, getContext }: IdentificacaoStepProps) 
             label="Código E-Docs"
             value={field.value ?? ""}
             onChange={field.onChange}
-            onBlur={field.onBlur}
+            onBlur={() => {
+              field.onBlur()
+              void trigger("identificacao.codigoEdocs")
+            }}
             helperText="Informe o identificador oficial do processo no ComprasGov."
             error={identificacaoErrors?.codigoEdocs?.message as string | undefined}
           />

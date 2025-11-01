@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-01] - Tarefa H3:** Implementada a máscara de input, validação `onBlur` e hyperlink configurável para o campo "Número Edocs".
 * **[2025-11-01] - Tarefa G2:** Implementado o rastreamento distribuído (distributed tracing) em toda a plataforma, permitindo a correlação de logs entre microsserviços.
 * **[2025-11-01] - Tarefa G1.1-FIX:** Implementados os provedores reais (Amazon SES, Webhook com `httpx`) para o serviço de notificações.
 * **[2025-11-01] - Tarefa G1:** Implementado o serviço central de notificações, com suporte para e-mail e webhooks.
