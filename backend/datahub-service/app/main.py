@@ -2,6 +2,10 @@ from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from app.api.v1.endpoints import artifacts, catalog
 from nexora_auth.middlewares import TraceMiddleware, TrustedHeaderMiddleware
+from app.core.logging_config import setup_logging
+
+# Setup structured logging
+setup_logging()
 
 # --- OpenAPI Security Scheme Definition ---
 security_schemes = {

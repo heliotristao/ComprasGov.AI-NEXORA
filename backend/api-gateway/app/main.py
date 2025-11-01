@@ -71,7 +71,7 @@ async def forward_auth(request: Request):
         return JSONResponse(status_code=401, content={"detail": "Authentication failed"})
 
     downstream_headers = {
-        "X-Request-ID": getattr(request.state, "request_id", ""),
+        "X-Trace-ID": getattr(request.state, "trace_id", ""),
         "X-User-Id": user_payload.get("sub", ""),
         "X-Org-Id": user_payload.get("org_id", ""),
         "X-User-Roles": ",".join(user_payload.get("roles", [])),

@@ -1,13 +1,14 @@
 import os
-import httpx
 import logging
+import httpx
 from typing import Optional, Dict
+from .base_client import BaseClient
 
 logger = logging.getLogger(__name__)
 
-class DataHubClient:
+class DataHubClient(BaseClient):
     def __init__(self, base_url: str = "http://datahub-service:8000/api/v1"):
-        self.base_url = base_url
+        super().__init__(base_url)
         # In a real scenario, this token would be a system-level JWT
         self.system_token = os.getenv("INTERNAL_JWT_TOKEN", "your_fallback_token")
 
@@ -31,10 +32,10 @@ class DataHubClient:
         }
         headers = {"Authorization": f"Bearer {self.system_token}"}
 
-        with httpx.Client() as client:
+        with self.get_client() as client:
             try:
                 response = client.post(
-                    f"{self.base_url}/artifacts",
+                    "/artifacts",
                     files=files,
                     data=data,
                     headers=headers,

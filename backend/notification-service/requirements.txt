@@ -10,3 +10,4 @@ httpx
 moto
 pytest-httpx
 backoff
+python-json-logger==2.0.7

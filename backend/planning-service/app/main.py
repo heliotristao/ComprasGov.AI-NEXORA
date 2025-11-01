@@ -7,6 +7,10 @@ from app.api.v1.endpoints import (
     tr_consolidation, etp_consolidation, etp_workflow, risk
 )
 from nexora_auth.middlewares import TraceMiddleware, TrustedHeaderMiddleware
+from app.core.logging_config import setup_logging
+
+# Setup structured logging
+setup_logging()
 
 # --- OpenAPI Security Scheme Definition ---
 security_schemes = {
