@@ -193,6 +193,7 @@ curl http://localhost:8000/api/v1/tr/1
 * **2025-10-23 - Tarefa IA-P-02:** Implementada a persistência dos dados de preços de mercado no banco de dados.
 * **2025-10-23 - Tarefa FRONTEND-P-01:** Expandido o formulário de criação de planejamento com campos detalhados do ETP.
 * **2025-10-23 - Tarefa BACKEND-P-01:** Expandido o modelo de dados doplanning-servicepara uma estrutura de ETP mais detalhada.
+* **2025-11-01 - Tarefa D4:** Implementada a interface de usuário do "Mapa de Preços", com filtros interativos e visualização de dados de mercado.
 * **2025-10-23 - Tarefa BACKEND-012:** Implementado o endpoint de WebSocket no 'dispute-service' em Go.
 * **2025-10-23 - Tarefa BACKEND-011:** Criada a estrutura de boilerplate em Go para o 'dispute-service'.
 * **2025-10-23 - Tarefa COMPOSE-001:** Criado o arquivo docker-compose.yml para orquestrar o ambiente de desenvolvimento.

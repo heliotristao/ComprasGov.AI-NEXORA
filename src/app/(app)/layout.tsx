@@ -9,11 +9,12 @@ import {
   FileText, 
   ClipboardList, 
   Gavel, 
-  FileSignature, 
+  FileSignature,
   Settings,
   Users,
   FileStack,
   Building2,
+  BarChart4,
   ChevronDown,
   ChevronRight,
   Menu,
@@ -38,12 +39,19 @@ type NavigationItem = {
 }
 
 const navigationItems: NavigationItem[] = [
-  { 
-    label: "Dashboard", 
-    href: "/dashboard", 
-    icon: LayoutDashboard 
+  {
+    label: "Dashboard",
+    href: "/dashboard",
+    icon: LayoutDashboard
   },
-  { 
+  {
+    label: "Mercado",
+    icon: BarChart4,
+    items: [
+      { label: "Mapa de Preços", href: "/mercado/precos", icon: BarChart4 }
+    ]
+  },
+  {
     label: "Planejamento",
     icon: ClipboardList,
     items: [
