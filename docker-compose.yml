@@ -117,6 +117,29 @@ services:
   metrics-service:
     build:
       context: ./backend/metrics-service
+  prediction-service:
+    build:
+      context: ./backend/prediction-service
+    ports:
+      - "8002:8000"
+    environment:
+      DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - nexora-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prediction.rule=PathPrefix(`/prediction`)"
+      - "traefik.http.routers.prediction.middlewares=forward-auth"
+      - "traefik.http.services.prediction.loadbalancer.server.port=8000"
+    environment:
+      DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
+
+  metrics-service:
+    build:
+      context: ./backend/metrics-service
     environment:
       DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
       REDIS_URL: "redis://redis:6379"
