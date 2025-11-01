@@ -79,11 +79,17 @@ services:
   planning-service:
     build:
       context: ./backend/planning-service
+    ports:
+      - "8001:8000"
     environment:
       DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/0"
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - nexora-net
     labels:
@@ -91,6 +97,22 @@ services:
       - "traefik.http.routers.planning.rule=PathPrefix(`/planning`)"
       - "traefik.http.routers.planning.middlewares=forward-auth"
       - "traefik.http.services.planning.loadbalancer.server.port=8000"
+
+  planning-worker:
+    build:
+      context: ./backend/planning-service
+    command: celery -A app.tasks.celery_app worker --loglevel=info
+    environment:
+      DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - nexora-net
 
   metrics-service:
     build:
