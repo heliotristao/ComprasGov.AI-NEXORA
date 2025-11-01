@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from fastapi import APIRouter, status, Response, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.models.planning import PlanningCreate, Planning, PlanningUpdate
+from app.schemas.planning import PlanningCreate, Planning, PlanningUpdate
 from app.db.models.planning import Planning as PlanningModel
 from app.db.session import SessionLocal
 from typing import List
