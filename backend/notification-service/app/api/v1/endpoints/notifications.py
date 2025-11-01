@@ -11,7 +11,7 @@ class NotificationRequest(BaseModel):
 
 @router.post("/notify")
 async def send_notification(request: NotificationRequest):
-    notification_service.send_notification(
+    await notification_service.send_notification(
         user_id=request.user_id,
         template_id=request.template_id,
         context=request.context
