@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-01] - Tarefa FIX-TEST-BASE-02:** Corrigidos problemas estruturais no ambiente de teste do `planning-service` relacionados a migrações idempotentes (Alembic) e substituição de dependências de autenticação.
 * **[2025-11-01] - Tarefa F2:** Implementado o workflow de aprovação (submeter, aprovar, rejeitar) para ETPs, com trilha de auditoria completa.
 * **[2025-10-31] - Tarefa C4-REDO-HARDENING:** Aumentada a robustez dos testes de consolidação de TR, com suporte a múltiplos templates e validação de placeholders.
 * **[2025-10-31] - Tarefa B6:** Implementada a consolidação de ETP com fila assíncrona, checksum SHA1 e versionamento no DataHub.

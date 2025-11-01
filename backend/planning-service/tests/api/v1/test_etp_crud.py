@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import uuid
 
 from app.core import config
-from app.models.etp import ETP
+from app.db.models.etp import ETP
 
 
 def create_test_token(user_email: str = "test@example.com") -> str:

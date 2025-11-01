@@ -2,8 +2,8 @@ import pytest
 from sqlalchemy.orm import Session
 from app.services.etp_accept_ia_service import accept_suggestion, TraceNotFoundError
 from app.db.models.etp import ETP
-from app.db.models.etp_ai_trace import ETPAITrace
-from app.db.models.etp_section_accepts import ETPSectionAccepts
+from app.models.etp_ai_trace import ETPAITrace
+from app.models.etp_section_accepts import ETPSectionAccepts
 from tests.utils.etp import create_random_etp
 import uuid
 
