@@ -1,20 +1,22 @@
-from sqlalchemy.orm import Session
-from app.db.models.etp import ETP
-from tests.utils.planning import create_random_planning
-import uuid
 import random
 import string
+import uuid
+
+from sqlalchemy.orm import Session
+
+from app.db.models.etp import ETP, ETPStatus
+
 
 def random_string(length: int = 10) -> str:
     return "".join(random.choices(string.ascii_lowercase + string.digits, k=length))
 
-def create_random_etp(db: Session) -> ETP:
+
+def create_random_etp(db: Session, status: ETPStatus = ETPStatus.draft) -> ETP:
     etp = ETP(
-        process_id=random_string(),
-        status="DRAFT",
-        data={"title": "Test ETP"},
+        title=f"Test ETP {random_string()}",
+        status=status,
+        data={"description": "A test ETP."},
         created_by="test_user",
-        org_id="test_org"
     )
     db.add(etp)
     db.commit()

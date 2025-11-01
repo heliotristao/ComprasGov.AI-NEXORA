@@ -17,7 +17,7 @@ class ETPSectionAccepts(Base):
     __tablename__ = 'etp_section_accepts'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    etp_id = Column(UUID(as_uuid=True), ForeignKey('etp.id'), nullable=False, index=True)
+    etp_id = Column(UUID(as_uuid=True), ForeignKey('etps.id'), nullable=False, index=True)
     section = Column(String, nullable=False)
     trace_id = Column(String, nullable=False, index=True)
     diff_short = Column(Text, nullable=False)

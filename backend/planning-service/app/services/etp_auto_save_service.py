@@ -52,6 +52,8 @@ def check_version_conflict(
         )
 
 
+from app.db.models.etp import ETPStatus
+
 def orchestrate_etp_auto_save(
     db: Session,
     *,
@@ -67,6 +69,15 @@ def orchestrate_etp_auto_save(
     3. Performs a merge patch to update the ETP data.
     4. Increments the ETP version.
     """
+    etp = crud.etp.get(db=db, id=etp_id)
+    if not etp:
+        raise HTTPException(status_code=404, detail="ETP not found")
+
+    if etp.status in [ETPStatus.approved, ETPStatus.rejected]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="ETPs that have been approved or rejected cannot be edited.",
+        )
     # 1. Check for version conflicts
     check_version_conflict(db=db, etp_id=etp_id, if_match=if_match)
 

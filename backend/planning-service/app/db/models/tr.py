@@ -16,6 +16,7 @@ from sqlalchemy.dialects.postgresql import UUID as pgUUID
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
+from app.db.models.tr_version import TRVersion
 
 
 class TRType(str, enum.Enum):

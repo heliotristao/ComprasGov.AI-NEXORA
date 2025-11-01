@@ -1,5 +1,6 @@
 import uuid
 from sqlalchemy import Column, String, Integer, DateTime, func, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from app.db.base import Base
 
@@ -7,7 +8,7 @@ class TRVersion(Base):
     __tablename__ = 'tr_versions'
 
     id = Column(Integer, primary_key=True, index=True)
-    tr_id = Column(Integer, ForeignKey('tr.id'), nullable=False)
+    tr_id = Column(UUID(as_uuid=True), ForeignKey('trs.id'), nullable=False)
     version = Column(Integer, nullable=False)
     filename = Column(String, nullable=False)
     filetype = Column(String, nullable=False)

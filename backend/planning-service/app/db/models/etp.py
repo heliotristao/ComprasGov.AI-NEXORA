@@ -19,6 +19,9 @@ from app.db.base import Base
 
 class ETPStatus(enum.Enum):
     draft = "draft"
+    in_review = "in_review"
+    approved = "approved"
+    rejected = "rejected"
     published = "published"
     archived = "archived"
 
@@ -34,6 +37,8 @@ class ETP(Base):
     data = Column(JSON, nullable=True)
     created_by = Column(String, nullable=False)
     updated_by = Column(String, nullable=True)
+    current_approver_id = Column(String, nullable=True)
+    version = Column(Integer, default=1, nullable=False)
 
     created_at = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
@@ -49,9 +54,11 @@ class ETP(Base):
     validations = relationship(
         "ETPValidation", back_populates="etp", cascade="all, delete-orphan"
     )
+    consolidation_jobs = relationship("ETPConsolidationJob", back_populates="etp")
 
     __table_args__ = (
         Index("ix_etps_edocs_number", "edocs_number"),
         Index("ix_etps_status", "status"),
         Index("ix_etps_created_by", "created_by"),
+        {'extend_existing': True}
     )
