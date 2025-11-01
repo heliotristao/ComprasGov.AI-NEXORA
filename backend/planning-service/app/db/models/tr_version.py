@@ -2,7 +2,7 @@ import uuid
 from sqlalchemy import Column, String, Integer, DateTime, func, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from app.db.base import Base
+from app.db.base_class import Base
 
 class TRVersion(Base):
     __tablename__ = 'tr_versions'

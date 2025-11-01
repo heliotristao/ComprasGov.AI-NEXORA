@@ -9,7 +9,7 @@ from sqlalchemy import (
     func,
 )
 from sqlalchemy.dialects.postgresql import UUID as pgUUID
-from app.db.base import Base
+from app.db.base_class import Base
 
 class DocumentType(enum.Enum):
     etp = "etp"
