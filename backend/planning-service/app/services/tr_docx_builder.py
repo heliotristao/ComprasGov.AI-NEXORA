@@ -1,40 +1,55 @@
 import os
 import tempfile
 from docx import Document
-from app.db.models.tr import TR, TRType
+from app.db.models.tr import TR
 
 class TRDocxBuilder:
-    def __init__(self, tr: TR):
+    def __init__(self, tr: TR, template_path: str):
         self.tr = tr
-        self.document = Document()
+        if not os.path.exists(template_path):
+            raise FileNotFoundError(f"Template not found at path: {template_path}")
+        self.document = Document(template_path)
+        self.context = self.tr.data
 
     def build(self) -> str:
         """
-        Builds a DOCX document from a TR object.
+        Builds a DOCX document from a TR object using a template.
         """
-        if self.tr.type == TRType.BEM:
-            self._build_from_template("Bem")
-        elif self.tr.type == TRType.SERVICO:
-            self._build_from_template("Serviço")
-        else:
-            raise ValueError("Invalid TR type")
-
+        self._replace_placeholders()
         self._add_gap_report()
         self._add_watermark()
-
         return self._save_document()
 
-    def _build_from_template(self, template_type: str):
+    def _replace_placeholders(self):
         """
-        Populates the document using a template.
+        Replaces placeholders in the format {{key}} with data from the TR.
         """
-        self.document.add_heading(f"Termo de Referência ({template_type}) - {self.tr.title}", level=1)
-        self.document.add_paragraph(f"ID do ETP: {self.tr.etp_id}")
-        self.document.add_paragraph(f"Número do EDOCS: {self.tr.edocs_number}")
-        self.document.add_heading("Dados do TR", level=2)
+        context = {**self.tr.data, "objeto": self.tr.title}
 
-        for key, value in self.tr.data.items():
-            self.document.add_paragraph(f"{key}: {value}")
+        # Replace in paragraphs
+        for p in self.document.paragraphs:
+            text = p.text
+            for key, value in context.items():
+                placeholder = f"{{{{{key}}}}}"
+                if placeholder in text:
+                    text = text.replace(placeholder, str(value))
+            if p.text != text:
+                p.clear()
+                p.add_run(text)
+
+        # Replace in tables
+        for table in self.document.tables:
+            for row in table.rows:
+                for cell in row.cells:
+                    for p in cell.paragraphs:
+                        text = p.text
+                        for key, value in context.items():
+                            placeholder = f"{{{{{key}}}}}"
+                            if placeholder in text:
+                                text = text.replace(placeholder, str(value))
+                        if p.text != text:
+                            p.clear()
+                            p.add_run(text)
 
     def _add_gap_report(self):
         """
