@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.api.deps import get_db
-from app.services.tr_consolidation_service import TRConsolidationService
+from app.services.tr_consolidation_service import TRConsolidationService, TemplateNotFoundError
 from nexora_auth.decorators import require_scope
 
 router = APIRouter()
@@ -19,7 +19,7 @@ def consolidate_tr(
         service = TRConsolidationService(db)
         service.consolidate(tr_id)
         return {"message": "TR consolidation process started."}
-    except ValueError as e:
+    except (ValueError, TemplateNotFoundError) as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

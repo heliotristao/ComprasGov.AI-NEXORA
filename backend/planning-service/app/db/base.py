@@ -6,3 +6,4 @@ from app.db.models import sla  # noqa: F401
 from app.models.etp_section_accepts import ETPSectionAccepts  # noqa: F401
 from app.models.etp_consolidation_job import ETPConsolidationJob # noqa
 from app.models.user import User # noqa
+from app.db.models.template import Template # noqa

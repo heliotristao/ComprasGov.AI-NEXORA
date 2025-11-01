@@ -9,6 +9,9 @@ from app.schemas.tr_version import TRVersionCreate
 from app.services.tr_docx_builder import TRDocxBuilder
 import app.crud as crud
 
+class TemplateNotFoundError(ValueError):
+    pass
+
 class TRConsolidationService:
     def __init__(self, db: Session):
         self.db = db
@@ -21,8 +24,14 @@ class TRConsolidationService:
         if not tr:
             raise ValueError("TR not found")
 
+        if not tr.template:
+            raise TemplateNotFoundError("TEMPLATE_NOT_FOUND")
+
         # 1. Generate DOCX
-        docx_builder = TRDocxBuilder(tr)
+        template_path = os.path.join(
+            os.getcwd(), "backend/planning-service/app", tr.template.path
+        )
+        docx_builder = TRDocxBuilder(tr, template_path=template_path)
         docx_path = docx_builder.build()
 
         # 2. Generate PDF (placeholder)

@@ -59,8 +59,11 @@ class TR(Base):
     )
     deleted_at = Column(DateTime(timezone=True), nullable=True)
 
+    template_id = Column(pgUUID(as_uuid=True), ForeignKey("templates.id"), nullable=True)
+
     etp = relationship("ETP", backref="trs")
     versions = relationship("TRVersion", back_populates="tr")
+    template = relationship("Template")
 
     __table_args__ = (
         Index("ix_trs_edocs_number", "edocs_number"),
