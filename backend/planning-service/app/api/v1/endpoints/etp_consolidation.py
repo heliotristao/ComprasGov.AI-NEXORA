@@ -5,8 +5,12 @@ from app import crud, models, schemas
 from nexora_auth.decorators import require_scope
 from app.api import deps
 from app.tasks.consolidation_worker import consolidate_etp_task
+from app.crud import crud_etp
 
 router = APIRouter()
+
+def get_etp_crud():
+    return crud_etp
 
 @router.post(
     "/etp/{id}/consolidate",
@@ -19,11 +23,12 @@ def consolidate_etp(
     *,
     db: Session = Depends(deps.get_db),
     current_user: dict = Depends(deps.get_current_user),
+    etp_crud = Depends(get_etp_crud)
 ):
     """
     Initiate an asynchronous ETP consolidation job.
     """
-    etp = crud.etp.get(db, id=id)
+    etp = etp_crud.get(db, id=id)
     if not etp:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

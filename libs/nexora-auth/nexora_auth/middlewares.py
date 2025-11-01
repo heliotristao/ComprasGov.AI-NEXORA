@@ -8,12 +8,17 @@ import jwt
 
 from .jwt import JWTValidator
 
+from contextvars import ContextVar
+
+trace_id_var: ContextVar[str] = ContextVar("trace_id", default=None)
+
 class TraceMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
-        request_id = str(uuid.uuid4())
-        request.state.request_id = request_id
+        trace_id = request.headers.get("X-Trace-ID") or str(uuid.uuid4())
+        trace_id_var.set(trace_id)
+        request.state.trace_id = trace_id
         response = await call_next(request)
-        response.headers["X-Request-ID"] = request_id
+        response.headers["X-Trace-ID"] = trace_id
         return response
 
 class AuthContextMiddleware(BaseHTTPMiddleware):
