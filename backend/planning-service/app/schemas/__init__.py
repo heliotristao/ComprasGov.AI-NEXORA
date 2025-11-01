@@ -7,6 +7,7 @@ from .etp_consolidation import (
     ETPConsolidationJobRead,
     ETPConsolidationJobStatus,
 )
+from .risk import Risk, RiskMatrix, RiskGenerationRequest
 
 
 __all__ = [
@@ -18,4 +19,7 @@ __all__ = [
     "ETPConsolidationJobCreate",
     "ETPConsolidationJobRead",
     "ETPConsolidationJobStatus",
+    "Risk",
+    "RiskMatrix",
+    "RiskGenerationRequest",
 ]
