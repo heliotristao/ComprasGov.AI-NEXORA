@@ -80,6 +80,7 @@ def update_etp(db: Session, *, db_obj: ETP, obj_in: ETPUpdate) -> ETP:
     return db_obj
 
 
+from app.db.models.etp_workflow_history import ETPWorkflowHistory
 def soft_delete_etp(db: Session, *, db_obj: ETP) -> ETP:
     """
     Soft delete an ETP by setting the deleted_at timestamp.
@@ -89,3 +90,24 @@ def soft_delete_etp(db: Session, *, db_obj: ETP) -> ETP:
     db.commit()
     db.refresh(db_obj)
     return db_obj
+
+def update_status(db: Session, *, etp_id: UUID, new_status: str, comments: Optional[str] = None) -> ETP:
+    """
+    Update the status of an ETP and log the change.
+    """
+    etp = get_etp(db=db, etp_id=etp_id)
+    if not etp:
+        raise HTTPException(status_code=404, detail="ETP not found")
+
+    etp.status = new_status
+
+    history_entry = ETPWorkflowHistory(
+        etp_id=etp_id,
+        status=new_status,
+        comments=comments
+    )
+    db.add(history_entry)
+
+    db.commit()
+    db.refresh(etp)
+    return etp
