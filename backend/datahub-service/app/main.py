@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
-from app.api.v1.endpoints import artifacts, catalog
+from app.api.v1.endpoints import artifacts, search
 from nexora_auth.middlewares import TraceMiddleware, TrustedHeaderMiddleware
 from app.core.logging_config import setup_logging
+from app.db.milvus import get_milvus_connection, close_milvus_connection
 
 # Setup structured logging
 setup_logging()
@@ -38,10 +39,19 @@ def custom_openapi():
 app = FastAPI(title="NEXORA DataHub Service")
 app.openapi = custom_openapi
 
+# --- Lifespan Events for Milvus Connection ---
+@app.on_event("startup")
+async def startup_event():
+    get_milvus_connection()
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    close_milvus_connection()
+
 # --- Middlewares ---
 app.add_middleware(TraceMiddleware)
 app.add_middleware(TrustedHeaderMiddleware)
 
 # --- API Routers ---
 app.include_router(artifacts.router, prefix="/api/v1/artifacts", tags=["Artifacts"])
-app.include_router(catalog.router, prefix="/api/v1/catalog", tags=["Catalog"])
+app.include_router(search.router, prefix="/api/v1/search", tags=["Search"])

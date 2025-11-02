@@ -1,280 +1,143 @@
 import uuid
-from typing import Any, Dict, Optional
-
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, status, Request, File, UploadFile
+from typing import List, Any
+from fastapi import APIRouter, Depends, HTTPException, status, Header, Query
 from sqlalchemy.orm import Session
 
-from app import crud
+from app.crud import crud_etp
 from app.api.deps import get_db
 from app.api.v1.dependencies import get_current_user
-from app.schemas.etp import ETPCreate, ETPSchema, ETPStatus
-from app.schemas.signed_document import SignedDocumentCreate, SignedDocumentSchema
-from app.schemas.compliance import ComplianceReport
-from app.core.compliance import compliance_engine
-from app.services import etp_auto_save_service
-from nexora_auth.decorators import require_scope
-from app.schemas.etp import ETPAcceptIA
-from app.services import etp_accept_ia_service
+import json
+from app.core.rule_engine_wrapper import RuleEngineWrapper
+from app.schemas.etp import ETPCreate, ETPSchema, ETPUpdate, ETPPatch
 from nexora_auth.audit import audited
-from app.core.exceptions import TraceNotFoundException, ETPNotFoundException
-from app.schemas.pagination import PaginatedResponse
-from app.schemas.etp_accept_ia import ETPAcceptanceLogSchema
-
 
 router = APIRouter()
 
 
 @router.post(
-    "",
+    "/",
     response_model=ETPSchema,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_scope("etp:write"))],
 )
+@audited(action="ETP_CREATED")
 def create_etp(
     etp_in: ETPCreate,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
-):
+) -> Any:
     """
-    Create a new ETP.
-    Requires scope: etp:write
+    Create new ETP.
     """
-    etp_in.created_by = current_user.get("sub")
-    etp = crud.etp.create(db=db, obj_in=etp_in)
+    user_id = uuid.UUID(current_user.get("sub"))
+    etp = crud_etp.etp.create_with_owner(db=db, obj_in=etp_in, created_by_id=user_id)
     return etp
 
 
-@router.get(
-    "/{etp_id}",
-    response_model=ETPSchema,
-    dependencies=[Depends(require_scope("etp:read"))],
-)
+@router.get("/{id}", response_model=ETPSchema)
 def read_etp(
-    etp_id: uuid.UUID,
+    id: uuid.UUID,
     db: Session = Depends(get_db),
-):
+) -> Any:
     """
-    Get an ETP by ID.
-    Requires scope: etp:read
+    Get ETP by ID.
     """
-    etp = crud.etp.get(db=db, id=etp_id)
-    if not etp or etp.deleted_at:
+    etp = crud_etp.etp.get(db=db, id=id)
+    if not etp:
         raise HTTPException(status_code=404, detail="ETP not found")
     return etp
 
 
-@router.post(
-    "/{etp_id}/validate",
-    response_model=ComplianceReport,
-    dependencies=[Depends(require_scope("etp:read"))],
-)
-def validate_etp(
-    etp_id: uuid.UUID,
+@router.get("/", response_model=List[ETPSchema])
+def read_etps(
     db: Session = Depends(get_db),
-):
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=100),
+) -> Any:
     """
-    Validate an ETP and return a compliance report.
-    Requires scope: etp:read
+    Retrieve ETPs.
     """
-    etp = crud.etp.get_etp(db=db, etp_id=etp_id)
-    if not etp or etp.deleted_at:
-        raise HTTPException(status_code=404, detail="ETP not found")
-
-    report = compliance_engine.validate_etp(etp)
-    return report
+    etps = crud_etp.etp.get_multi(db, skip=skip, limit=limit)
+    return etps
 
 
-@router.patch(
-    "/{etp_id}",
-    response_model=ETPSchema,
-)
-@require_scope("etp:write")
-def patch_etp_auto_save(
-    request: Request,
-    etp_id: uuid.UUID,
-    patch_data: Dict[str, Any],
-    db: Session = Depends(get_db),
-    if_match: Optional[str] = Header(None, alias="If-Match"),
-    validate_step: Optional[str] = Query(None, alias="validate_step"),
-):
-    """
-    Perform a partial update (auto-save) on an ETP, with version control.
-    - Requires scope: `etp:write`
-    - Requires `If-Match` header for concurrency control.
-    - Optionally validates payload against a step schema via `validate_step`
-      query param.
-    """
-    updated_etp = etp_auto_save_service.orchestrate_etp_auto_save(
-        db=db,
-        etp_id=etp_id,
-        patch_data=patch_data,
-        if_match=if_match,
-        validate_step=validate_step,
-    )
-    return updated_etp
-
-
-@router.delete(
-    "/{etp_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(require_scope("etp:delete"))],
-)
-def delete_etp(
-    etp_id: uuid.UUID,
-    db: Session = Depends(get_db),
-):
-    """
-    Soft delete an ETP.
-    Requires scope: etp:delete
-    """
-    etp = crud.etp.get(db=db, id=etp_id)
-    if not etp or etp.deleted_at:
-        raise HTTPException(status_code=404, detail="ETP not found")
-
-    crud.etp.remove(db=db, id=etp_id)
-    return None
-
-
-@router.post(
-    "/{etp_id}/accept-ia/{section}",
-    response_model=ETPSchema,
-    status_code=status.HTTP_200_OK,
-)
-@audited(action="ETP_AI_ACCEPT")
-@require_scope("etp:write")
-def accept_etp_ia(
-    etp_id: uuid.UUID,
-    section: str,
-    payload: ETPAcceptIA,
-    db: Session = Depends(get_db),
-    if_match: str = Header(..., alias="If-Match"),
-    current_user: dict = Depends(get_current_user),
-):
-    """
-    Accept an AI suggestion for an ETP section.
-    - Requires scope: `etp:write`
-    - Requires `If-Match` header for concurrency control.
-    """
-    try:
-        updated_etp = etp_accept_ia_service.accept_suggestion(
-            db=db,
-            etp_id=etp_id,
-            section=section,
-            trace_id=payload.trace_id,
-            if_match=if_match,
-            user_id=current_user.get("sub"),
-        )
-        return updated_etp
-    except ETPNotFoundException:
-        raise HTTPException(status_code=404, detail="ETP not found")
-    except TraceNotFoundException:
-        raise HTTPException(status_code=404, detail="Trace not found")
-    except ValueError as e:
-        raise HTTPException(status_code=409, detail=str(e))
-
-
-# Legacy endpoint alias for frontend compatibility
-@router.post(
-    "/{etp_id}/aceitar-ia/{campoId}",
-    response_model=ETPSchema,
-    status_code=status.HTTP_200_OK,
-    deprecated=True,
-)
-@audited(action="ETP_AI_ACCEPT")
-@require_scope("etp:write")
-def accept_etp_ia_legacy(
-    etp_id: uuid.UUID,
-    campoId: str,
-    payload: ETPAcceptIA,
-    db: Session = Depends(get_db),
-    if_match: str = Header(..., alias="If-Match"),
-    current_user: dict = Depends(get_current_user),
-):
-    """
-    (Legacy) Accept an AI suggestion for an ETP section.
-    """
-    return accept_etp_ia(
-        etp_id=etp_id,
-        section=campoId,
-        payload=payload,
-        db=db,
-        if_match=if_match,
-        current_user=current_user,
-    )
-
-
-@router.get(
-    "/{etp_id}/sections/{section}/accepts",
-    response_model=PaginatedResponse[ETPAcceptanceLogSchema],
-    dependencies=[Depends(require_scope("etp:read"))],
-)
-def list_etp_ia_accepts(
-    etp_id: uuid.UUID,
-    section: str,
-    db: Session = Depends(get_db),
-    page: int = Query(1, ge=1),
-    size: int = Query(10, ge=1, le=100),
-):
-    """
-    List AI suggestion acceptances for an ETP section.
-    Requires scope: etp:read
-    """
-    total, accepts = etp_accept_ia_service.list_acceptances(
-        db=db,
-        etp_id=etp_id,
-        section=section,
-        page=page,
-        size=size,
-    )
-    return {
-        "items": accepts,
-        "total": total,
-        "page": page,
-        "size": size,
-        "pages": (total + size - 1) // size,
-    }
-
-@router.post(
-    "/{etp_id}/upload-signed",
-    response_model=SignedDocumentSchema,
-    status_code=status.HTTP_201_CREATED,
-)
-@audited(action="ETP_SIGNED")
-@require_scope("etp:sign")
-async def upload_signed_etp(
-    etp_id: uuid.UUID,
-    file: UploadFile = File(...),
+@router.patch("/{id}", response_model=ETPSchema)
+@audited(action="ETP_AUTOSAVED")
+def patch_etp(
+    id: uuid.UUID,
+    etp_in: ETPPatch,
+    if_match: int = Header(...),
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
-):
+) -> Any:
     """
-    Upload a signed ETP document.
-    - Requires scope: `etp:sign`
+    Patch an ETP for auto-save functionality.
     """
-    etp = crud.etp.get(db=db, id=etp_id)
+    etp = crud_etp.etp.get(db=db, id=id)
     if not etp:
         raise HTTPException(status_code=404, detail="ETP not found")
 
-    if etp.status != ETPStatus.approved:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"ETP must be in 'approved' status to upload a signed document. Current status: {etp.status}",
-        )
+    etp = crud_etp.etp.patch(db=db, db_obj=etp, obj_in=etp_in, version=if_match)
+    return etp
 
-    # Mock datahub-service interaction
-    # In a real implementation, this would be an HTTP client call
-    # that uploads the file.content and returns a real artifact_id.
-    artifact_id = uuid.uuid4()
 
-    signed_doc_in = SignedDocumentCreate(
-        document_id=etp_id,
-        document_type="etp",
-        signed_by_id=current_user.get("sub"),
-        artifact_id=artifact_id,
-    )
-    signed_document = crud.signed_document.create(db=db, obj_in=signed_doc_in)
+@router.put("/{id}", response_model=ETPSchema)
+@audited(action="ETP_UPDATED")
+def update_etp(
+    id: uuid.UUID,
+    etp_in: ETPUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+) -> Any:
+    """
+    Update an ETP.
+    """
+    etp = crud_etp.etp.get(db=db, id=id)
+    if not etp:
+        raise HTTPException(status_code=404, detail="ETP not found")
+    etp = crud_etp.etp.update(db=db, db_obj=etp, obj_in=etp_in)
+    return etp
 
-    # Update ETP status
-    crud.etp.update(db=db, db_obj=etp, obj_in={"status": ETPStatus.signed})
 
-    return signed_document
+@router.delete("/{id}", status_code=204)
+@audited(action="ETP_DELETED")
+def delete_etp(
+    id: uuid.UUID,
+    db: Session = Depends(get_db),
+) -> None:
+    """
+    Delete an ETP.
+    """
+    etp = crud_etp.etp.get(db=db, id=id)
+    if not etp:
+        raise HTTPException(status_code=404, detail="ETP not found")
+    crud_etp.etp.remove(db=db, id=id)
+
+
+@router.get("/{id}/validar", response_model=List[dict])
+def validate_etp(
+    id: uuid.UUID,
+    db: Session = Depends(get_db),
+) -> Any:
+    """
+    Validate an ETP against a set of rules.
+    """
+    etp = crud_etp.etp.get(db=db, id=id)
+    if not etp:
+        raise HTTPException(status_code=404, detail="ETP not found")
+
+    with open("app/rules/etp_rules.json") as f:
+        rules = json.load(f)
+
+    etp_data = ETPSchema.model_validate(etp).dict()
+
+    # The `data` field is a JSON string in the database, so we need to parse it
+    if isinstance(etp_data.get("data"), str):
+        etp_data["data"] = json.loads(etp_data["data"])
+
+    # Flatten the data structure to match the rules
+    etp_data.update(etp_data.pop("data", {}))
+
+    engine = RuleEngineWrapper(rules)
+    result = engine.run(etp_data)
+
+    return result

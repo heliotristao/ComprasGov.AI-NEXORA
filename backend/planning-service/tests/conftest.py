@@ -20,9 +20,11 @@ engine = create_engine(
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+import uuid
+
 # Mock the get_current_user dependency
 def get_current_user_override():
-    return {"sub": "test@example.com", "scopes": ["etp:read", "etp:write", "etp:delete", "etp:sign"]}
+    return {"sub": str(uuid.uuid4()), "scopes": ["etp:read", "etp:write", "etp:delete", "etp:sign"]}
 
 app.dependency_overrides[get_current_user] = get_current_user_override
 

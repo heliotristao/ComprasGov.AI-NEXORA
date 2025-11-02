@@ -7,11 +7,16 @@ pydantic-settings
 python-dotenv
 alembic
 boto3
+celery
+redis
+langchain-milvus
+python-magic
 passlib[bcrypt]
 bcrypt==3.1.7
 python-multipart
 pytest
-moto[s3]
 httpx
 pgvector
 python-json-logger==2.0.7
+PyPDF2
+python-docx

@@ -102,6 +102,16 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-02] - Tarefa B3.2:** Implementado o motor de validação de conformidade para ETPs, com regras baseadas na Lei 14.133/2021.
+* **[2025-11-02] - Tarefa B3.1:** Criado um wrapper abstrato para o motor de regras de negócio, isolando a lógica da aplicação de bibliotecas de terceiros.
+* **[2025-11-02] - Tarefa B2:** Implementada a funcionalidade de auto-save para ETPs através de um endpoint `PATCH` otimizado.
+* **[2025-11-02] - Tarefa B1:** Criado o modelo de dados e o CRUD completo para a gestão de Estudos Técnicos Preliminares (ETP).
+* **[2025-11-02] - Tarefa A5.1-FIX:** Corrigidos os testes de integração do `metrics-service`, resolvendo o bloqueio de validação da funcionalidade de KPIs.
+* **[2025-11-02] - Tarefa A5:** Criado o `metrics-service` para calcular e expor KPIs de negócio para o dashboard de gestão e monitoramento.
+* **[2025-11-02] - Tarefa A4:** Criada a biblioteca `nexora-auth` para padronizar o controle de acesso (RBAC) и a trilha de auditoria em toda a plataforma.
+* **[2025-11-02] - Tarefa A3:** Implementado o API Gateway, centralizando o roteamento e a segurança da plataforma.
+* **[2025-11-01] - Tarefa A2:** Criado o `datahub-service`, o núcleo central para armazenamento versionado de artefatos e busca semântica.
+* **[2025-11-01] - Tarefa A1:** Criado o motor de IA (`AIEngine`) com suporte a múltiplos provedores, fallback automático e cache em Redis.
 * **[2025-11-01] - Tarefa J3:** Consolidada a documentação técnica dos microsserviços e criado um Runbook operacional para diagnóstico de falhas.
 * **[2025-11-01] - Tarefa J2:** Aprimorado o pipeline de CI/CD com deploys de preview para PRs de frontend e bloqueio de merge em caso de falha nos testes.
 * **[2025-11-01] - Tarefa J1:** Implementados testes de ponta a ponta (E2E) com Playwright para o fluxo principal e configurado um portão de qualidade de 80% de cobertura de testes.

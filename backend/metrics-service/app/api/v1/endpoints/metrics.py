@@ -1,12 +1,14 @@
-import httpx
 from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+
+from app.api.deps import get_db
 from app.schemas.metrics import (
     ProcessStatusMetrics, TrendMetrics, SavingsMetrics
 )
-from nexora_auth.auth import require_role
+from nexora_auth.decorators import require_role
 
 from app.core.cache import redis_cache
-
+from app.services import metrics_calculator
 
 router = APIRouter()
 
@@ -18,23 +20,12 @@ router = APIRouter()
     dependencies=[Depends(require_role(["GESTOR"]))],
 )
 @redis_cache(ttl=300)
-def get_process_status_metrics():
+def get_process_status_metrics(db: Session = Depends(get_db)):
     """
     Retrieves a count of processes (ETPs, TRs, etc.) grouped by their
     current status.
     """
-    response = httpx.get(
-        "http://planning-service:8000/api/v1/dashboard/summary"
-    )
-    data = response.json()
-
-    # This is a simplification, as the actual data structure is not defined.
-    # I'm assuming the planning-service returns a compatible structure.
-    status_data = {
-        "draft": data.get("total_etp_rascunho", 0),
-        "in_review": data.get("total_etp_analise", 0),
-        "approved": data.get("total_etp_concluido", 0),
-    }
+    status_data = metrics_calculator.get_process_status(db)
     return ProcessStatusMetrics(**status_data)
 
 
@@ -45,18 +36,13 @@ def get_process_status_metrics():
     dependencies=[Depends(require_role(["GESTOR"]))],
 )
 @redis_cache(ttl=300)
-def get_trend_metrics():
+def get_trend_metrics(db: Session = Depends(get_db)):
     """
     Retrieves a time series of the volume of processes created over the
     last 12 months.
     """
-    # The actual endpoint in datahub-service is not defined,
-    # so this is a placeholder.
-    response = httpx.get(
-        "http://datahub-service:8000/api/v1/trends/process-volume"
-    )
-    data = response.json()
-    return TrendMetrics(**data)
+    trend_data = metrics_calculator.get_trend(db)
+    return TrendMetrics(**trend_data)
 
 
 @router.get(
@@ -66,14 +52,9 @@ def get_trend_metrics():
     dependencies=[Depends(require_role(["GESTOR"]))],
 )
 @redis_cache(ttl=300)
-def get_savings_metrics():
+def get_savings_metrics(db: Session = Depends(get_db)):
     """
     Retrieves an estimated savings metric.
     """
-    # The actual endpoint in collector-service is not defined,
-    # so this is a placeholder.
-    response = httpx.get(
-        "http://collector-service:8000/api/v1/savings/estimated"
-    )
-    data = response.json()
-    return SavingsMetrics(**data)
+    savings_data = metrics_calculator.get_savings(db)
+    return SavingsMetrics(**savings_data)

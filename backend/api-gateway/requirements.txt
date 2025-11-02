@@ -2,5 +2,6 @@ fastapi==0.110.0
 uvicorn[standard]==0.29.0
 requests
 redis
+httpx==0.25.2
 prometheus-fastapi-instrumentator
 -e libs/nexora-auth
