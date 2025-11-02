@@ -1,41 +1,71 @@
-# datahub-service
+# NEXORA DataHub Service
 
-## Responsabilidade
+The `datahub-service` is a central microservice responsible for managing the storage, versioning, and retrieval of all document artifacts generated within the NEXORA platform, such as ETPs and TRs. It also provides a powerful semantic search capability to find relevant documents based on their content, not just their metadata.
 
-Este microsserviço atua como o catálogo central de metadados e artefatos do sistema. Suas principais funções são:
+## Core Features
 
-*   **Armazenamento de Metadados:** Persiste informações sobre os documentos gerados (ETPs, TRs), como versão, hash de conteúdo (checksum) e localização.
-*   **Catalogação Semântica:** Indexa os documentos para permitir buscas e análises futuras.
-*   **Gerenciamento de Artefatos:** Lida com o armazenamento e recuperação dos arquivos de documentos (DOCX/PDF).
+-   **Artifact Storage:** Securely stores and versions all document artifacts.
+-   **Metadata Management:** Tracks key metadata for each artifact, including the associated process, document type, and creator.
+-   **Semantic Search:** Uses a vector database (Milvus) to provide intelligent search over the content of the stored artifacts.
+-   **Asynchronous Processing:** Offloads heavy tasks like text extraction and embedding generation to a Celery worker to ensure fast API response times.
 
-## Como Rodar Localmente
+## API Documentation
 
-O serviço é containerizado e gerenciado pelo `docker-compose.yml` na raiz do projeto. Para subir o serviço:
+### Artifacts
 
-```bash
-docker compose up datahub-service
-```
+#### `POST /api/v1/artifacts/`
 
-O serviço estará disponível na porta `8002` do localhost.
+Uploads a new artifact and creates its first version.
 
-## Variáveis de Ambiente
+-   **Request Body:**
+    -   `process_id` (string): The ID of the process this artifact belongs to.
+    -   `doc_type` (string): The type of document (e.g., "ETP", "TR").
+    -   `created_by` (string): The ID of the user creating the artifact.
+    -   `file` (file): The artifact file to upload.
+-   **Response:** `200 OK` with the created `Artifact` object.
 
-| Variável | Descrição | Exemplo |
-| :--- | :--- | :--- |
-| `DATABASE_URL` | URL de conexão com o banco de dados PostgreSQL. | `postgresql://user:pass@host:port/db` |
-| `S3_BUCKET_NAME` | Nome do bucket S3 para armazenamento de artefatos. | `nexora-artifacts` |
-| `AWS_ACCESS_KEY_ID` | Chave de acesso AWS. | `AKIA...` |
-| `AWS_SECRET_ACCESS_KEY` | Chave de acesso secreta AWS. | `...` |
-| `AWS_REGION` | Região da AWS onde o bucket está localizado. | `us-east-1` |
+#### `POST /api/v1/artifacts/{artifact_id}/versions`
 
-## Como Rodar os Testes
+Uploads a new version of an existing artifact.
 
-Os testes são escritos com `pytest`. Para executá-los, utilize o seguinte comando a partir da raiz do projeto:
+-   **Path Parameters:**
+    -   `artifact_id` (UUID): The ID of the artifact to version.
+-   **Request Body:**
+    -   `file` (file): The new version of the artifact file.
+-   **Response:** `200 OK` with the created `ArtifactVersion` object.
 
-```bash
-# Exporta o pythonpath para encontrar os módulos locais
-export PYTHONPATH=$PYTHONPATH:$(pwd)/backend/datahub-service:$(pwd)/libs/nexora-auth
+#### `GET /api/v1/artifacts/{artifact_id}`
 
-# Roda os testes do serviço
-python -m pytest backend/datahub-service/tests/
-```
+Retrieves the metadata for an artifact, including all its versions.
+
+-   **Path Parameters:**
+    -   `artifact_id` (UUID): The ID of the artifact to retrieve.
+-   **Response:** `200 OK` with the `Artifact` object.
+
+#### `GET /api/v1/artifacts/{artifact_id}/versions/{version_num}`
+
+Retrieves the metadata for a specific version of an artifact.
+
+-   **Path Parameters:**
+    -   `artifact_id` (UUID): The ID of the artifact.
+    -   `version_num` (integer): The version number to retrieve.
+-   **Response:** `200 OK` with the `ArtifactVersion` object.
+
+#### `GET /api/v1/artifacts/{artifact_id}/versions/{version_num}/download`
+
+Downloads the actual file for a specific version of an artifact.
+
+-   **Path Parameters:**
+    -   `artifact_id` (UUID): The ID of the artifact.
+    -   `version_num` (integer): The version number to download.
+-   **Response:** `200 OK` with the file content.
+
+### Search
+
+#### `GET /api/v1/search/`
+
+Performs a semantic search for artifacts based on a text query.
+
+-   **Query Parameters:**
+    -   `q` (string): The text query to search for.
+-   **Response:** `200 OK` with a list of search results, including the `artifact_version_id` and a similarity `score`.
