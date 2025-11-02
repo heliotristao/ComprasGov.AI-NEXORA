@@ -32,4 +32,8 @@ __all__ = [
     "AIExecutionCreate",
     "ETPGenerateSectionIn",
     "ETPGenerateSectionOut",
+    "IAAcceptanceCreate",
+    "IAAcceptanceHistorySchema",
 ]
+
+from .ia_acceptance import IAAcceptanceCreate, IAAcceptanceHistorySchema
