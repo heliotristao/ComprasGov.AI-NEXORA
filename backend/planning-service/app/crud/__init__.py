@@ -1,2 +1,2 @@
-from . import crud_etp as etp
+from .crud_etp import etp
 from . import crud_signed_document as signed_document

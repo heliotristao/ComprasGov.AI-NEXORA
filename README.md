@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-02] - Tarefa B2:** Implementada a funcionalidade de auto-save para ETPs através de um endpoint PATCH otimizado.
 * **[2025-11-02] - Tarefa B1:** Criado o modelo de dados e o CRUD completo para a gestão de Estudos Técnicos Preliminares (ETP).
 * **[2025-11-02] - Tarefa A5.1-FIX:** Corrigidos os testes de integração do `metrics-service`, resolvendo o bloqueio de validação da funcionalidade de KPIs.
 * **[2025-11-02] - Tarefa A5:** Criado o `metrics-service` para calcular e expor KPIs de negócio para o dashboard de gestão e monitoramento.

@@ -9,11 +9,36 @@ from sqlalchemy.orm.attributes import flag_modified
 from app.crud.base import CRUDBase
 from app.db.models.etp import ETP
 from app.schemas.etp import ETPCreate, ETPUpdate
+from app.schemas.etp_schemas import ETPPartialUpdate
 
 
 class CRUDETP(CRUDBase[ETP, ETPCreate, ETPUpdate]):
     def create_with_owner(self, db: Session, *, obj_in: ETPCreate, created_by_id: UUID) -> ETP:
         db_obj = self.model(**obj_in.dict(), created_by_id=created_by_id)
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
+    def patch(self, db: Session, *, id: UUID, obj_in: ETPPartialUpdate, expected_version: int) -> ETP:
+        db_obj = self.get(db, id=id)
+        if not db_obj:
+            raise HTTPException(status_code=404, detail="ETP not found")
+
+        if db_obj.version != expected_version:
+            raise HTTPException(status_code=409, detail="Conflict, the document has been modified by another user.")
+
+        update_data = obj_in.dict(exclude_unset=True)
+
+        for field, value in update_data.items():
+            if field == "data" and db_obj.data:
+                db_obj.data.update(value)
+                flag_modified(db_obj, "data")
+            else:
+                setattr(db_obj, field, value)
+
+        db_obj.version += 1
+
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)

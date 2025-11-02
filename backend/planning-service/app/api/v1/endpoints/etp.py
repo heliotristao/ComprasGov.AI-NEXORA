@@ -7,7 +7,9 @@ from app import crud
 from app.api.deps import get_db
 from app.api.v1.dependencies import get_current_user
 from app.schemas.etp import ETPCreate, ETPSchema, ETPUpdate
+from app.schemas.etp_schemas import ETPPartialUpdate
 from nexora_auth.audit import audited
+from fastapi import Header
 
 router = APIRouter()
 
@@ -73,6 +75,26 @@ def update_etp(
     if not etp:
         raise HTTPException(status_code=404, detail="ETP not found")
     etp = crud.etp.update(db=db, db_obj=etp, obj_in=etp_in)
+    return etp
+
+
+from nexora_auth.decorators import require_scope
+
+@router.patch("/{id}", response_model=ETPSchema)
+@audited(action="ETP_AUTOSAVED")
+@require_scope("etp:write")
+async def partial_update_etp(
+    id: uuid.UUID,
+    etp_in: ETPPartialUpdate,
+    if_match: int = Header(...),
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+    request: Request = None,
+) -> Any:
+    """
+    Partially update an ETP for auto-save functionality.
+    """
+    etp = crud.etp.patch(db=db, id=id, obj_in=etp_in, expected_version=if_match)
     return etp
 
 
