@@ -37,10 +37,16 @@ class ETPUpdate(ETPBase):
     status: Optional[ETPStatus] = None
 
 
+# Schema for patch updates
+class ETPPatch(ETPBase):
+    pass
+
+
 # Schema returned to the client
 class ETPSchema(ETPBase):
     id: uuid.UUID
     status: ETPStatus
+    version: int
     current_step: int
     created_by_id: uuid.UUID
     updated_by: Optional[str]

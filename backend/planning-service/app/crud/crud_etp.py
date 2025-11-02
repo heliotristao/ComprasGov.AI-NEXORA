@@ -8,7 +8,7 @@ from sqlalchemy.orm.attributes import flag_modified
 
 from app.crud.base import CRUDBase
 from app.db.models.etp import ETP
-from app.schemas.etp import ETPCreate, ETPUpdate
+from app.schemas.etp import ETPCreate, ETPUpdate, ETPPatch
 
 
 class CRUDETP(CRUDBase[ETP, ETPCreate, ETPUpdate]):
@@ -38,6 +38,31 @@ class CRUDETP(CRUDBase[ETP, ETPCreate, ETPUpdate]):
             else:
                 setattr(db_obj, field, value)
 
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
+    def patch(self, db: Session, *, db_obj: ETP, obj_in: ETPPatch, version: int) -> ETP:
+        """
+        Patch an ETP with optimistic concurrency control.
+        """
+        if db_obj.version != version:
+            raise HTTPException(
+                status_code=409,
+                detail="Conflict: The document has been modified by another process. Please refresh and try again.",
+            )
+
+        update_data = obj_in.dict(exclude_unset=True)
+
+        for field, value in update_data.items():
+            if field == "data" and db_obj.data and isinstance(value, dict):
+                db_obj.data.update(value)
+                flag_modified(db_obj, "data")
+            else:
+                setattr(db_obj, field, value)
+
+        db_obj.version += 1
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)

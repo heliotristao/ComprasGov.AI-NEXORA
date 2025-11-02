@@ -1,12 +1,12 @@
 import uuid
 from typing import List, Any
-from fastapi import APIRouter, Depends, HTTPException, status, Request, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Header, Query
 from sqlalchemy.orm import Session
 
-from app import crud
+from app.crud import crud_etp
 from app.api.deps import get_db
 from app.api.v1.dependencies import get_current_user
-from app.schemas.etp import ETPCreate, ETPSchema, ETPUpdate
+from app.schemas.etp import ETPCreate, ETPSchema, ETPUpdate, ETPPatch
 from nexora_auth.audit import audited
 
 router = APIRouter()
@@ -27,7 +27,7 @@ def create_etp(
     Create new ETP.
     """
     user_id = uuid.UUID(current_user.get("sub"))
-    etp = crud.etp.create_with_owner(db=db, obj_in=etp_in, created_by_id=user_id)
+    etp = crud_etp.etp.create_with_owner(db=db, obj_in=etp_in, created_by_id=user_id)
     return etp
 
 
@@ -39,7 +39,7 @@ def read_etp(
     """
     Get ETP by ID.
     """
-    etp = crud.etp.get(db=db, id=id)
+    etp = crud_etp.etp.get(db=db, id=id)
     if not etp:
         raise HTTPException(status_code=404, detail="ETP not found")
     return etp
@@ -54,8 +54,28 @@ def read_etps(
     """
     Retrieve ETPs.
     """
-    etps = crud.etp.get_multi(db, skip=skip, limit=limit)
+    etps = crud_etp.etp.get_multi(db, skip=skip, limit=limit)
     return etps
+
+
+@router.patch("/{id}", response_model=ETPSchema)
+@audited(action="ETP_AUTOSAVED")
+def patch_etp(
+    id: uuid.UUID,
+    etp_in: ETPPatch,
+    if_match: int = Header(...),
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+) -> Any:
+    """
+    Patch an ETP for auto-save functionality.
+    """
+    etp = crud_etp.etp.get(db=db, id=id)
+    if not etp:
+        raise HTTPException(status_code=404, detail="ETP not found")
+
+    etp = crud_etp.etp.patch(db=db, db_obj=etp, obj_in=etp_in, version=if_match)
+    return etp
 
 
 @router.put("/{id}", response_model=ETPSchema)
@@ -69,10 +89,10 @@ def update_etp(
     """
     Update an ETP.
     """
-    etp = crud.etp.get(db=db, id=id)
+    etp = crud_etp.etp.get(db=db, id=id)
     if not etp:
         raise HTTPException(status_code=404, detail="ETP not found")
-    etp = crud.etp.update(db=db, db_obj=etp, obj_in=etp_in)
+    etp = crud_etp.etp.update(db=db, db_obj=etp, obj_in=etp_in)
     return etp
 
 
@@ -85,7 +105,7 @@ def delete_etp(
     """
     Delete an ETP.
     """
-    etp = crud.etp.get(db=db, id=id)
+    etp = crud_etp.etp.get(db=db, id=id)
     if not etp:
         raise HTTPException(status_code=404, detail="ETP not found")
-    crud.etp.remove(db=db, id=id)
+    crud_etp.etp.remove(db=db, id=id)
