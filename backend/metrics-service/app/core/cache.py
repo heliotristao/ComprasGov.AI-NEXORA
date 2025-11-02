@@ -16,7 +16,7 @@ def redis_cache(ttl: int = 300):
         @wraps(func)
         def wrapper(*args, **kwargs) -> Any:
             # Generate a unique key for the function call
-            key = f"{func.__name__}:{json.dumps(args)}:{json.dumps(kwargs)}"
+            key = f"{func.__name__}"
 
             # Check if the result is in the cache
             cached_result = cache.get(key)
@@ -25,7 +25,7 @@ def redis_cache(ttl: int = 300):
 
             # If not, call the function and store the result
             result = func(*args, **kwargs)
-            cache.setex(key, ttl, json.dumps(result.model_dump()))
+            cache.setex(key, ttl, result.model_dump_json())
             return result
         return wrapper
     return decorator
