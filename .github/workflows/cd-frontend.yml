@@ -5,17 +5,38 @@ on:
     branches: [ "main" ]
     paths:
       - 'src/**'
+  pull_request:
+    paths:
+      - 'src/**'
 
 jobs:
-  deploy-vercel:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Deploy to Vercel
+        id: vercel-deploy
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: npx vercel --prod --token $VERCEL_TOKEN
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "URL=$(npx vercel --token ${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
+          else
+            echo "URL=$(npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `✅ Deploy de Preview concluído! Acesse a pré-visualização em: ${{ steps.vercel-deploy.outputs.URL }}`
+            })
