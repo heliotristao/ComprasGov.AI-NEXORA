@@ -1,6 +1,6 @@
 """Pydantic schema exports for the planning service."""
 
-from .plan import Plan, PlanCreate, PlanUpdate
+from .plan import Planning, PlanningCreate, PlanningUpdate
 from .compliance import ComplianceReport, ComplianceItem
 from .etp_consolidation import (
     ETPConsolidationJobCreate,
@@ -11,9 +11,9 @@ from .risk import Risk, RiskMatrix, RiskGenerationRequest
 
 
 __all__ = [
-    "Plan",
-    "PlanCreate",
-    "PlanUpdate",
+    "Planning",
+    "PlanningCreate",
+    "PlanningUpdate",
     "ComplianceReport",
     "ComplianceItem",
     "ETPConsolidationJobCreate",
