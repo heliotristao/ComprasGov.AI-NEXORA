@@ -10,7 +10,7 @@ from nexora_auth.audit import AuditLogger
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.Plan])
+@router.get("/", response_model=List[schemas.plan.Planning])
 def read_plans(
     db: Session = Depends(deps.get_db),
     current_user: dict = Depends(deps.get_current_user)
@@ -24,13 +24,13 @@ def read_plans(
     return []
 
 
-@router.post("/", response_model=schemas.Plan, status_code=201)
+@router.post("/", response_model=schemas.plan.Planning, status_code=201)
 @require_role({"Admin", "Planejador"})
 def create_plan(
     *,
     request: Request,
     db: Session = Depends(deps.get_db),
-    plan_in: schemas.PlanCreate,
+    plan_in: schemas.plan.PlanningCreate,
     current_user: dict = Depends(deps.get_current_user),
     audit_logger: AuditLogger = Depends(deps.get_audit_logger)
 ):
@@ -46,7 +46,7 @@ def create_plan(
     return plan
 
 
-@router.get("/{plan_id}", response_model=schemas.Plan)
+@router.get("/{plan_id}", response_model=schemas.plan.Planning)
 def read_plan(
     *,
     db: Session = Depends(deps.get_db),
@@ -62,14 +62,14 @@ def read_plan(
     return plan
 
 
-@router.put("/{plan_id}", response_model=schemas.Plan)
+@router.put("/{plan_id}", response_model=schemas.plan.Planning)
 @require_role({"Admin", "Planejador"})
 def update_plan(
     *,
     request: Request,
     db: Session = Depends(deps.get_db),
     plan_id: str,
-    plan_in: schemas.PlanUpdate,
+    plan_in: schemas.plan.PlanningUpdate,
     current_user: dict = Depends(deps.get_current_user),
     audit_logger: AuditLogger = Depends(deps.get_audit_logger)
 ):

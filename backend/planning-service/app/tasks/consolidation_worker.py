@@ -7,7 +7,7 @@ from celery import shared_task
 from prometheus_client import Counter, Histogram
 from app.db.session import SessionLocal
 from app import crud
-from app.models.etp_consolidation_job import ETPConsolidationJob
+from app.db.models.etp_consolidation_job import ETPConsolidationJob
 from app.clients.datahub_client import datahub_client
 from app.services.etp_document_generator import generate_etp_docx # Assuming this service exists
 

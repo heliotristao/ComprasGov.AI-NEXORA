@@ -1,7 +1,9 @@
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app import crud, models, schemas
+from app import crud
+from app.db import models
+from app.schemas.etp_consolidation import ETPConsolidationJobCreate, ETPConsolidationJobStatus
 from nexora_auth.decorators import require_scope
 from app.api import deps
 from app.tasks.consolidation_worker import consolidate_etp_task
@@ -14,7 +16,7 @@ def get_etp_crud():
 
 @router.post(
     "/etp/{id}/consolidate",
-    response_model=schemas.ETPConsolidationJobStatus,
+    response_model=ETPConsolidationJobStatus,
     status_code=status.HTTP_202_ACCEPTED,
     dependencies=[Depends(require_scope("etp:write"))],
 )
@@ -22,7 +24,7 @@ def consolidate_etp(
     id: uuid.UUID,
     *,
     db: Session = Depends(deps.get_db),
-    current_user: dict = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     etp_crud = Depends(get_etp_crud)
 ):
     """
@@ -37,7 +39,7 @@ def consolidate_etp(
 
     job_id = uuid.uuid4()
     db_obj = crud.etp_consolidation_job.create(
-        db, obj_in=schemas.ETPConsolidationJobCreate(etp_id=id, job_id=job_id)
+        db, obj_in=ETPConsolidationJobCreate(etp_id=id, job_id=job_id)
     )
 
     current_user_id = current_user.id
@@ -49,7 +51,7 @@ def consolidate_etp(
 
 @router.get(
     "/etp/{id}/consolidation-status/{job_id}",
-    response_model=schemas.ETPConsolidationJobStatus,
+    response_model=ETPConsolidationJobStatus,
     dependencies=[Depends(require_scope("etp:read"))],
 )
 def get_consolidation_status(
@@ -57,7 +59,7 @@ def get_consolidation_status(
     job_id: uuid.UUID,
     *,
     db: Session = Depends(deps.get_db),
-    current_user: dict = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
 ):
     """
     Get the status of an ETP consolidation job.
