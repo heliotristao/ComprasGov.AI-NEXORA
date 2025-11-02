@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-01] - Tarefa J2:** Aprimorado o pipeline de CI/CD com deploys de preview para PRs de frontend e bloqueio de merge em caso de falha nos testes.
 * **[2025-11-01] - Tarefa J1:** Implementados testes de ponta a ponta (E2E) com Playwright para o fluxo principal e configurado um portão de qualidade de 80% de cobertura de testes.
 * **[2025-11-01] - Tarefa I2:** Expandido o dataset de semente do Mercado.AI para mais de 1.000 registros, melhorando a base para análises e predições.
 * **[2025-11-02] - Tarefa I1.2:** Implementada a interface de administração para listagem e preview de placeholders de templates de documentos.
