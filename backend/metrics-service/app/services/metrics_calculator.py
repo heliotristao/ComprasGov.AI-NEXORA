@@ -80,7 +80,7 @@ def get_savings(db: Session):
     # accurate model.
     estimated_savings = float(average_market_price) * 100 - float(total_contract_value)
 
-    return {"estimated_savings": estimated_savings}
+    return {"estimated_savings": estimated_savings, "currency": "BRL"}
 
 # --- Prometheus Wrapper Functions ---
 
