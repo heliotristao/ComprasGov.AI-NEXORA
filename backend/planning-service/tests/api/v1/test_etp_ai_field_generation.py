@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 from unittest.mock import patch
 from app.db.models.etp_modular import DocumentoETP
-from tests.api.v1.test_etp_crud import create_test_token
+from tests.utils.user import create_test_token
 
 
 @pytest.fixture

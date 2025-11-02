@@ -21,28 +21,28 @@ class ETPStatus(str, enum.Enum):
 
 EdocsType = Annotated[str, StringConstraints(pattern=r"^\d{4}-\d{6}$")]
 
-# Schema for creating an ETP
-class ETPCreate(BaseModel):
-    title: str
+# Base Schema
+class ETPBase(BaseModel):
+    title: Optional[str] = None
     data: Optional[dict[str, Any]] = None
-    created_by: Optional[str] = None
+    edocs_number: Optional[EdocsType] = None
+
+# Schema for creating an ETP
+class ETPCreate(ETPBase):
+    title: str
 
 
 # Schema for updating an ETP
-class ETPUpdate(BaseModel):
-    title: Optional[str] = None
-    data: Optional[dict[str, Any]] = None
-    updated_by: Optional[str] = None
+class ETPUpdate(ETPBase):
+    status: Optional[ETPStatus] = None
 
 
-# The main schema for returning ETP data
-class ETPSchema(BaseModel):
+# Schema returned to the client
+class ETPSchema(ETPBase):
     id: uuid.UUID
-    title: str
     status: ETPStatus
-    step: int
-    data: Optional[dict[str, Any]]
-    created_by: str
+    current_step: int
+    created_by_id: uuid.UUID
     updated_by: Optional[str]
     current_approver_id: Optional[str] = None
     created_at: datetime
@@ -52,6 +52,10 @@ class ETPSchema(BaseModel):
     class Config:
         from_attributes = True
         use_enum_values = True
+
+# Schema for data in DB
+class ETPInDB(ETPSchema):
+    pass
 
 
 # Schema for accepting an AI suggestion
