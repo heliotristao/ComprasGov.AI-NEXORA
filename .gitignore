@@ -63,3 +63,7 @@ audit.log
 playwright-report/
 test-results/
 npm_output.log
+
+# Coverage reports
+.coverage
+coverage.xml
