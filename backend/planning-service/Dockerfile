@@ -13,15 +13,15 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Instalar a biblioteca nexora-auth compartilhada
-COPY ../../libs/nexora-auth /app/libs/nexora-auth
+COPY libs/nexora-auth /app/libs/nexora-auth
 RUN pip install --no-cache-dir -e /app/libs/nexora-auth
 
 # Instalar dependências do serviço
-COPY requirements.txt .
+COPY backend/planning-service/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar o código da aplicação
-COPY ./app /app/app
+COPY backend/planning-service/app /app/app
 
 CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
 

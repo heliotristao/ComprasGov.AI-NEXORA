@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t $ECR_REPOSITORY:ci-test ./backend/planning-service
+        run: docker build -t $ECR_REPOSITORY:ci-test -f ./backend/planning-service/Dockerfile .
 
       - name: Configure AWS credentials
         if: github.event_name == 'push'
