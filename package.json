@@ -8,6 +8,7 @@
     "start": "node scripts/run-next.js start",
     "lint": "node scripts/run-eslint.js src",
     "test:e2e": "node scripts/run-playwright.js",
+    "test:cov": "echo 'Frontend coverage not yet implemented' && exit 0",
     "vercel-build": "npm run build"
   },
   "dependencies": {
@@ -42,6 +43,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.56.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^18",
