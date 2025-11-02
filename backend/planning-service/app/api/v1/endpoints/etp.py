@@ -12,7 +12,7 @@ from app.schemas.signed_document import SignedDocumentCreate, SignedDocumentSche
 from app.schemas.compliance import ComplianceReport
 from app.core.compliance import compliance_engine
 from app.services import etp_auto_save_service
-from nexora_auth.decorators import require_scope
+from nexora_auth.decorators import require_scope, require_role
 from app.schemas.etp import ETPAcceptIA
 from app.services import etp_accept_ia_service
 from nexora_auth.audit import audited
@@ -28,10 +28,12 @@ router = APIRouter()
     "",
     response_model=ETPSchema,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_scope("etp:write"))],
 )
+@audited(action="CREATE_ETP")
+@require_role(required_roles={"Planejador"})
 def create_etp(
     etp_in: ETPCreate,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):

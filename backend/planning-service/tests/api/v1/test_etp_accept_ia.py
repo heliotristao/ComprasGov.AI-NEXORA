@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 from app.core import config
 from tests.utils.user import create_test_token
 from tests.utils.etp import create_random_etp
-from app.models.etp_ai_trace import ETPAITrace
+from app.db.models.etp_ai_trace import ETPAITrace
 from app.db.models.etp import ETP
 
 
