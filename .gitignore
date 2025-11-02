@@ -58,3 +58,8 @@ test.db
 
 # Log files
 audit.log
+
+# test reports
+playwright-report/
+test-results/
+npm_output.log

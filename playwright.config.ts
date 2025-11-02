@@ -6,11 +6,12 @@ export default defineConfig({
   expect: {
     timeout: 10_000,
   },
-  reporter: "list",
+  reporter: "html",
   use: {
     baseURL: "http://127.0.0.1:3000",
     trace: "on-first-retry",
     headless: true,
+    video: "retain-on-failure",
   },
   projects: [
     {
