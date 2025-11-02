@@ -6,7 +6,14 @@ import logging
 import json
 import uuid
 import hashlib
-from typing import List, Optional
+from typing import List, Optional, TypedDict
+
+class GenerationResult(TypedDict):
+    response: str
+    provider: Optional[str]
+    cost: Optional[float]
+    trace_id: str
+    confidence_score: Optional[float]
 
 # Simple pricing map for OpenAI models (cost per 1M tokens)
 OPENAI_PRICING = {
@@ -54,15 +61,16 @@ class AIEngine:
         }
         logger.info(json.dumps({k: v for k, v in log_entry.items() if v is not None}))
 
-    def generate(self, prompt: str, provider: str = "auto", **kwargs) -> str:
+    def generate(self, prompt: str, provider: str = "auto", **kwargs) -> GenerationResult:
         trace_id = str(uuid.uuid4())
         cache_key = hashlib.sha256(prompt.encode('utf-8')).hexdigest()
 
         if self.redis_client:
-            cached_response = self.redis_client.get(cache_key)
-            if cached_response:
+            cached_response_json = self.redis_client.get(cache_key)
+            if cached_response_json:
                 self._log("cache.hit", trace_id=trace_id, cache_hit=True)
-                return cached_response.decode('utf-8')
+                cached_response = json.loads(cached_response_json)
+                return GenerationResult(**cached_response)
 
         self._log("cache.miss", trace_id=trace_id, cache_hit=False)
 
@@ -76,16 +84,27 @@ class AIEngine:
             try:
                 self._log("api.call.start", trace_id=trace_id, provider=p)
                 cost = None
+                response = None
+                confidence_score = None
+
                 if p == 'openai':
                     response, cost = self._generate_openai(prompt, **kwargs)
                 elif p == 'gemini':
                     response = self._generate_gemini(prompt, **kwargs)
 
+                result = GenerationResult(
+                    response=response,
+                    provider=p,
+                    cost=cost,
+                    trace_id=trace_id,
+                    confidence_score=confidence_score,
+                )
+
                 if self.redis_client:
-                    self.redis_client.set(cache_key, response, ex=3600)
+                    self.redis_client.set(cache_key, json.dumps(result), ex=3600)
 
                 self._log("api.call.success", trace_id=trace_id, provider=p, cost=cost)
-                return response
+                return result
             except Exception as e:
                 last_error = str(e)
                 self._log("api.call.error", trace_id=trace_id, provider=p, error=last_error)
