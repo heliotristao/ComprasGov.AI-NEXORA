@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-02] - Tarefa A5.1-FIX:** Corrigidos os testes de integração do `metrics-service`, resolvendo o bloqueio de validação da funcionalidade de KPIs.
 * **[2025-11-02] - Tarefa A5:** Criado o `metrics-service` para calcular e expor KPIs de negócio para o dashboard de gestão e monitoramento.
 * **[2025-11-02] - Tarefa A4:** Criada a biblioteca `nexora-auth` para padronizar o controle de acesso (RBAC) и a trilha de auditoria em toda a plataforma.
 * **[2025-11-02] - Tarefa A3:** Implementado o API Gateway, centralizando o roteamento e a segurança da plataforma.
