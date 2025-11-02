@@ -27,6 +27,7 @@ A API de ETPs fornece endpoints para gerenciar o ciclo de vida dos Estudos Técn
 | Endpoint | Método | Descrição |
 | :--- | :--- | :--- |
 | `/api/v1/etp/{id}/generate-section/{section_name}` | `POST` | Gera conteúdo para uma seção específica do ETP usando IA, com base em palavras-chave. |
+| `/api/v1/etp/{id}/accept-section/{section_name}` | `POST` | Aceita uma sugestão de IA para uma seção, salvando o texto final e registrando o histórico de edições. |
 
 ## Como Rodar Localmente
 

@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-02] - Tarefa B5:** Implementada a funcionalidade de aceite para sugestões de IA, com histórico de edições e rastreabilidade.
 * **[2025-11-02] - Tarefa B4:** Implementada a funcionalidade de geração de conteúdo por IA para campos do ETP no `planning-service`, incluindo rastreabilidade de cada execução e suporte a múltiplos provedores.
 * **[2025-11-02] - Tarefa B3.2:** Implementado o motor de validação de conformidade para ETPs, com regras baseadas na Lei 14.133/2021.
 * **[2025-11-02] - Tarefa B3.1:** Criado um wrapper abstrato para o motor de regras de negócio, isolando a lógica da aplicação de bibliotecas de terceiros.
