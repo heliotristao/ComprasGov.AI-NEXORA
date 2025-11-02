@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-02] - Tarefa A3:** Implementado o API Gateway, centralizando o roteamento e a segurança da plataforma.
 * **[2025-11-01] - Tarefa A2:** Criado o `datahub-service`, o núcleo central para armazenamento versionado de artefatos e busca semântica.
 * **[2025-11-01] - Tarefa A1:** Criado o motor de IA (`AIEngine`) com suporte a múltiplos provedores, fallback automático e cache em Redis.
 * **[2025-11-01] - Tarefa J3:** Consolidada a documentação técnica dos microsserviços e criado um Runbook operacional para diagnóstico de falhas.
