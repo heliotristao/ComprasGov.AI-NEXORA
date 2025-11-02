@@ -1,0 +1,37 @@
+[
+  {
+    "field": "justificativa_necessidade_contratacao",
+    "operator": "not_empty",
+    "value": "",
+    "level": "blocker",
+    "message": "A justificativa da necessidade da contratação é obrigatória."
+  },
+  {
+    "field": "estimativa_valor",
+    "operator": "greater_than",
+    "value": 0,
+    "level": "blocker",
+    "message": "A estimativa de valor da contratação deve ser maior que zero."
+  },
+  {
+    "field": "descricao_solucao",
+    "operator": "not_empty",
+    "value": "",
+    "level": "blocker",
+    "message": "A descrição da solução como um todo é obrigatória."
+  },
+  {
+    "field": "justificativa_parcelamento",
+    "operator": "not_empty",
+    "value": "",
+    "level": "warning",
+    "message": "A justificativa para o parcelamento ou não da solução deve ser preenchida."
+  },
+  {
+    "field": "responsavel_id",
+    "operator": "not_empty",
+    "value": "",
+    "level": "warning",
+    "message": "É recomendado designar um responsável pelo ETP."
+  }
+]

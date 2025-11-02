@@ -1,7 +1,10 @@
 import uuid
+import json
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app import crud
+from app.core.rule_engine_wrapper import RuleEngineWrapper
+from app.schemas.etp import ETPSchema
 from app.db import models
 from app.schemas.etp_consolidation import ETPConsolidationJobCreate, ETPConsolidationJobStatus
 from nexora_auth.decorators import require_scope
@@ -35,6 +38,28 @@ def consolidate_etp(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="ETP not found",
+        )
+
+    # Run validation before consolidation
+    with open("app/rules/etp_rules.json") as f:
+        rules = json.load(f)
+
+    etp_data = ETPSchema.model_validate(etp).dict()
+    if isinstance(etp_data.get("data"), str):
+        etp_data["data"] = json.loads(etp_data["data"])
+    etp_data.update(etp_data.pop("data", {}))
+
+    engine = RuleEngineWrapper(rules)
+    validation_result = engine.run(etp_data)
+
+    blockers = [
+        item for item in validation_result if item["level"] == "blocker" and item["status"] == "fail"
+    ]
+
+    if blockers:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "ETP validation failed with blockers.", "errors": blockers},
         )
 
     job_id = uuid.uuid4()
