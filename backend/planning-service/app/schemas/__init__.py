@@ -8,6 +8,12 @@ from .etp_consolidation import (
     ETPConsolidationJobStatus,
 )
 from .risk import Risk, RiskMatrix, RiskGenerationRequest
+from .ai_execution import (
+    AIExecution,
+    AIExecutionCreate,
+    ETPGenerateSectionIn,
+    ETPGenerateSectionOut,
+)
 
 
 __all__ = [
@@ -22,4 +28,8 @@ __all__ = [
     "Risk",
     "RiskMatrix",
     "RiskGenerationRequest",
+    "AIExecution",
+    "AIExecutionCreate",
+    "ETPGenerateSectionIn",
+    "ETPGenerateSectionOut",
 ]

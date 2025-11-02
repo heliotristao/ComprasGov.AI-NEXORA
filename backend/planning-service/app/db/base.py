@@ -12,3 +12,4 @@ from app.db.models.template import Template # noqa
 from app.db.models.termo_referencia import TermoReferencia # noqa
 from app.db.models.tr import TR # noqa
 from app.db.models.tr_version import TRVersion # noqa
+from app.db.models.ai_execution import AIExecution # noqa

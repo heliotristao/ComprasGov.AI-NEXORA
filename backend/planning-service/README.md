@@ -22,6 +22,12 @@ A API de ETPs fornece endpoints para gerenciar o ciclo de vida dos Estudos Técn
 | `/api/v1/etp/{id}` | `PUT` | Atualiza um ETP existente. |
 | `/api/v1/etp/{id}` | `DELETE` | Realiza o soft delete de um ETP. |
 
+### Endpoints de IA
+
+| Endpoint | Método | Descrição |
+| :--- | :--- | :--- |
+| `/api/v1/etp/{id}/generate-section/{section_name}` | `POST` | Gera conteúdo para uma seção específica do ETP usando IA, com base em palavras-chave. |
+
 ## Como Rodar Localmente
 
 O serviço é containerizado e gerenciado pelo `docker-compose.yml` na raiz do projeto. Para subir o serviço:

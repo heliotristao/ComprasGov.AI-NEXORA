@@ -1,11 +1,53 @@
+import time
 from sqlalchemy.orm import Session
 from langchain_core.runnables import Runnable, RunnableLambda
 
+from app import crud, schemas
+from nexora_core.ai_engine import AIEngine
 from app.crud.crud_documento_etp import get_documento_etp
 from app.crud.crud_etp_ai_trace import create_trace
 from app.llm.chains.etp_field_chain import generate_field_content
 from app.services.ai_provider import get_ai_provider
 from app.schemas.etp_ai_trace_schemas import ETPAITraceCreate
+
+
+def generate_section_content(db: Session, *, etp_id: int, section_name: str, keywords: str) -> schemas.ETPGenerateSectionOut:
+    """
+    Generates content for a specific ETP section using AI.
+    """
+    # 1. Validate ETP existence
+    etp = get_documento_etp(db, etp_id=etp_id)
+    if not etp:
+        raise ValueError(f"ETP with id {etp_id} not found.")
+
+    # 2. Prompt Engineering
+    prompt = f"Aja como um especialista em compras públicas. Com base nas palavras-chave '{keywords}', escreva um parágrafo para a seção '{section_name}' de um Estudo Técnico Preliminar."
+
+    # 3. Call AIEngine
+    ai_engine = AIEngine()
+    start_time = time.time()
+    generation_result = ai_engine.generate(prompt)
+    end_time = time.time()
+    latency_ms = int((end_time - start_time) * 1000)
+
+    # 4. Create AI Execution Record
+    execution_data = schemas.AIExecutionCreate(
+        prompt_text=prompt,
+        response_text=generation_result["response"],
+        provider_used=generation_result["provider"],
+        confidence_score=generation_result["confidence_score"],
+        cost=generation_result["cost"],
+        latency_ms=latency_ms,
+        trace_id=generation_result["trace_id"],
+    )
+
+    db_execution = crud.ai_execution.create(db, obj_in=execution_data)
+
+    # 5. Return response
+    return schemas.ETPGenerateSectionOut(
+        generated_text=generation_result["response"],
+        execution_id=db_execution.id,
+    )
 
 
 def generate_field(db: Session, *, etp_id: int, field: str) -> dict:
