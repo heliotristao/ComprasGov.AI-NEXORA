@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-02] - Tarefa B3.2:** Implementado o motor de validação de conformidade para ETPs, com regras baseadas na Lei 14.133/2021.
 * **[2025-11-02] - Tarefa B3.1:** Criado um wrapper abstrato para o motor de regras de negócio, isolando a lógica da aplicação de bibliotecas de terceiros.
 * **[2025-11-02] - Tarefa B2:** Implementada a funcionalidade de auto-save para ETPs através de um endpoint `PATCH` otimizado.
 * **[2025-11-02] - Tarefa B1:** Criado o modelo de dados e o CRUD completo para a gestão de Estudos Técnicos Preliminares (ETP).

@@ -18,6 +18,7 @@ A API de ETPs fornece endpoints para gerenciar o ciclo de vida dos Estudos Técn
 | `/api/v1/etp/{id}` | `GET` | Retorna um ETP específico pelo seu ID. |
 | `/api/v1/etp/` | `GET` | Retorna uma lista paginada de ETPs. |
 | `/api/v1/etp/{id}` | `PATCH` | Atualiza parcialmente um ETP (para auto-save). |
+| `/api/v1/etp/{id}/validar` | `GET` | Executa a validação de conformidade de um ETP. |
 | `/api/v1/etp/{id}` | `PUT` | Atualiza um ETP existente. |
 | `/api/v1/etp/{id}` | `DELETE` | Realiza o soft delete de um ETP. |
 

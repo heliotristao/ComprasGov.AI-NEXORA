@@ -26,9 +26,21 @@ def test_consolidate_etp_task_trigger(
     """
     Test that the consolidation task is triggered on endpoint call.
     """
-    etp = create_random_etp(db)
-    client.post(f"{settings.API_V1_STR}/etp/{etp.id}/consolidate")
+    etp = create_random_etp(db, data={"justificativa_necessidade_contratacao": "some justification", "estimativa_valor": 100, "descricao_solucao": "some solution"})
+    client.post(f"{API_V1_STR}/etp/{etp.id}/consolidate")
     mock_delay.assert_called_once()
+
+
+def test_consolidate_etp_with_blockers(client: TestClient, db: Session) -> None:
+    """
+    Test that ETP consolidation is blocked if validation fails with blockers.
+    """
+    etp = create_random_etp(db, data={"estimativa_valor": 0})  # This will trigger a blocker
+    response = client.post(f"{API_V1_STR}/etp/{etp.id}/consolidate")
+    assert response.status_code == 400
+    data = response.json()
+    assert "ETP validation failed with blockers" in data["detail"]["message"]
+    assert len(data["detail"]["errors"]) > 0
 
 def test_get_consolidation_status(client: TestClient, db: Session) -> None:
     """

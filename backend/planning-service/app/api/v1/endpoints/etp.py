@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 from app.crud import crud_etp
 from app.api.deps import get_db
 from app.api.v1.dependencies import get_current_user
+import json
+from app.core.rule_engine_wrapper import RuleEngineWrapper
 from app.schemas.etp import ETPCreate, ETPSchema, ETPUpdate, ETPPatch
 from nexora_auth.audit import audited
 
@@ -109,3 +111,33 @@ def delete_etp(
     if not etp:
         raise HTTPException(status_code=404, detail="ETP not found")
     crud_etp.etp.remove(db=db, id=id)
+
+
+@router.get("/{id}/validar", response_model=List[dict])
+def validate_etp(
+    id: uuid.UUID,
+    db: Session = Depends(get_db),
+) -> Any:
+    """
+    Validate an ETP against a set of rules.
+    """
+    etp = crud_etp.etp.get(db=db, id=id)
+    if not etp:
+        raise HTTPException(status_code=404, detail="ETP not found")
+
+    with open("app/rules/etp_rules.json") as f:
+        rules = json.load(f)
+
+    etp_data = ETPSchema.model_validate(etp).dict()
+
+    # The `data` field is a JSON string in the database, so we need to parse it
+    if isinstance(etp_data.get("data"), str):
+        etp_data["data"] = json.loads(etp_data["data"])
+
+    # Flatten the data structure to match the rules
+    etp_data.update(etp_data.pop("data", {}))
+
+    engine = RuleEngineWrapper(rules)
+    result = engine.run(etp_data)
+
+    return result
