@@ -1,137 +1,101 @@
+import hashlib
 import uuid
-from typing import List, Optional
-
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, BackgroundTasks, Request
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-
+from app import crud, schemas
 from app.api import deps
-from app.api.v1 import dependencies
-from app.crud import crud_artifact
-from app.schemas import artifact as artifact_schema
-from app.tasks.catalog_job import add_artifact_to_index
-from app.core.storage import (
-    upload_file_to_s3,
-    get_presigned_download_url,
-    generate_s3_key,
-)
-from app.models.artifact import DocType
-from nexora_auth.decorators import require_role
-from nexora_auth.audit import AuditLogger
+from app.core.storage import storage_client
+from app.tasks.processing_tasks import process_artifact
 
 router = APIRouter()
 
-
-@router.post("/", response_model=artifact_schema.Artifact)
-@require_role({"Admin", "Planejador"})
-def upload_artifact(
+@router.post("/", response_model=schemas.ArtifactSchema)
+def create_artifact(
     *,
-    request: Request,
     db: Session = Depends(deps.get_db),
-    background_tasks: BackgroundTasks,
-    current_user: dict = Depends(dependencies.get_current_user),
-    audit_logger: AuditLogger = Depends(deps.get_audit_logger),
-    process_id: str = Form(...),
-    doc_type: DocType = Form(...),
-    org_id: str = Form(...),
-    author_id: str = Form(...),
+    artifact_in: schemas.ArtifactCreate,
     file: UploadFile = File(...),
 ):
-    """
-    Upload an artifact, store it in S3, and save its metadata in the database.
-    """
-    # 1. Get the latest version for this artifact type
-    latest_version = crud_artifact.get_latest_version(
-        db, process_id=process_id, doc_type=doc_type
+    artifact = crud.create_artifact(db=db, artifact=artifact_in)
+    file_path, file_hash = _save_upload_file(file, artifact.id)
+
+    version_in = schemas.ArtifactVersionCreate(
+        file_path=file_path, file_hash=file_hash, version=1
     )
-    new_version = latest_version + 1
+    version = crud.create_artifact_version(db=db, version=version_in, artifact_id=artifact.id)
 
-    # 2. Generate S3 key
-    s3_key = generate_s3_key(
-        org_id, process_id, doc_type.value, new_version, file.filename
-    )
-
-    # 3. Upload file to S3
-    if not upload_file_to_s3(file.file, s3_key):
-        raise HTTPException(
-            status_code=500, detail="Failed to upload file to S3"
-        )
-
-    # 4. Create artifact metadata in the database
-    artifact_in = artifact_schema.ArtifactCreate(
-        process_id=process_id,
-        doc_type=doc_type,
-        org_id=org_id,
-        author_id=author_id,
-        filename=file.filename,
-    )
-    artifact = crud_artifact.create(
-        db, obj_in=artifact_in, version=new_version, s3_key=s3_key
-    )
-
-    # 5. Log the audit event
-    audit_logger.log(
-        action="UPLOAD_ARTIFACT",
-        request=request,
-        details={"artifact_id": str(artifact.id), "s3_key": artifact.s3_key},
-    )
-
-    # 6. Trigger background task to index the artifact
-    add_artifact_to_index(background_tasks, artifact.id)
-
+    process_artifact.delay(version.id)
+    db.refresh(artifact)
     return artifact
 
+@router.post("/{artifact_id}/versions", response_model=schemas.ArtifactVersionSchema)
+def create_artifact_version(
+    *,
+    db: Session = Depends(deps.get_db),
+    artifact_id: uuid.UUID,
+    file: UploadFile = File(...),
+):
+    artifact = crud.get_artifact(db=db, artifact_id=str(artifact_id))
+    if not artifact:
+        raise HTTPException(status_code=404, detail="Artifact not found")
 
-@router.get("/{artifact_id}", response_model=artifact_schema.Artifact)
+    file_path, file_hash = _save_upload_file(file, artifact.id)
+    version_in = schemas.ArtifactVersionCreate(
+        file_path=file_path, file_hash=file_hash, version=0
+    )
+    version = crud.create_artifact_version(db=db, version=version_in, artifact_id=str(artifact_id))
+
+    process_artifact.delay(version.id)
+    return version
+
+@router.get("/{artifact_id}", response_model=schemas.ArtifactSchema)
 def get_artifact(
     *,
     db: Session = Depends(deps.get_db),
     artifact_id: uuid.UUID,
-    current_user: dict = Depends(dependencies.get_current_user),
 ):
-    """
-    Get artifact metadata by ID.
-    """
-    artifact = crud_artifact.get(db, id=artifact_id)
+    artifact = crud.get_artifact(db=db, artifact_id=str(artifact_id))
     if not artifact:
         raise HTTPException(status_code=404, detail="Artifact not found")
     return artifact
 
-
-@router.get("/{artifact_id}/download-url")
-def get_artifact_download_url(
+@router.get("/{artifact_id}/versions/{version_num}", response_model=schemas.ArtifactVersionSchema)
+def get_artifact_version(
     *,
     db: Session = Depends(deps.get_db),
     artifact_id: uuid.UUID,
-    current_user: dict = Depends(dependencies.get_current_user),
+    version_num: int,
 ):
-    """
-    Get a pre-signed download URL for an artifact.
-    """
-    artifact = crud_artifact.get(db, id=artifact_id)
-    if not artifact:
-        raise HTTPException(status_code=404, detail="Artifact not found")
+    version = crud.get_artifact_version(db=db, artifact_id=str(artifact_id), version_num=version_num)
+    if not version:
+        raise HTTPException(status_code=404, detail="Artifact version not found")
+    return version
 
-    download_url = get_presigned_download_url(artifact.s3_key)
-    if not download_url:
-        raise HTTPException(
-            status_code=500, detail="Failed to generate download URL"
-        )
-    return {"url": download_url}
-
-
-@router.get("/search/", response_model=List[artifact_schema.Artifact])
-def search_artifacts(
+@router.get("/{artifact_id}/versions/{version_num}/download")
+def download_artifact_version(
     *,
     db: Session = Depends(deps.get_db),
-    current_user: dict = Depends(dependencies.get_current_user),
-    process_id: Optional[str] = None,
-    doc_type: Optional[DocType] = None,
-    org_id: Optional[str] = None,
+    artifact_id: uuid.UUID,
+    version_num: int,
 ):
-    """
-    Search for artifacts with optional filters.
-    """
-    artifacts = crud_artifact.search(
-        db, process_id=process_id, doc_type=doc_type, org_id=org_id
-    )
-    return artifacts
+    version = crud.get_artifact_version(db=db, artifact_id=str(artifact_id), version_num=version_num)
+    if not version:
+        raise HTTPException(status_code=404, detail="Artifact version not found")
+
+    file_obj = storage_client.download_file(version.file_path)
+    return StreamingResponse(file_obj["Body"], media_type=file_obj["ContentType"])
+
+def _save_upload_file(upload_file: UploadFile, artifact_id: uuid.UUID) -> tuple[str, str]:
+    file_content = upload_file.file.read()
+
+    file_hash = hashlib.sha256(file_content).hexdigest()
+
+    upload_file.file.seek(0)
+
+    file_extension = upload_file.filename.split(".")[-1] if "." in upload_file.filename else "bin"
+    object_name = f"{artifact_id}/{file_hash}.{file_extension}"
+
+    storage_client.upload_file(upload_file.file, object_name)
+
+    return object_name, file_hash

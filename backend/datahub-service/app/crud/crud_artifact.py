@@ -1,53 +1,36 @@
-import uuid
-from typing import List, Optional
 from sqlalchemy.orm import Session
-from app.models.artifact import Artifact, DocType
-from app.schemas.artifact import ArtifactCreate
+from app.db import models
+from app.schemas import ArtifactCreate, ArtifactVersionCreate
 
-
-def get(db: Session, id: uuid.UUID) -> Optional[Artifact]:
-    return db.query(Artifact).filter(Artifact.id == id).first()
-
-
-def get_latest_version(
-    db: Session, process_id: str, doc_type: DocType
-) -> int:
-    latest_artifact = (
-        db.query(Artifact)
-        .filter(
-            Artifact.process_id == process_id, Artifact.doc_type == doc_type
-        )
-        .order_by(Artifact.version.desc())
-        .first()
-    )
-    return latest_artifact.version if latest_artifact else 0
-
-
-def create(
-    db: Session, obj_in: ArtifactCreate, version: int, s3_key: str
-) -> Artifact:
-    db_obj = Artifact(
-        **obj_in.dict(),
-        version=version,
-        s3_key=s3_key,
-    )
-    db.add(db_obj)
+def create_artifact(db: Session, artifact: ArtifactCreate) -> models.Artifact:
+    db_artifact = models.Artifact(**artifact.dict())
+    db.add(db_artifact)
     db.commit()
-    db.refresh(db_obj)
-    return db_obj
+    db.refresh(db_artifact)
+    return db_artifact
 
+def get_artifact(db: Session, artifact_id: str) -> models.Artifact | None:
+    return db.query(models.Artifact).filter(models.Artifact.id == artifact_id).first()
 
-def search(
-    db: Session,
-    process_id: Optional[str] = None,
-    doc_type: Optional[DocType] = None,
-    org_id: Optional[str] = None,
-) -> List[Artifact]:
-    query = db.query(Artifact)
-    if process_id:
-        query = query.filter(Artifact.process_id == process_id)
-    if doc_type:
-        query = query.filter(Artifact.doc_type == doc_type)
-    if org_id:
-        query = query.filter(Artifact.org_id == org_id)
-    return query.all()
+def create_artifact_version(db: Session, version: ArtifactVersionCreate, artifact_id: str) -> models.ArtifactVersion:
+    artifact = get_artifact(db, artifact_id)
+    if not artifact:
+        raise ValueError("Artifact not found")
+
+    latest_version = max([v.version for v in artifact.versions], default=0)
+
+    db_version = models.ArtifactVersion(
+        **version.dict(),
+        artifact_id=artifact_id,
+        version=latest_version + 1,
+    )
+    db.add(db_version)
+    db.commit()
+    db.refresh(db_version)
+    return db_version
+
+def get_artifact_version(db: Session, artifact_id: str, version_num: int | None = None):
+    query = db.query(models.ArtifactVersion).filter(models.ArtifactVersion.artifact_id == artifact_id)
+    if version_num:
+        return query.filter(models.ArtifactVersion.version == version_num).first()
+    return query.order_by(models.ArtifactVersion.version.desc()).first()
