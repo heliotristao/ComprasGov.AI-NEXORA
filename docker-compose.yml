@@ -80,7 +80,8 @@ services:
 
   planning-service:
     build:
-      context: ./backend/planning-service
+      context: .
+      dockerfile: ./backend/planning-service/Dockerfile
     environment:
       DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
       CELERY_BROKER_URL: "redis://redis:6379/0"
@@ -100,7 +101,8 @@ services:
 
   planning-worker:
     build:
-      context: ./backend/planning-service
+      context: .
+      dockerfile: ./backend/planning-service/Dockerfile
     command: celery -A app.tasks.celery_app worker --loglevel=info
     environment:
       DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
