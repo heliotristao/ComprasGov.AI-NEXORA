@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-01] - Tarefa I2:** Expandido o dataset de semente do Mercado.AI para mais de 1.000 registros, melhorando a base para análises e predições.
 * **[2025-11-02] - Tarefa I1.2:** Implementada a interface de administração para listagem e preview de placeholders de templates de documentos.
 * **[2025-11-01] - Tarefa H3:** Implementada a máscara de input, validação `onBlur` e hyperlink configurável para o campo "Número Edocs".
 * **[2025-11-01] - Tarefa G2:** Implementado o rastreamento distribuído (distributed tracing) em toda a plataforma, permitindo a correlação de logs entre microsserviços.
