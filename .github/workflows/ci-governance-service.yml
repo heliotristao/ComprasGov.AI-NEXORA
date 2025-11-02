@@ -25,22 +25,5 @@ jobs:
       - name: Verify seeding script path
         run: test -f backend/governance-service/app/scripts/create_user.py || (echo "Seeding script not found at the expected path" && exit 1)
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::100108344586:role/github-actions-ecr-role
-          aws-region: us-east-1
-
-      - name: Log in to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: nexora-governance-service # Placeholder
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest ./backend/governance-service
-          docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
+      - name: Build Docker image for validation
+        run: docker build . -f backend/governance-service/Dockerfile

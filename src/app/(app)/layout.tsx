@@ -1,9 +1,26 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import type { ReactNode } from "react"
 import { useMemo, useState } from "react"
+import {
+  LayoutDashboard,
+  FileText,
+  ClipboardList,
+  Gavel,
+  FileSignature,
+  Settings,
+  Users,
+  FileStack,
+  Building2,
+  BarChart4,
+  ChevronDown,
+  ChevronRight,
+  Menu,
+  X,
+  ShieldCheck
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -15,11 +32,149 @@ import {
 import { useAuthStore } from "@/stores/authStore"
 import { cn } from "@/lib/utils"
 
-const navigationItems = [
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Planejamento", href: "#" },
-  { label: "Licitações", href: "#" },
+type NavigationItem = {
+  label: string
+  href?: string
+  icon?: React.ComponentType<{ className?: string }>
+  items?: { label: string; href: string; icon?: React.ComponentType<{ className?: string }> }[]
+}
+
+const navigationItems: NavigationItem[] = [
+  {
+    label: "Dashboard",
+    href: "/dashboard",
+    icon: LayoutDashboard
+  },
+  {
+    label: "Mercado",
+    icon: BarChart4,
+    items: [
+      { label: "Mapa de Preços", href: "/mercado/precos", icon: BarChart4 }
+    ]
+  },
+  {
+    label: "Planejamento",
+    icon: ClipboardList,
+    items: [
+      { label: "Planos de Contratação", href: "/plans", icon: FileText },
+      { label: "Estudos Técnicos (ETP)", href: "/etp", icon: FileStack },
+      { label: "Termos de Referência (TR)", href: "/tr", icon: FileSignature },
+    ]
+  },
+  {
+    label: "Licitações",
+    href: "/licitacoes",
+    icon: Gavel
+  },
+  {
+    label: "Contratos",
+    href: "/contracts",
+    icon: FileSignature
+  },
+  {
+    label: "Gestão",
+    icon: ShieldCheck,
+    items: [
+      { label: "Painel de Governança", href: "/gestao", icon: LayoutDashboard },
+      { label: "Usuários", href: "/gestao/usuarios", icon: Users },
+      { label: "Órgãos", href: "/gestao/orgaos", icon: Building2 },
+    ],
+  },
+  {
+    label: "Administração",
+    icon: Settings,
+    items: [
+      { label: "Usuários", href: "/admin/users", icon: Users },
+      { label: "Modelos Superiores", href: "/admin/modelos-superiores", icon: Building2 },
+      { label: "Modelos Institucionais", href: "/admin/modelos-institucionais", icon: FileStack },
+    ]
+  },
 ]
+
+function NavItem({ item, pathname, onNavigate }: {
+  item: NavigationItem
+  pathname: string | null
+  onNavigate: () => void
+}) {
+  const [isOpen, setIsOpen] = useState(false)
+  const Icon = item.icon
+
+  // Se tem href direto, é um link simples
+  if (item.href) {
+    const isActive = pathname === item.href || pathname?.startsWith(item.href + "/")
+
+    return (
+      <Link
+        href={item.href}
+        className={cn(
+          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+          isActive
+            ? "bg-slate-900 text-white shadow-sm"
+            : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+        )}
+        onClick={onNavigate}
+      >
+        {Icon && <Icon className="h-5 w-5" />}
+        <span>{item.label}</span>
+      </Link>
+    )
+  }
+
+  // Se tem items, é um grupo expansível
+  const hasActiveChild = item.items?.some(child =>
+    pathname === child.href || pathname?.startsWith(child.href + "/")
+  )
+
+  return (
+    <div>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+          hasActiveChild
+            ? "bg-slate-100 text-slate-900"
+            : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+        )}
+      >
+        <div className="flex items-center gap-3">
+          {Icon && <Icon className="h-5 w-5" />}
+          <span>{item.label}</span>
+        </div>
+        {isOpen ? (
+          <ChevronDown className="h-4 w-4" />
+        ) : (
+          <ChevronRight className="h-4 w-4" />
+        )}
+      </button>
+
+      {isOpen && item.items && (
+        <div className="ml-4 mt-1 space-y-1 border-l-2 border-slate-200 pl-4">
+          {item.items.map((subItem) => {
+            const SubIcon = subItem.icon
+            const isActive = pathname === subItem.href || pathname?.startsWith(subItem.href + "/")
+
+            return (
+              <Link
+                key={subItem.href}
+                href={subItem.href}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all",
+                  isActive
+                    ? "bg-slate-900 text-white shadow-sm"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                )}
+                onClick={onNavigate}
+              >
+                {SubIcon && <SubIcon className="h-4 w-4" />}
+                <span>{subItem.label}</span>
+              </Link>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function AppLayout({
   children,
@@ -30,6 +185,7 @@ export default function AppLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const logout = useAuthStore((state) => state.logout)
   const user = useAuthStore((state) => state.user)
+  const pathname = usePathname()
 
   const { name: userName, email: userEmail } = useMemo(() => {
     if (user && typeof user === "object") {
@@ -55,86 +211,129 @@ export default function AppLayout({
 
   return (
     <div className="flex min-h-screen w-full bg-slate-50">
+      {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-200 bg-white px-4 py-6 transition-transform duration-300 ease-in-out",
+          "fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out",
           "md:static md:translate-x-0 md:shadow-none",
-          isSidebarOpen ? "translate-x-0 shadow-lg" : "-translate-x-full md:translate-x-0",
+          isSidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full md:translate-x-0",
         )}
       >
-        <div className="mb-8">
-          <span className="text-lg font-semibold text-slate-900">NEXORA ComprasGov.AI</span>
+        {/* Logo */}
+        <div className="border-b border-slate-200 px-6 py-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 text-white font-bold text-lg shadow-md">
+              N
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-slate-900">NEXORA</div>
+              <div className="text-xs text-slate-500">ComprasGov.AI</div>
+            </div>
+          </div>
         </div>
-        <nav className="flex flex-1 flex-col gap-2 text-sm font-medium text-slate-600">
+
+        {/* Navigation */}
+        <nav className="flex-1 space-y-1 overflow-y-auto px-4 py-6">
           {navigationItems.map((item) => (
-            <Link
+            <NavItem
               key={item.label}
-              href={item.href}
-              className="rounded-md px-3 py-2 transition-colors hover:bg-slate-100 hover:text-slate-900"
-              onClick={closeSidebar}
-            >
-              {item.label}
-            </Link>
+              item={item}
+              pathname={pathname}
+              onNavigate={closeSidebar}
+            />
           ))}
         </nav>
-        <div className="mt-auto rounded-md border border-dashed border-slate-200 p-3 text-xs text-slate-500">
-          Área autenticada - conteúdo em desenvolvimento.
+
+        {/* Footer */}
+        <div className="border-t border-slate-200 p-4">
+          <div className="rounded-lg bg-blue-50 p-3 text-xs">
+            <div className="font-medium text-blue-900">💡 Dica</div>
+            <div className="mt-1 text-blue-700">
+              Use Ctrl+K para busca rápida
+            </div>
+          </div>
         </div>
       </aside>
 
-      {isSidebarOpen ? (
+      {/* Overlay para mobile */}
+      {isSidebarOpen && (
         <button
           type="button"
           onClick={closeSidebar}
-          className="fixed inset-0 z-30 bg-slate-900/40 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-30 bg-slate-900/50 backdrop-blur-sm md:hidden"
           aria-label="Fechar menu lateral"
         />
-      ) : null}
+      )}
 
-      <div className="flex min-h-screen flex-1 flex-col md:pl-64">
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 shadow-sm md:px-8">
-          <div className="flex items-center gap-3">
+      {/* Main Content */}
+      <div className="flex min-h-screen flex-1 flex-col">
+        {/* Header */}
+        <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+          <div className="flex h-16 items-center justify-between px-4 md:px-8">
+            {/* Mobile menu button */}
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
               className="md:hidden"
               onClick={toggleSidebar}
-              aria-label="Alternar menu lateral"
             >
               {isSidebarOpen ? (
-                <span aria-hidden="true" className="text-xl">×</span>
+                <X className="h-5 w-5" />
               ) : (
-                <span aria-hidden="true" className="text-xl">☰</span>
+                <Menu className="h-5 w-5" />
               )}
             </Button>
-            <div className="hidden md:flex md:flex-col">
-              <span className="text-sm font-medium text-slate-500">Portal</span>
-              <span className="text-lg font-semibold text-slate-900">NEXORA ComprasGov.AI</span>
+
+            {/* Page title (opcional - pode ser preenchido por cada página) */}
+            <div className="hidden md:block">
+              <h1 className="text-lg font-semibold text-slate-900">
+                {/* Título dinâmico baseado na rota */}
+              </h1>
             </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="hidden text-right text-sm md:block">
-              <div className="font-medium text-slate-900">{userName}</div>
-              <div className="text-slate-500">{userEmail}</div>
+
+            {/* User menu */}
+            <div className="ml-auto flex items-center gap-4">
+              <div className="hidden text-right text-sm md:block">
+                <div className="font-medium text-slate-900">{userName}</div>
+                <div className="text-xs text-slate-500">{userEmail}</div>
+              </div>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-700 text-sm font-semibold text-white shadow-md transition-all hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                  >
+                    {userInitial}
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="px-2 py-1.5">
+                    <div className="text-sm font-medium">{userName}</div>
+                    <div className="text-xs text-slate-500">{userEmail}</div>
+                  </div>
+                  <DropdownMenuItem onSelect={() => router.push("/perfil")}>
+                    Meu Perfil
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => router.push("/configuracoes")}>
+                    Configurações
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={handleLogout}
+                    className="text-red-600 focus:text-red-600"
+                  >
+                    Sair
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
-                  aria-label="Abrir menu do usuário"
-                >
-                  {userInitial}
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onSelect={() => handleLogout()}>Sair</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </header>
 
-        <main className="flex-1 px-4 pb-10 pt-6 md:px-10">{children}</main>
+        {/* Page Content */}
+        <main className="flex-1 px-4 pb-10 pt-6 md:px-10">
+          {children}
+        </main>
       </div>
     </div>
   )

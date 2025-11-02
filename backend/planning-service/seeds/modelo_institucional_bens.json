@@ -1,0 +1,33 @@
+{
+    "instituicao": {
+        "nome": "Hospital Universitário Federal",
+        "sigla": "HUF",
+        "cnpj": "33.333.333/0001-33",
+        "tipo": "hospital",
+        "uf": "SP",
+        "municipio": "São Paulo",
+        "orgao_controle": "TCU"
+    },
+    "modelo": {
+        "nome": "ETP - Aquisição de Bens",
+        "descricao": "Modelo para compra de materiais e equipamentos.",
+        "tipo_documento": "ETP",
+        "tipo_contratacao": "Bens",
+        "versao": "1.0",
+        "status": "ativo",
+        "estrutura": {
+            "secoes": [
+                {
+                    "id": "especificacao_bens",
+                    "titulo": "Especificação dos Bens",
+                    "campos": [
+                        {"id": "termo_referencia", "label": "Termo de Referência", "tipo": "textarea"},
+                        {"id": "quantitativo_estimado", "label": "Quantitativo Estimado", "tipo": "textarea"}
+                    ]
+                }
+            ]
+        },
+        "mapeamento_lei": {},
+        "configuracao_documento": {}
+    }
+}

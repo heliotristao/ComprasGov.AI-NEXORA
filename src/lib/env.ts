@@ -1,3 +1,5 @@
+import { config } from "@/lib/config"
+
 const API_URL_ENV_NAME = "NEXT_PUBLIC_API_URL" as const
 
 function normalizeUrl(value: string): string {
@@ -10,7 +12,7 @@ function parseAndNormalizeUrl(rawValue: string): string {
 }
 
 export function resolveApiBaseUrl(): string | null {
-  const rawValue = process.env[API_URL_ENV_NAME]
+  const rawValue = config.api.baseUrl
 
   if (!rawValue || !rawValue.trim()) {
     return null
@@ -22,7 +24,7 @@ export function resolveApiBaseUrl(): string | null {
     if (process.env.NODE_ENV !== "production") {
       console.error(
         `Valor inválido para a variável ${API_URL_ENV_NAME}: ${rawValue}. Informe uma URL absoluta.`,
-        error
+        error,
       )
     }
 

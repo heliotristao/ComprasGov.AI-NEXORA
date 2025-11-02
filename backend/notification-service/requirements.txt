@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg2-binary
+alembic
+jinja2
+python-dotenv
+boto3
+httpx
+moto
+pytest-httpx
+backoff
+python-json-logger==2.0.7

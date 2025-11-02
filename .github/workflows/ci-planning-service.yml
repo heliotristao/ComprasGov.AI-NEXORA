@@ -18,26 +18,39 @@ jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
 
+    env:
+      ECR_REPOSITORY: nexora-planning-service
+      IMAGE_TAG: ${{ github.sha }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Build Docker image
+        run: docker build -t $ECR_REPOSITORY:ci-test ./backend/planning-service
+
       - name: Configure AWS credentials
+        if: github.event_name == 'push'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::266519201491:role/GitHubAction-ECR-Role
           aws-region: us-east-1
 
       - name: Log in to Amazon ECR
+        if: github.event_name == 'push'
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
+      - name: Tag image for ECR
+        if: github.event_name == 'push'
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: nexora-planning-service
-          IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest ./backend/planning-service
-          docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
+          docker tag $ECR_REPOSITORY:ci-test $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag $ECR_REPOSITORY:ci-test $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Push image to Amazon ECR
+        if: github.event_name == 'push'
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY

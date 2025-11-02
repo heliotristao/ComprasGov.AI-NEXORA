@@ -1,0 +1,17 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg2-binary
+pydantic[email]
+pydantic-settings
+python-dotenv
+alembic
+boto3
+passlib[bcrypt]
+bcrypt==3.1.7
+python-multipart
+pytest
+moto[s3]
+httpx
+pgvector
+python-json-logger==2.0.7

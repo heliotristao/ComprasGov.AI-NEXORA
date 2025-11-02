@@ -1,12 +1,29 @@
 version: '3.8'
 
 services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - nexora-net
+
   postgres:
     image: postgres:15-alpine
     environment:
       POSTGRES_USER: nexora_admin
       POSTGRES_PASSWORD: strong_password_change_me
       POSTGRES_DB: nexora_db
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -17,23 +34,89 @@ services:
       timeout: 5s
       retries: 5
 
-  governance-service:
-    # Port mapping verified for frontend communication
-    build:
-      context: ./backend/governance-service
-    ports:
-      - "8001:8000"
-    environment:
-      DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
-    depends_on:
-      postgres:
-        condition: service_healthy
+  redis:
+    image: redis:7-alpine
     networks:
       - nexora-net
+
+  # api-gateway:
+  #   build:
+  #     context: ./backend/api-gateway
+  #   environment:
+  #     REDIS_HOST: redis
+  #     GOVERNANCE_JWKS_URL: "http://governance-service:8000/.well-known/jwks.json"
+  #   depends_on:
+  #     - redis
+  #   networks:
+  #     - nexora-net
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.services.api-gateway-svc.loadbalancer.server.port=8000"
+  #     - "traefik.http.middlewares.forward-auth.forwardauth.address=http://api-gateway:8000/auth"
+
+  # governance-service:
+  #   build:
+  #     context: ./backend/governance-service
+  #   environment:
+  #     DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - nexora-net
+  #   labels:
+  #     - "traefik.enable=true"
+  #     # Public routes (no auth)
+  #     - "traefik.http.routers.governance-public.rule=PathPrefix(`/governance/api/v1/token`) || PathPrefix(`/governance/.well-known/jwks.json`)"
+  #     - "traefik.http.routers.governance-public.service=governance-svc"
+  #     # Protected routes
+  #     - "traefik.http.routers.governance-protected.rule=PathPrefix(`/governance`)"
+  #     - "traefik.http.routers.governance-protected.middlewares=forward-auth"
+  #     - "traefik.http.routers.governance-protected.service=governance-svc"
+  #
+  #     - "traefik.http.services.governance-svc.loadbalancer.server.port=8000"
 
   planning-service:
     build:
       context: ./backend/planning-service
+    ports:
+      - "8001:8000"
+    environment:
+      DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - nexora-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.planning.rule=PathPrefix(`/planning`)"
+      - "traefik.http.routers.planning.middlewares=forward-auth"
+      - "traefik.http.services.planning.loadbalancer.server.port=8000"
+
+  planning-worker:
+    build:
+      context: ./backend/planning-service
+    command: celery -A app.tasks.celery_app worker --loglevel=info
+    environment:
+      DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - nexora-net
+
+  prediction-service:
+    build:
+      context: ./backend/prediction-service
     ports:
       - "8002:8000"
     environment:
@@ -43,45 +126,127 @@ services:
         condition: service_healthy
     networks:
       - nexora-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prediction.rule=PathPrefix(`/prediction`)"
+      - "traefik.http.routers.prediction.middlewares=forward-auth"
+      - "traefik.http.services.prediction.loadbalancer.server.port=8000"
 
-  frontend:
+  metrics-service:
     build:
-      context: ./src
-    ports:
-      - "3000:3000"
-    depends_on:
-      - governance-service
-      - planning-service
-    networks:
-      - nexora-net
-
-  milvus:
-    image: milvusdb/milvus:v2.4.4-standalone
-    ports:
-      - "19530:19530"
-      - "9091:9091"
-    volumes:
-      - ./volumes/milvus:/var/lib/milvus
+      context: ./backend/metrics-service
     environment:
-      ETCD_USE_EMBED: "true"
-      ETCD_DATA_DIR: "/var/lib/milvus/etcd"
-      COMMON_STORAGETYPE: "local"
+      DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
+      REDIS_URL: "redis://redis:6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - nexora-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.metrics.rule=PathPrefix(`/metrics`)"
+      - "traefik.http.routers.metrics.middlewares=forward-auth"
+      - "traefik.http.services.metrics.loadbalancer.server.port=8000"
 
-  create-user:
+  notification-service:
     build:
-      context: ./backend/governance-service
-    command: >
-      sh -c "
-        alembic upgrade head &&
-        python app/scripts/create_user.py
-      "
+      context: ./backend/notification-service
+    ports:
+      - "8003:8000"
+    environment:
+      DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - nexora-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.notification.rule=PathPrefix(`/notification`)"
+      - "traefik.http.routers.notification.middlewares=forward-auth"
+      - "traefik.http.services.notification.loadbalancer.server.port=8000"
+
+  # frontend:
+  #   build:
+  #     context: ./src
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - traefik
+  #   networks:
+  #     - nexora-net
+
+  datahub-service:
+    build:
+      context: ./backend/datahub-service
+    environment:
+      DATABASE_URL: "postgresql://nexora_admin:strong_password_change_me@postgres:5432/nexora_db"
+      S3_ENDPOINT_URL: "http://minio:9000"
+      S3_ACCESS_KEY: "minioadmin"
+      S3_SECRET_KEY: "minioadmin"
+      S3_BUCKET_NAME: "nexora-artifacts"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - nexora-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.datahub.rule=PathPrefix(`/datahub`)"
+      - "traefik.http.routers.datahub.middlewares=forward-auth"
+      - "traefik.http.services.datahub.loadbalancer.server.port=8000"
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./volumes/minio:/data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    networks:
+      - nexora-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # milvus:
+  #   image: milvusdb/milvus:v2.4.4-standalone
+  #   ports:
+  #     - "19530:19530"
+  #     - "9091:9091"
+  #   volumes:
+  #     - ./volumes/milvus:/var/lib/milvus
+  #   environment:
+  #     ETCD_USE_EMBED: "true"
+  #     ETCD_DATA_DIR: "/var/lib/milvus/etcd"
+  #     COMMON_STORAGETYPE: "local"
+  #   networks:
+  #     - nexora-net
+
+  # create-user:
+  #   build:
+  #     context: ./backend/governance-service
+  #   command: >
+  #     sh -c "
+  #       alembic upgrade head &&
+  #       python app/scripts/create_user.py
+  #     "
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - nexora-net
 
 networks:
   nexora-net:

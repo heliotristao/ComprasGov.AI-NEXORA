@@ -2,7 +2,8 @@ import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 
 import { useAuthStore } from "@/stores/authStore"
-import { getApiBaseUrl } from "@/lib/env"
+import { persistSession } from "@/lib/auth/session.client"
+import type { SessionPayload } from "@/lib/auth/session"
 
 interface LoginCredentials {
   email: string
@@ -11,22 +12,13 @@ interface LoginCredentials {
 
 interface LoginResponse {
   access_token?: string
+  token_type?: string
+  user?: Record<string, unknown>
   [key: string]: unknown
 }
 
 async function requestLogin(credentials: LoginCredentials): Promise<LoginResponse> {
-  let apiBaseUrl: string
-
-  try {
-    apiBaseUrl = getApiBaseUrl()
-  } catch (error) {
-    console.error("Configuração de NEXT_PUBLIC_API_URL ausente ou inválida.", error)
-    throw new Error(
-      "Falha na configuração do ambiente. Verifique a variável NEXT_PUBLIC_API_URL e tente novamente."
-    )
-  }
-
-  const response = await fetch(`${apiBaseUrl}/token`, {
+  const response = await fetch("/api/governance/auth/token", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -60,7 +52,17 @@ export function useAuth() {
         return
       }
 
-      login(token)
+      const user = (data?.user && typeof data.user === "object" ? data.user : null) as
+        | Record<string, unknown>
+        | null
+
+      const sessionPayload: SessionPayload = {
+        token,
+        user: user as SessionPayload["user"],
+      }
+
+      persistSession(sessionPayload)
+      login(token, user ?? undefined)
       router.push("/dashboard")
     },
     onError: (error) => {

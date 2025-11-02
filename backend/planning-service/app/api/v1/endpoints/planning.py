@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from fastapi import APIRouter, status, Response, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.models.planning import PlanningCreate, Planning, PlanningUpdate
+from app.schemas import PlanCreate, Plan, PlanUpdate
 from app.db.models.planning import Planning as PlanningModel
 from app.db.session import SessionLocal
 from typing import List
@@ -20,12 +20,12 @@ def get_db():
 
 @router.post(
     "/plannings",
-    response_model=Planning,
+    response_model=Plan,
     status_code=status.HTTP_201_CREATED
 )
 def create_planning(
     *,
-    planning_in: PlanningCreate,
+    planning_in: PlanCreate,
     response: Response,
     db: Session = Depends(get_db)
 ):
@@ -40,7 +40,7 @@ def create_planning(
     return db_planning
 
 
-@router.get("/plannings", response_model=List[Planning])
+@router.get("/plannings", response_model=List[Plan])
 def list_plannings(db: Session = Depends(get_db)):
     """
     List all plannings.
@@ -48,11 +48,11 @@ def list_plannings(db: Session = Depends(get_db)):
     return db.query(PlanningModel).all()
 
 
-@router.patch("/plannings/{planning_id}", response_model=Planning)
+@router.patch("/plannings/{planning_id}", response_model=Plan)
 def update_planning(
     *,
     planning_id: int,
-    planning_in: PlanningUpdate,
+    planning_in: PlanUpdate,
     db: Session = Depends(get_db)
 ):
     """

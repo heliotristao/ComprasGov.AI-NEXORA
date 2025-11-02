@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import type { ReactNode } from "react"
 import "./globals.css"
-import { Providers } from "@/components/providers"
+import { Providers } from "./providers"
 import { Toaster } from "@/components/ui/sonner"
 
 import favicon from "@/public/assets/images/favicon.svg"
@@ -10,8 +10,18 @@ export const metadata: Metadata = {
   title: "NEXORA ComprasGov.AI",
   description: "Plataforma de governança para contratações públicas.",
   icons: {
-    icon: favicon.src,
-    shortcut: favicon.src,
+    icon: [
+      {
+        url: favicon.src,
+        type: "image/svg+xml",
+      },
+    ],
+    shortcut: [
+      {
+        url: favicon.src,
+        type: "image/svg+xml",
+      },
+    ],
   },
 }
 
@@ -22,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className="antialiased font-sans">
+      <body className="min-h-screen bg-neutral-50 font-sans text-foreground antialiased">
         <Providers>
           {children}
           <Toaster />

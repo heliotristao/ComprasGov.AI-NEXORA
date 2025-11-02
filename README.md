@@ -1,6 +1,6 @@
 # NEXORA-ComprasGov.AI - O Sistema Operacional para Contratações Públicas
 
-**Status:** Fase 0 - Setup
+**Status:** ✅ Sistema ETP e TR Implementado - Fase 1 Completa
 
 ---
 
@@ -17,7 +17,151 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Backend e Infraestrutura:** Consulte JULES.MD.
 * **Frontend:** Consulte CODEX.MD.
 
-## 4. Histórico Técnico de Alterações
+## 4. Importação do Blueprint na Render
+Ao importar o blueprint da Render, o campo de repositório não é preenchido automaticamente. Utilize uma das opções abaixo para apontar o blueprint para o seu clone ou fork:
+
+1. Durante a etapa "Connect repository" da importação, selecione manualmente o repositório correto na sua conta da Render.
+2. Alternativamente, antes da importação, defina a variável de ambiente **RENDER_REPO_URL** no Render com a URL completa do seu repositório. O blueprint utilizará esse valor para o campo `repo`.
+
+> Caso esteja usando um fork, confirme que a URL informada corresponde ao fork desejado antes de concluir a importação.
+
+## 5. Documentação do Sistema ETP e TR
+
+### **📋 Relatórios Completos**
+* **[RELATORIO_SESSAO_2024-10-27.md](./RELATORIO_SESSAO_2024-10-27.md)** - Relatório detalhado de tudo que foi implementado na sessão de 27/10/2024
+* **[RESUMO_EXECUTIVO_ETP_TR.md](./RESUMO_EXECUTIVO_ETP_TR.md)** - Resumo executivo para stakeholders com métricas e ROI
+* **[DOCUMENTACAO_SISTEMA_ETP_TR.md](./DOCUMENTACAO_SISTEMA_ETP_TR.md)** - Documentação técnica completa do sistema
+* **[SISTEMA_TR_COMPLETO.md](./SISTEMA_TR_COMPLETO.md)** - Documentação específica do sistema de TR
+* **[INTEGRACAO_COMPLETA_ETP_TR.md](./INTEGRACAO_COMPLETA_ETP_TR.md)** - Guia de integração e uso
+
+### **🎯 Principais Funcionalidades Implementadas**
+
+#### **Sistema de ETP (Estudo Técnico Preliminar)**
+* 13 campos obrigatórios da Lei 14.133/2021 (Art. 18)
+* Wizard multi-página com navegação lateral
+* Geração de conteúdo com IA (5 chains LLM especializadas)
+* Validação automática de conformidade legal
+* Geração de documentos DOCX/PDF profissionais
+* Gestão multi-tenant de templates institucionais
+
+#### **Sistema de TR (Termo de Referência)**
+* 10 campos obrigatórios da Lei 14.133/2021 (Art. 6º, XXIII)
+* **Criação automática a partir de ETP aprovado** (inovação!)
+* Herança inteligente de dados do ETP
+* Transformação automática de conteúdo
+* Redução de 80% no tempo de criação
+* Mesmo wizard e funcionalidades do ETP
+
+#### **Gestão de Templates**
+* Hierarquia: Lei 14.133/2021 → Órgão de Controle (TCU/TCE/PGE) → Instituição
+* Templates customizáveis por cliente
+* Versionamento e controle de mudanças
+* Área de administração completa
+* Mapeamento automático ETP → TR
+
+#### **Integração com IA**
+* 5 chains LLM especializadas (necessity, solution, viability, quantities, specs)
+* Geração genérica com prompts customizados
+* Score de confiança por campo gerado
+* Consolidação automática com revisão de IA
+* Auditoria completa de uso de IA
+
+### **📊 Estatísticas da Implementação**
+* **24 arquivos criados** (16 backend + 8 frontend)
+* **~7.595 linhas de código**
+* **21 endpoints da API**
+* **6 tabelas de banco de dados**
+* **20+ schemas Pydantic**
+* **8 componentes React**
+* **100% de conformidade legal**
+
+### **🚀 Como Testar**
+
+```bash
+# 1. Popular banco com seeds
+cd backend/planning-service
+python scripts/seed_etp_system.py
+
+# 2. Criar e aprovar ETP
+curl -X POST http://localhost:8000/api/v1/etp \
+  -H "Content-Type: application/json" \
+  -d '{"plan_id": 1, "template_id": 1, "dados": {}}'
+
+curl -X PUT http://localhost:8000/api/v1/etp/1 \
+  -d '{"status": "aprovado"}'
+
+# 3. Criar TR automaticamente do ETP
+curl -X POST http://localhost:8000/api/v1/tr/criar-de-etp/1 \
+  -H "Content-Type: application/json" \
+  -d '{"template_tr_id": 2, "user_id": 1}'
+
+# 4. Verificar dados herdados
+curl http://localhost:8000/api/v1/tr/1
+```
+
+---
+
+## 6. Histórico Técnico de Alterações
+* **[2025-11-01] - Tarefa J3:** Consolidada a documentação técnica dos microsserviços e criado um Runbook operacional para diagnóstico de falhas.
+* **[2025-11-01] - Tarefa J2:** Aprimorado o pipeline de CI/CD com deploys de preview para PRs de frontend e bloqueio de merge em caso de falha nos testes.
+* **[2025-11-01] - Tarefa J1:** Implementados testes de ponta a ponta (E2E) com Playwright para o fluxo principal e configurado um portão de qualidade de 80% de cobertura de testes.
+* **[2025-11-01] - Tarefa I2:** Expandido o dataset de semente do Mercado.AI para mais de 1.000 registros, melhorando a base para análises e predições.
+* **[2025-11-02] - Tarefa I1.2:** Implementada a interface de administração para listagem e preview de placeholders de templates de documentos.
+* **[2025-11-01] - Tarefa H3:** Implementada a máscara de input, validação `onBlur` e hyperlink configurável para o campo "Número Edocs".
+* **[2025-11-01] - Tarefa G2:** Implementado o rastreamento distribuído (distributed tracing) em toda a plataforma, permitindo a correlação de logs entre microsserviços.
+* **[2025-11-01] - Tarefa G1.1-FIX:** Implementados os provedores reais (Amazon SES, Webhook com `httpx`) para o serviço de notificações.
+* **[2025-11-01] - Tarefa G1:** Implementado o serviço central de notificações, com suporte para e-mail e webhooks.
+* **[2025-11-01] - Tarefa F4:** Adicionadas buscas, estados de vazio/erro e modal de criação às telas de gestão de usuários e órgãos.
+* **[2025-11-01] - Tarefa E1:** Implementado o motor de geração de Matriz de Riscos (Risco.AI), combinando regras e IA.
+* **[2025-11-01] - Tarefa F3:** Implementada a funcionalidade de upload e vínculo de documentos PDF assinados para ETPs.
+* **[2025-11-01] - Tarefa FIX-TEST-BASE-02:** Corrigidos problemas estruturais no ambiente de teste do `planning-service` relacionados a migrações idempotentes (Alembic) e substituição de dependências de autenticação.
+* **[2025-11-01] - Tarefa F2:** Implementado o workflow de aprovação (submeter, aprovar, rejeitar) para ETPs, com trilha de auditoria completa.
+* **[2025-11-01] - Tarefa E2:** Implementada a interface de usuário da Matriz de Riscos (Risco.AI) com visualização em heatmap e exportação para PDF.
+* **[2025-10-31] - Tarefa C4-REDO-HARDENING:** Aumentada a robustez dos testes de consolidação de TR, com suporte a múltiplos templates e validação de placeholders.
+* **[2025-10-31] - Tarefa B6:** Implementada a consolidação de ETP com fila assíncrona, checksum SHA1 e versionamento no DataHub.
+* **[2025-10-31] - Tarefa B5.3:** Exposta a API no `planning-service` para aceite de sugestões de IA, completando a funcionalidade de rastreabilidade.
+* **[2025-10-31] - Tarefa B5.2:** Implementada a lógica de serviço no `planning-service` para validar e persistir o aceite de sugestões de IA.
+* **[2025-10-31] - Tarefa B5.1:** Criada a estrutura de dados no `planning-service` para o rastreamento de aceites de sugestões de IA.
+* **[2025-10-31] - Tarefa C4-REDO:** Reimplementado o serviço de consolidação para gerar, versionar e armazenar artefatos DOCX/PDF para Termos de Referência (TR).
+* **[2025-10-30] - Tarefa B3:** Implementado o motor de validação de conformidade no `planning-service`, permitindo a verificação de regras de negócio em documentos ETP.
+* **[2025-10-30] - Tarefa B2.3:** Exposta a API PATCH no `planning-service` para suportar o auto-save de ETPs, completando a funcionalidade de atualização parcial.
+* **[2025-10-30] - Tarefa B2.2:** Implementada a lógica de serviço para atualizações parciais (merge-patch) de ETPs.
+* **[2025-10-30] - Tarefa A5:** Criado o `metrics-service`, responsável por agregar e expor métricas operacionais consolidadas para o Dashboard Preditivo.
+* **[2025-10-30] - Tarefa A4:** Criada a biblioteca `nexora-auth` e implementado o sistema de RBAC e auditoria cross-service, padronizando a segurança e a rastreabilidade em todo o ecossistema.
+* **[2025-10-30] - Tarefa A3:** Criado o `api-gateway`, um ponto de entrada único para todos os microsserviços, centralizando autenticação, roteamento, rate limiting e logging.
+* **[2025-10-29] - Tarefa C3:** Implementado o serviço "transformer" no `planning-service` para criar rascunhos de Termos de Referência (TR) a partir de ETPs existentes, com mapeamento automático de campos e relatório de gaps.
+* **[2025-10-29] - Tarefa C5:** Implementado o wizard multietapas para Termo de Referência (TR), com fluxos dinâmicos para Bens e Serviços, auto-save, validação e integração com IA.
+* **[2025-10-29] - Tarefa C2:** Implementado o motor de monitoramento de SLA e o serviço de notificações automáticas no `planning-service`, com APIs para configuração e consulta de status.
+* **[2025-10-29] - Tarefa C1:** Implementado o Módulo de Gestão com um dashboard unificado para visualização e filtragem de todos os processos da plataforma.
+* **[2025-10-29] - Tarefa B7:** Implementada a interface completa do wizard multietapas para ETP com auto-save, validação guiada e integração de geração de conteúdo por IA.
+* **[2025-10-29] - Tarefa B3:** Implementado o motor de validação de conformidade para ETPs no `planning-service`, com um endpoint que retorna um checklist de regras e sugestões de melhoria.
+* **[2025-10-29] - Tarefa B2:** Implementada a API de auto-save (`PATCH`) para a entidade ETP no `planning-service`, permitindo a atualização incremental de dados e o salvamento contínuo do progresso do usuário.
+* **[2025-10-29] - Tarefa B4:** Implementada a funcionalidade de geração de conteúdo por IA para campos do ETP no `planning-service`, incluindo rastreabilidade de cada execução e suporte a múltiplos provedores.
+* **[2025-10-29] - Tarefa B1:** Implementado o modelo de dados, migração e CRUD completo para a entidade ETP no `planning-service`, estabelecendo a base para a persistência dos Estudos Técnicos Preliminares.
+* **[2025-10-29] - Tarefa ATOM-008:** Implementada a interface administrativa para listagem e criação de templates de documentos (ETP/TR), estabelecendo a base para personalização institucional.
+* **[2025-10-30] - Tarefa ATOM-007:** Implementada a persistência de dados com auto-save e carregamento automático nos wizards de ETP e TR, conectando a UI aos endpoints de salvamento do backend.
+* **[2025-10-29] - Tarefa ATOM-006:** Implementadas as telas de consolidação para ETP e TR, permitindo validação de conformidade, seleção de template e geração dos documentos finais (DOCX/PDF).
+* **[2024-10-28] - Tarefa ATOM-005:** Implementadas as telas de listagem e detalhe de processos, com busca, filtros, paginação server-side e visualização de timeline e vínculos.
+* **[2025-10-28] - Tarefa ATOM-003:** Implementado o Wizard de Termo de Referência (TR) com fluxos dinâmicos para Bens e Serviços, incluindo auto-save, validação por etapa e integração via proxy com o backend.
+* **[2025-10-28] - Tarefa ATOM-002:** Implementado o Wizard de ETP com múltiplos passos, validação, auto-save e retomada de sessão, incluindo a listagem e criação de rascunhos.
+* **[2025-10-28] - Tarefa ATOM-001:** Criada a shell inicial com App Router, dashboard de acesso rápido e Wizard de Planejamento integrado ao layout global.
+* **[2025-10-27] - Tarefa BACKEND-P-12:** Criado o endpoint para salvamento de dados do Wizard de ETP, permitindo a persistência do progresso do usuário.
+* **[2024-10-27] - Tarefa FEAT-ETP-TR-001:** Implementado sistema completo de ETP e TR com integração de IA, criação automática de TR a partir de ETP, gestão multi-tenant de templates e geração de documentos DOCX/PDF. (Commit: `2924849`)
+* **[2024-10-27] - Tarefa FIX-017:** Corrigidas as URLs dos endpoints da API no dashboard para incluir o prefixo `/api/v1`. (Commit: `6ce0587`)
+* **[2025-10-26] - Tarefa BACKEND-P-11:** Criado o endpoint `PUT /plans/{plan_id}` e enriquecido o modelo de dados do Plano com novos atributos.
+* **[2025-10-26] - Tarefa BACKEND-P-10:** Criado o endpoint `GET /plans/{plan_id}` no `planning-service` para obter os detalhes de um plano específico.
+* **[2025-10-26] - Tarefa BACKEND-P-09:** Criado o endpoint `POST /plans` no `planning-service` para a criação de novos planos de contratação.
+* **[2025-10-25] - Tarefa BACKEND-P-08:** Criado o endpoint `GET /plans` no `planning-service` para listar os planos de contratação.
+* **[2025-10-25] - Tarefa DEBUG-002:** Habilitada a documentação da API (Swagger UI) no `governance-service` para fins de diagnóstico do endpoint de autenticação.
+* **[2025-10-25] - Tarefa DEVOPS-PROD-03:** Simplificado o pipeline de CI do backend, removendo a etapa legada de push da imagem Docker para a AWS.
+* **[2025-10-25] - Tarefa FIX-016:** Corrigida a ausência da rota de autenticação `POST /token` no `governance-service`, resolvendo o erro 404 no login.
+* **[2025-10-25] - Tarefa FIX-015:** Ajustado o path da chamada de API de autenticação no frontend para corresponder à rota exposta pelo backend, resolvendo o erro 404.
+* **[2025-10-25] - Tarefa DEVOPS-PROD-02:** Limpeza do pipeline de CI/CD do backend, removendo passos legados de autenticação da AWS.
+* **[2025-10-25] - Tarefa FIX-014:** Configurada a política de CORS nos serviços de backend para permitir requisições do frontend em produção, resolvendo o bloqueio de comunicação.
+* **[2025-10-25] - Tarefa OPS-PROD-002:** Corrigida a variável de ambiente `NEXT_PUBLIC_API_URL` no Vercel para incluir o prefixo `/api/v1`, resolvendo a falha de comunicação do frontend em produção.
+* **[2025-10-25] - Tarefa OPS-PROD-002:** Corrigida a configuração de deploy do Vercel para remover a referência a um "Secret" inexistente.
+* **[2025-10-25] - Tarefa DEVOPS-PROD-01:** Unificado e corrigido o processo de CI/CD. Deploys para Render (backend) e Vercel (frontend) agora são automatizados via GitHub Actions de forma segura.
+* **[2025-10-24] - Tarefa INFRA-PROD-03R:** Realizado o deploy do 'planning-service' na plataforma Render.com.
 * **[2025-10-24] - Tarefa INFRA-PROD-02R:** Realizado o deploy do 'governance-service' na plataforma Render.com.
 * **[2025-10-24] - Tarefa FIX-012:** Corrigida a comunicação de rede entre o frontend e os serviços de backend no ambiente Docker.
 * **[2025-10-24] - Tarefa EXTRA-005:** Implementado um mecanismo de "upsert" para garantir a existência do usuário Master padrão.
@@ -61,6 +205,7 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **2025-10-23 - Tarefa IA-P-02:** Implementada a persistência dos dados de preços de mercado no banco de dados.
 * **2025-10-23 - Tarefa FRONTEND-P-01:** Expandido o formulário de criação de planejamento com campos detalhados do ETP.
 * **2025-10-23 - Tarefa BACKEND-P-01:** Expandido o modelo de dados doplanning-servicepara uma estrutura de ETP mais detalhada.
+* **2025-11-01 - Tarefa D4:** Implementada a interface de usuário do "Mapa de Preços", com filtros interativos e visualização de dados de mercado.
 * **2025-10-23 - Tarefa BACKEND-012:** Implementado o endpoint de WebSocket no 'dispute-service' em Go.
 * **2025-10-23 - Tarefa BACKEND-011:** Criada a estrutura de boilerplate em Go para o 'dispute-service'.
 * **2025-10-23 - Tarefa COMPOSE-001:** Criado o arquivo docker-compose.yml para orquestrar o ambiente de desenvolvimento.

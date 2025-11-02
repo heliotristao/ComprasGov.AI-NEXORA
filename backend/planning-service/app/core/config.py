@@ -2,3 +2,4 @@
 SECRET_KEY = "a_very_secret_key"  # This should be securely managed
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+API_V1_STR = "/api/v1"

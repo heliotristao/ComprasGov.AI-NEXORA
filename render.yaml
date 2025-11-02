@@ -1,14 +1,42 @@
 services:
+  # Serviço de Governança (Autenticação, Usuários, Roles, Planos)
   - type: web
     name: governance-service
     env: docker
-    repo: https://github.com/heliotristao/ComprasGov.AI-NEXORA
     rootDir: backend/governance-service
     region: oregon
     branch: main
     plan: free
     envVars:
+      - key: PORT
+        value: 10000
       - key: DATABASE_URL
-        value: postgresql://comprasgov_user:AbC123XyZ@dpg-abcdefg12345-a.oregon-postgres.render.com/comprasgov_db
+        sync: false
       - key: SECRET_KEY
-        value: 76374328578cb697cd76affd0a521e95090811a001d9fc83c597f59d2b9a5727
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+
+  # Serviço de Planejamento (ETPs, TRs, Documentos, IA)
+  - type: web
+    name: planning-service
+    env: docker
+    rootDir: backend/planning-service
+    region: oregon
+    branch: main
+    plan: free
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_API_BASE
+        value: https://api.openai.com/v1
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GOVERNANCE_SERVICE_URL
+        value: https://governance-service.onrender.com
