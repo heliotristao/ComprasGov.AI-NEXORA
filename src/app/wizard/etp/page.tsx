@@ -24,6 +24,7 @@ import {
   type EtpStepFieldPath,
   validationResponseSchema,
 } from "./etp.zod"
+import { getOptionalApiBaseUrl } from "@/lib/env"
 
 const WIZARD_STEPS: StepDefinition[] = [
   {
@@ -106,6 +107,8 @@ function EtpWizardPageContent() {
   const [isValidationOpen, setIsValidationOpen] = React.useState(false)
   const [isValidating, setIsValidating] = React.useState(false)
   const [validationResult, setValidationResult] = React.useState(validationResponseSchema.parse({}))
+
+  const apiBaseUrl = React.useMemo(() => getOptionalApiBaseUrl(), [])
 
   const form = useForm<EtpFormValues>({
     resolver: zodResolver(etpSchema) as Resolver<EtpFormValues>,
@@ -329,6 +332,14 @@ function EtpWizardPageContent() {
     ]
   }, [etpId, form])
 
+  const downloadUrl = React.useMemo(() => {
+    if (!etpId) {
+      return undefined
+    }
+    const path = `/etp/${etpId}/pdf`
+    return apiBaseUrl ? `${apiBaseUrl}${path}` : path
+  }, [apiBaseUrl, etpId])
+
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center bg-neutral-50">
@@ -367,6 +378,7 @@ function EtpWizardPageContent() {
             isValidating={isValidating}
             autosaveStatus={autosave.status}
             lastSavedAt={autosave.lastSavedAt}
+            downloadUrl={downloadUrl}
           />
         }
       >

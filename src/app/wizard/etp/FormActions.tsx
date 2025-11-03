@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ShieldCheck, ChevronLeft, ChevronRight, Bot, FileInput, Layers } from "lucide-react"
+import { ShieldCheck, ChevronLeft, ChevronRight, Bot, FileInput, Layers, Download } from "lucide-react"
 
 import { AutosaveBadge } from "@/app/_shared/components/AutosaveBadge"
 import { Button } from "@/components/ui/button"
@@ -26,6 +26,7 @@ interface FormActionsProps {
   importTooltip?: string
   onConsolidate?: () => void
   isConsolidateEnabled?: boolean
+  downloadUrl?: string
 }
 
 export function FormActions({
@@ -45,6 +46,7 @@ export function FormActions({
   importTooltip = "Em breve",
   onConsolidate,
   isConsolidateEnabled = false,
+  downloadUrl,
 }: FormActionsProps) {
   const isFirstStep = currentStep === 1
   const isLastStep = currentStep === totalSteps
@@ -100,6 +102,27 @@ export function FormActions({
             </TooltipTrigger>
             <TooltipContent>Em breve</TooltipContent>
           </Tooltip>
+
+          {downloadUrl ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="inline-flex items-center gap-2"
+              asChild
+            >
+              <a
+                href={downloadUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+                data-testid="download-pdf"
+              >
+                <Download className="h-4 w-4" aria-hidden />
+                Download PDF
+              </a>
+            </Button>
+          ) : null}
 
           <Button type="button" variant="outline" size="sm" disabled className="inline-flex items-center gap-2">
             <Bot className="h-4 w-4" aria-hidden />

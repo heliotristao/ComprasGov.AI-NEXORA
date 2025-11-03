@@ -13,6 +13,7 @@ interface EdocsFieldProps {
   helperText?: string
   error?: string
   required?: boolean
+  testId?: string
 }
 
 export function EdocsField({
@@ -24,6 +25,7 @@ export function EdocsField({
   helperText = "Informe o código oficial do processo no formato AAAA-XXXXXX.",
   error,
   required = true,
+  testId,
 }: EdocsFieldProps) {
   return (
     <EdocsInput
@@ -35,6 +37,7 @@ export function EdocsField({
       helperText={helperText}
       error={error}
       required={required}
+      data-testid={testId}
     />
   )
 }

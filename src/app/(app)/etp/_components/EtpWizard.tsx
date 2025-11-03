@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { Loader2 } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FormProvider, useForm, type Resolver } from "react-hook-form"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
@@ -14,7 +15,9 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Skeleton } from "@/components/ui/skeleton"
 import { useEtp, type EtpDocument } from "@/hooks/useEtp"
 
+import { api } from "@/lib/axios"
 import { buildEdocsUrl, isValidEdocs, normalizeEdocsValue } from "@/lib/edocs"
+import { getOptionalApiBaseUrl } from "@/lib/env"
 
 import { EtpFormStep1 } from "./EtpFormStep1"
 import { EtpFormStep2 } from "./EtpFormStep2"
@@ -144,6 +147,8 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
 
   const initialDocument = React.useMemo(() => buildInitialDocument(etp, initialStep), [etp, initialStep])
 
+  const apiBaseUrl = React.useMemo(() => getOptionalApiBaseUrl(), [])
+
   const {
     data: etpDocument,
     error,
@@ -176,9 +181,47 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(() =>
     documentData.updatedAt ? new Date(documentData.updatedAt) : null
   )
+  const [isCreatingTr, setIsCreatingTr] = React.useState(false)
 
   const autosaveTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
   const skipNextWatchRef = React.useRef(true)
+
+  const pdfDownloadUrl = React.useMemo(() => {
+    const path = `/etp/${etp.id}/pdf`
+    return apiBaseUrl ? `${apiBaseUrl}${path}` : path
+  }, [apiBaseUrl, etp.id])
+
+  const handleCreateTr = React.useCallback(async () => {
+    if (isCreatingTr) {
+      return
+    }
+
+    try {
+      setIsCreatingTr(true)
+      const response = await api.post(`/tr/from-etp/${etp.id}`)
+      const rawData = response.data as any
+      const newTrId = String(
+        rawData?.id ??
+          rawData?.trId ??
+          rawData?.tr_id ??
+          rawData?.tr?.id ??
+          rawData?.data?.id ??
+          ""
+      )
+
+      if (!newTrId) {
+        throw new Error("Resposta inválida ao criar TR a partir do ETP")
+      }
+
+      toast.success("Termo de Referência criado com sucesso.")
+      router.push(`/tr/${newTrId}/wizard`)
+    } catch (error) {
+      console.error("Erro ao criar TR a partir do ETP", error)
+      toast.error("Não foi possível criar o Termo de Referência. Tente novamente.")
+    } finally {
+      setIsCreatingTr(false)
+    }
+  }, [etp.id, isCreatingTr, router])
 
   React.useEffect(() => {
     if (etpDocument?.updatedAt) {
@@ -416,15 +459,42 @@ export function EtpWizard({ etp, initialStep = 1 }: EtpWizardProps) {
             <p className="text-sm text-neutral-500">
               Preencha todas as etapas para concluir o Estudo Técnico Preliminar com rastreabilidade completa.
             </p>
-          </div>
+        </div>
 
           <div className="flex flex-col items-start gap-3 md:items-end">
             <AutosaveBadge status={autosaveStatus} lastSavedAt={lastSavedAt} />
-            <Button variant="outline" asChild>
-              <a href={`/api/etp/${etp.id}/export`} target="_blank" rel="noopener noreferrer">
-                Exportar JSON
-              </a>
-            </Button>
+            <div className="flex flex-wrap gap-2 md:justify-end">
+              <Button variant="outline" asChild>
+                <a href={`/api/etp/${etp.id}/export`} target="_blank" rel="noopener noreferrer">
+                  Exportar JSON
+                </a>
+              </Button>
+              <Button variant="outline" asChild>
+                <a
+                  href={pdfDownloadUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  data-testid="download-pdf"
+                >
+                  Download PDF
+                </a>
+              </Button>
+              <Button
+                type="button"
+                onClick={handleCreateTr}
+                disabled={isCreatingTr}
+                data-testid="criar-tr"
+              >
+                {isCreatingTr ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Criando...
+                  </span>
+                ) : (
+                  "Criar TR"
+                )}
+              </Button>
+            </div>
           </div>
         </header>
 

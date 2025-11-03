@@ -12,6 +12,12 @@ interface DimensionamentoStepProps {
   getContext: () => TrFormValues
 }
 
+const TEST_IDS = {
+  quantidadeProfissionais: "quantidade-profissionais",
+  cargaHoraria: "carga-horaria",
+  criteriosAlocacao: "criterios-alocacao",
+} as const
+
 export function DimensionamentoStep({ trId, getContext }: DimensionamentoStepProps) {
   const {
     control,
@@ -37,6 +43,7 @@ export function DimensionamentoStep({ trId, getContext }: DimensionamentoStepPro
               value={field.value ?? 1}
               onChange={(event) => field.onChange(Number(event.target.value))}
               onBlur={field.onBlur}
+              data-testid={TEST_IDS.quantidadeProfissionais}
             />
             {dimensionamentoErrors?.quantidadeProfissionais ? (
               <p className="text-xs font-medium text-error-600">
@@ -66,6 +73,7 @@ export function DimensionamentoStep({ trId, getContext }: DimensionamentoStepPro
             fieldKey="dimensionamento-carga"
             getContext={() => ({ ...getContext(), step: "dimensionamento" })}
             rows={4}
+            testId={TEST_IDS.cargaHoraria}
           />
         )}
       />
@@ -87,6 +95,7 @@ export function DimensionamentoStep({ trId, getContext }: DimensionamentoStepPro
             fieldKey="dimensionamento-criterios"
             getContext={() => ({ ...getContext(), step: "dimensionamento" })}
             rows={5}
+            testId={TEST_IDS.criteriosAlocacao}
           />
         )}
       />

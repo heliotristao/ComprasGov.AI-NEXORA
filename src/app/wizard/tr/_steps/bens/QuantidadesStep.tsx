@@ -12,6 +12,13 @@ interface QuantidadesStepProps {
   getContext: () => TrFormValues
 }
 
+const TEST_IDS = {
+  quantidadeTotal: "quantidade-total",
+  unidadeMedida: "unidade-medida",
+  justificativaQuantidade: "justificativa-quantidade",
+  cronogramaEntrega: "cronograma-entrega",
+} as const
+
 export function QuantidadesStep({ trId, getContext }: QuantidadesStepProps) {
   const {
     control,
@@ -37,6 +44,7 @@ export function QuantidadesStep({ trId, getContext }: QuantidadesStepProps) {
               value={field.value ?? 1}
               onChange={(event) => field.onChange(Number(event.target.value))}
               onBlur={field.onBlur}
+              data-testid={TEST_IDS.quantidadeTotal}
             />
             {quantidadesErrors?.quantidadeTotal ? (
               <p className="text-xs font-medium text-error-600">
@@ -63,6 +71,7 @@ export function QuantidadesStep({ trId, getContext }: QuantidadesStepProps) {
               value={field.value ?? ""}
               onChange={field.onChange}
               onBlur={field.onBlur}
+              data-testid={TEST_IDS.unidadeMedida}
             />
             {quantidadesErrors?.unidadeMedida ? (
               <p className="text-xs font-medium text-error-600">
@@ -79,20 +88,21 @@ export function QuantidadesStep({ trId, getContext }: QuantidadesStepProps) {
         control={control}
         name={"quantidades.justificativaQuantidade" as const}
         render={({ field, fieldState }) => (
-          <AiField
-            id="quantidades.justificativaQuantidade"
-            label="Justificativa da quantidade"
-            value={field.value ?? ""}
-            onChange={field.onChange}
-            onBlur={field.onBlur}
-            error={fieldState.error?.message}
-            description="Explique o racional utilizado para dimensionar as quantidades."
-            placeholder="Fundamente com histórico de consumo, estimativas ou projeções de demanda."
-            trId={trId}
-            fieldKey="quantidades-justificativa"
-            getContext={() => ({ ...getContext(), step: "quantidades" })}
-            rows={5}
-          />
+            <AiField
+              id="quantidades.justificativaQuantidade"
+              label="Justificativa da quantidade"
+              value={field.value ?? ""}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              error={fieldState.error?.message}
+              description="Explique o racional utilizado para dimensionar as quantidades."
+              placeholder="Fundamente com histórico de consumo, estimativas ou projeções de demanda."
+              trId={trId}
+              fieldKey="quantidades-justificativa"
+              getContext={() => ({ ...getContext(), step: "quantidades" })}
+              rows={5}
+              testId={TEST_IDS.justificativaQuantidade}
+            />
         )}
       />
 
@@ -100,20 +110,21 @@ export function QuantidadesStep({ trId, getContext }: QuantidadesStepProps) {
         control={control}
         name={"quantidades.cronogramaEntrega" as const}
         render={({ field, fieldState }) => (
-          <AiField
-            id="quantidades.cronogramaEntrega"
-            label="Cronograma de entrega"
-            value={field.value ?? ""}
-            onChange={field.onChange}
-            onBlur={field.onBlur}
-            error={fieldState.error?.message}
-            description="Detalhe as etapas de entrega, marcos e prazos desejados."
-            placeholder="Informe previsão de entrega inicial, reposições e ajustes de estoque."
-            trId={trId}
-            fieldKey="quantidades-cronograma"
-            getContext={() => ({ ...getContext(), step: "quantidades" })}
-            rows={5}
-          />
+            <AiField
+              id="quantidades.cronogramaEntrega"
+              label="Cronograma de entrega"
+              value={field.value ?? ""}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              error={fieldState.error?.message}
+              description="Detalhe as etapas de entrega, marcos e prazos desejados."
+              placeholder="Informe previsão de entrega inicial, reposições e ajustes de estoque."
+              trId={trId}
+              fieldKey="quantidades-cronograma"
+              getContext={() => ({ ...getContext(), step: "quantidades" })}
+              rows={5}
+              testId={TEST_IDS.cronogramaEntrega}
+            />
         )}
       />
     </div>

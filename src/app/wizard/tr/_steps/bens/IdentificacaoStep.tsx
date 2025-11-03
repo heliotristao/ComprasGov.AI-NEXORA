@@ -13,6 +13,13 @@ interface IdentificacaoStepProps {
   getContext: () => TrFormValues
 }
 
+const TEST_IDS = {
+  codigoEdocs: "codigo-edocs",
+  objeto: "objeto-contratacao",
+  justificativa: "justificativa-necessidade",
+  setorRequisitante: "setor-requisitante",
+} as const
+
 export function IdentificacaoStep({ trId, getContext }: IdentificacaoStepProps) {
   const {
     control,
@@ -39,6 +46,7 @@ export function IdentificacaoStep({ trId, getContext }: IdentificacaoStepProps) 
             }}
             helperText="Informe o identificador oficial do processo no ComprasGov."
             error={identificacaoErrors?.codigoEdocs?.message as string | undefined}
+            testId={TEST_IDS.codigoEdocs}
           />
         )}
       />
@@ -57,6 +65,7 @@ export function IdentificacaoStep({ trId, getContext }: IdentificacaoStepProps) 
               value={field.value ?? ""}
               onChange={field.onChange}
               onBlur={field.onBlur}
+              data-testid={TEST_IDS.objeto}
             />
             {identificacaoErrors?.objeto ? (
               <p className="text-xs font-medium text-error-600">{identificacaoErrors.objeto.message as string}</p>
@@ -71,20 +80,21 @@ export function IdentificacaoStep({ trId, getContext }: IdentificacaoStepProps) 
         control={control}
         name={"identificacao.justificativa" as const}
         render={({ field, fieldState }) => (
-          <AiField
-            id="identificacao.justificativa"
-            label="Justificativa da necessidade"
-            value={field.value ?? ""}
-            onChange={field.onChange}
-            onBlur={field.onBlur}
-            error={fieldState.error?.message}
-            description="Explique o cenário que demanda a contratação e os benefícios esperados."
-            placeholder="Fundamente a necessidade com dados e alinhamento estratégico."
-            trId={trId}
-            fieldKey="identificacao-justificativa"
-            getContext={() => ({ ...getContext(), step: "identificacao" })}
-            rows={6}
-          />
+            <AiField
+              id="identificacao.justificativa"
+              label="Justificativa da necessidade"
+              value={field.value ?? ""}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              error={fieldState.error?.message}
+              description="Explique o cenário que demanda a contratação e os benefícios esperados."
+              placeholder="Fundamente a necessidade com dados e alinhamento estratégico."
+              trId={trId}
+              fieldKey="identificacao-justificativa"
+              getContext={() => ({ ...getContext(), step: "identificacao" })}
+              rows={6}
+              testId={TEST_IDS.justificativa}
+            />
         )}
       />
 
@@ -102,6 +112,7 @@ export function IdentificacaoStep({ trId, getContext }: IdentificacaoStepProps) 
               value={field.value ?? ""}
               onChange={field.onChange}
               onBlur={field.onBlur}
+              data-testid={TEST_IDS.setorRequisitante}
             />
             {identificacaoErrors?.setorRequisitante ? (
               <p className="text-xs font-medium text-error-600">

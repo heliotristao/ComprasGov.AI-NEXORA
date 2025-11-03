@@ -34,6 +34,7 @@ import {
   type TrTipo,
   type TrValidationResult,
 } from "./tr.zod"
+import { getOptionalApiBaseUrl } from "@/lib/env"
 
 const BENS_STEPS: StepDefinition[] = [
   {
@@ -166,6 +167,8 @@ function TrWizardPageContent() {
   const [isValidationOpen, setIsValidationOpen] = React.useState(false)
   const [isValidating, setIsValidating] = React.useState(false)
   const [validationResult, setValidationResult] = React.useState<TrValidationResult | null>(null)
+
+  const apiBaseUrl = React.useMemo(() => getOptionalApiBaseUrl(), [])
 
   const form = useForm<TrFormValues>({
     resolver: zodResolver(trSchema) as Resolver<TrFormValues>,
@@ -438,6 +441,14 @@ function TrWizardPageContent() {
     ]
   }, [getContext, tipo, trId])
 
+  const downloadUrl = React.useMemo(() => {
+    if (!trId) {
+      return undefined
+    }
+    const path = `/tr/${trId}/pdf`
+    return apiBaseUrl ? `${apiBaseUrl}${path}` : path
+  }, [apiBaseUrl, trId])
+
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center bg-neutral-50">
@@ -479,6 +490,7 @@ function TrWizardPageContent() {
             importTooltip="Em breve"
             isImportEnabled={false}
             isConsolidateEnabled={false}
+            downloadUrl={downloadUrl}
           />
         }
         badgeLabel="Planeja.AI • Termo de Referência"

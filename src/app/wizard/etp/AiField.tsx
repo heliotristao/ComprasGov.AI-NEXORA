@@ -33,6 +33,7 @@ interface AiFieldProps {
   getContext?: () => JsonRecord
   disabled?: boolean
   rows?: number
+  testId?: string
 }
 
 export function AiField({
@@ -49,6 +50,7 @@ export function AiField({
   getContext,
   disabled = false,
   rows = 5,
+  testId,
 }: AiFieldProps) {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [generatedText, setGeneratedText] = React.useState("")
@@ -123,6 +125,7 @@ export function AiField({
         rows={rows}
         className="min-h-[140px]"
         aria-invalid={Boolean(error)}
+        data-testid={testId}
       />
 
       {description ? <p className="text-xs text-neutral-500">{description}</p> : null}

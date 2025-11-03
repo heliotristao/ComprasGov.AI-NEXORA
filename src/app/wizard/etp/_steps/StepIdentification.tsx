@@ -14,6 +14,13 @@ interface StepIdentificationProps {
   getContext: () => EtpFormValues
 }
 
+const TEST_IDS = {
+  requestingUnit: "unidade-requisitante",
+  edocsNumber: "numero-edocs",
+  processTitle: "titulo-processo",
+  summary: "resumo-executivo",
+} as const
+
 export function StepIdentification({ etpId, getContext }: StepIdentificationProps) {
   const {
     register,
@@ -32,6 +39,7 @@ export function StepIdentification({ etpId, getContext }: StepIdentificationProp
           id="identification.requestingUnit"
           placeholder="Ex.: Diretoria de Tecnologia da Informação"
           {...register("identification.requestingUnit")}
+          data-testid={TEST_IDS.requestingUnit}
         />
         {errors.identification?.requestingUnit ? (
           <p className="text-xs font-medium text-error-600">{errors.identification.requestingUnit.message}</p>
@@ -53,6 +61,7 @@ export function StepIdentification({ etpId, getContext }: StepIdentificationProp
               void trigger("identification.edocsNumber")
             }}
             error={fieldState.error?.message}
+            testId={TEST_IDS.edocsNumber}
           />
         )}
       />
@@ -65,6 +74,7 @@ export function StepIdentification({ etpId, getContext }: StepIdentificationProp
           id="identification.processTitle"
           placeholder="Ex.: Aquisição de equipamentos de informática"
           {...register("identification.processTitle")}
+          data-testid={TEST_IDS.processTitle}
         />
         {errors.identification?.processTitle ? (
           <p className="text-xs font-medium text-error-600">{errors.identification.processTitle.message}</p>
@@ -90,6 +100,7 @@ export function StepIdentification({ etpId, getContext }: StepIdentificationProp
             fieldKey="identification-summary"
             getContext={() => ({ ...getContext(), step: "identification" })}
             rows={6}
+            testId={TEST_IDS.summary}
           />
         )}
       />

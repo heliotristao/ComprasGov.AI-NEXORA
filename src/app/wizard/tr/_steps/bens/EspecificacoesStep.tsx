@@ -10,6 +10,12 @@ interface EspecificacoesStepProps {
   getContext: () => TrFormValues
 }
 
+const TEST_IDS = {
+  descricaoTecnica: "descricao-tecnica",
+  requisitosMinimos: "requisitos-minimos",
+  normasReferencia: "normas-referencia",
+} as const
+
 export function EspecificacoesStep({ trId, getContext }: EspecificacoesStepProps) {
   const { control } = useFormContext<TrFormValues>()
 
@@ -32,6 +38,7 @@ export function EspecificacoesStep({ trId, getContext }: EspecificacoesStepProps
             fieldKey="especificacoes-descricao"
             getContext={() => ({ ...getContext(), step: "especificacoes" })}
             rows={6}
+            testId={TEST_IDS.descricaoTecnica}
           />
         )}
       />
@@ -53,6 +60,7 @@ export function EspecificacoesStep({ trId, getContext }: EspecificacoesStepProps
             fieldKey="especificacoes-requisitos"
             getContext={() => ({ ...getContext(), step: "especificacoes" })}
             rows={5}
+            testId={TEST_IDS.requisitosMinimos}
           />
         )}
       />
@@ -74,6 +82,7 @@ export function EspecificacoesStep({ trId, getContext }: EspecificacoesStepProps
             fieldKey="especificacoes-normas"
             getContext={() => ({ ...getContext(), step: "especificacoes" })}
             rows={4}
+            testId={TEST_IDS.normasReferencia}
           />
         )}
       />
