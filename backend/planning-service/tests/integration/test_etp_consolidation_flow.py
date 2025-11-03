@@ -12,7 +12,7 @@ def test_consolidate_etp_propagates_trace_id(
 ):
     # Arrange
     httpx_mock.add_response(
-        url="http://datahub-service:8000/api/v1/artifacts",
+        url__regex=r"http://.*/api/v1/artifacts",
         method="POST",
         json={"id": "artifact-id"},
         status_code=200,
