@@ -17,7 +17,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "types": ["node", "@playwright/test", "jest"]
   },
   "include": [
     "next-env.d.ts",

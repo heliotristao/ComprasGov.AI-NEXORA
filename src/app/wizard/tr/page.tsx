@@ -162,6 +162,7 @@ function TrWizardPageContent() {
   const [currentStep, setCurrentStep] = React.useState<number>(() =>
     clampStep(stepQueryParam, 1, STEP_DEFINITIONS[tipoQueryParam].length),
   )
+  const prevStepRef = React.useRef(currentStep)
   const [completedSteps, setCompletedSteps] = React.useState<Set<number>>(new Set())
   const [errorSteps, setErrorSteps] = React.useState<Set<number>>(new Set())
   const [isValidationOpen, setIsValidationOpen] = React.useState(false)
@@ -181,18 +182,6 @@ function TrWizardPageContent() {
       setTipo(tipoQueryParam)
     }
   }, [tipoQueryParam, tipo])
-
-  React.useEffect(() => {
-    const params = new URLSearchParams(searchParamsString)
-    params.set("tipo", tipo)
-    if (!params.get("id") && trId) {
-      params.set("id", trId)
-    }
-    if (!params.get("step")) {
-      params.set("step", String(currentStep))
-    }
-    router.replace(`?${params.toString()}`, { scroll: false })
-  }, [currentStep, router, searchParamsString, tipo, trId])
 
   const createDraftMutation = useMutation({
     mutationFn: () => createTrDraft({ tipo }),
@@ -283,31 +272,24 @@ function TrWizardPageContent() {
     })
 
     setCurrentStep((prev) => {
-      const derivedStep = stepQueryParam ? clampStep(stepQueryParam, prev, STEP_DEFINITIONS[normalizedTipo].length) : serverStep
-      if (trId && (!stepQueryParam || derivedStep !== prev)) {
-        const params = new URLSearchParams(searchParamsString)
-        params.set("id", trId)
-        params.set("tipo", normalizedTipo)
-        params.set("step", String(derivedStep))
-        router.replace(`?${params.toString()}`, { scroll: false })
-      }
+      const derivedStep = stepQueryParam
+        ? clampStep(stepQueryParam, prev, STEP_DEFINITIONS[normalizedTipo].length)
+        : serverStep
       return derivedStep
     })
-  }, [autosave, form, router, searchParamsString, stepQueryParam, tipo, trId, trQuery.data])
+  }, [autosave, form, searchParamsString, stepQueryParam, tipo, trId, trQuery.data])
 
   React.useEffect(() => {
     form.setValue("tipo", tipo)
   }, [form, tipo])
 
   React.useEffect(() => {
-    if (!stepQueryParam) {
-      return
+    const parsedStep = clampStep(stepQueryParam, 1, STEP_DEFINITIONS[tipo].length)
+    if (parsedStep !== prevStepRef.current) {
+      setCurrentStep(parsedStep)
+      prevStepRef.current = parsedStep
     }
-    const nextStep = clampStep(stepQueryParam, currentStep, STEP_DEFINITIONS[tipo].length)
-    if (nextStep !== currentStep) {
-      setCurrentStep(nextStep)
-    }
-  }, [currentStep, stepQueryParam, tipo])
+  }, [stepQueryParam, tipo])
 
   const stepStates: StepState[] = React.useMemo(() => {
     const totalSteps = STEP_DEFINITIONS[tipo].length
