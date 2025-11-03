@@ -44,7 +44,8 @@ def test_generate_etp_field_success(mock_get_ai_provider, client: TestClient, db
     assert data["confidence"] == 0.9
 
     # Check if the trace was saved in the database
-    trace = db.execute("SELECT * FROM etp_ai_traces").fetchone()
+    from sqlalchemy import text
+    trace = db.execute(text("SELECT * FROM etp_ai_traces")).fetchone()
     assert trace is not None
     assert trace.etp_id == test_etp.id
     assert trace.field == "justificativa"

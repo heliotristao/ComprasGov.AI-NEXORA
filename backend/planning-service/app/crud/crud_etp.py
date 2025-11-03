@@ -77,3 +77,6 @@ class CRUDETP(CRUDBase[ETP, ETPCreate, ETPUpdate]):
         return db_obj
 
 etp = CRUDETP(ETP)
+
+def get_etp(db: Session, id: UUID) -> Optional[ETP]:
+    return etp.get(db, id=id)

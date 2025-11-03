@@ -4,6 +4,13 @@ from functools import wraps
 from fastapi import Request, HTTPException, status
 from typing import Callable, Any, Set, Optional, Dict
 
+def get_current_user() -> Any:
+    """
+    Placeholder used by application and intended to be monkeypatched in tests.
+    Tests must replace this with a fixture that returns a user object.
+    """
+    raise RuntimeError("get_current_user must be configured in application or monkeypatched in tests")
+
 def require_role(required_roles: Set[str]):
     """
     Decorator to enforce role-based access control on a FastAPI endpoint.
