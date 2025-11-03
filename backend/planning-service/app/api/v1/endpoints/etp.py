@@ -113,6 +113,22 @@ def delete_etp(
     crud_etp.etp.remove(db=db, id=id)
 
 
+from app.utils.pdf_utils import generate_pdf_response
+
+@router.get("/{id}/pdf", response_model=None)
+def download_etp_pdf(
+    id: uuid.UUID,
+    db: Session = Depends(get_db),
+) -> Any:
+    """
+    Generate and download ETP as PDF.
+    """
+    etp = crud_etp.etp.get(db=db, id=id)
+    if not etp:
+        raise HTTPException(status_code=404, detail="ETP not found")
+    return generate_pdf_response(doc_id=id, doc_type="etp", db=db)
+
+
 @router.get("/{id}/validar", response_model=List[dict])
 def validate_etp(
     id: uuid.UUID,
