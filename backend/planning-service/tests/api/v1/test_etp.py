@@ -4,12 +4,24 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from app.db.models.etp import ETP
+from app.db.models.user import User
 from app.schemas.etp import ETPCreate, ETPStatus
+
+def create_test_user(db: Session) -> User:
+    user = User(
+        id=uuid.uuid4(),
+        email="test@example.com",
+        hashed_password="testpassword",
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
 
 def create_test_etp(db: Session) -> ETP:
     etp_in = ETPCreate(title="Test ETP for Patching")
-    user_id = uuid.uuid4()
-    etp = ETP(**etp_in.dict(), created_by_id=user_id)
+    user = create_test_user(db)
+    etp = ETP(**etp_in.dict(), created_by=user)
     etp.version = 1
     db.add(etp)
     db.commit()
@@ -59,12 +71,11 @@ def test_validate_etp_valid(client: TestClient, db: Session) -> None:
             "estimativa_valor": 1000,
             "descricao_solucao": "Required solution description",
             "justificativa_parcelamento": "Some justification",
-            "responsavel_id": str(uuid.uuid4())
         }
     }
     etp_in = ETPCreate(**etp_data)
-    user_id = uuid.uuid4()
-    etp = ETP(**etp_in.dict(), created_by_id=user_id)
+    user = create_test_user(db)
+    etp = ETP(**etp_in.dict(), created_by=user)
     db.add(etp)
     db.commit()
     db.refresh(etp)
@@ -86,8 +97,8 @@ def test_validate_etp_with_warnings(client: TestClient, db: Session) -> None:
         }
     }
     etp_in = ETPCreate(**etp_data)
-    user_id = uuid.uuid4()
-    etp = ETP(**etp_in.dict(), created_by_id=user_id)
+    user = create_test_user(db)
+    etp = ETP(**etp_in.dict(), created_by=user)
     db.add(etp)
     db.commit()
     db.refresh(etp)
@@ -111,8 +122,8 @@ def test_validate_etp_with_blockers(client: TestClient, db: Session) -> None:
         }
     }
     etp_in = ETPCreate(**etp_data)
-    user_id = uuid.uuid4()
-    etp = ETP(**etp_in.dict(), created_by_id=user_id)
+    user = create_test_user(db)
+    etp = ETP(**etp_in.dict(), created_by=user)
     db.add(etp)
     db.commit()
     db.refresh(etp)
