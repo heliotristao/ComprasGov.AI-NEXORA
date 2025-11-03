@@ -2,7 +2,7 @@
 Endpoints da API para Termo de Referência (TR)
 """
 
-from typing import List, Optional
+from typing import List, Optional, Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -17,8 +17,11 @@ from app.schemas.etp_schemas import (
 from app.db.models.termo_referencia import DocumentoTR
 from app.db.models.templates_gestao import ModeloInstitucional
 # from app.services.etp_ai_service import ETPAIService
+import uuid
+from app.api.v1.dependencies import get_current_user
+from app.db.models.tr import TRType
 from app.services.document_generator import DocumentGenerator
-# from app.services.etp_to_tr_transformer import ETPToTRTransformer
+from app.services.etp_to_tr_transformer import build_tr_from_etp
 
 router = APIRouter()
 
@@ -27,42 +30,26 @@ router = APIRouter()
 # CRIAR TR A PARTIR DE ETP
 # ============================================================================
 
-@router.post("/tr/criar-de-etp/{etp_id}")
-async def criar_tr_de_etp(
-    etp_id: int,
-    template_tr_id: int,
-    user_id: int = 1,  # TODO: Obter do token JWT
-    db: Session = Depends(get_db)
+@router.post("/from-etp/{etp_id}", status_code=status.HTTP_201_CREATED)
+def create_tr_from_etp(
+    etp_id: uuid.UUID,
+    tipo: TRType,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """
-    Cria TR automaticamente a partir de ETP aprovado
-    
-    - Herda dados do ETP
-    - Transforma conteúdo automaticamente
-    - Retorna TR pronto para edição
+    Cria um novo Termo de Referência (TR) a partir de um Estudo Técnico Preliminar (ETP).
     """
-    # transformer = ETPToTRTransformer(db)
-    
+    user_id = current_user.get("sub")
     try:
-        tr = await {}.criar_tr_de_etp(
-            etp_id=etp_id,
-            template_tr_id=template_tr_id,
-            user_id=user_id
-        )
-        
-        return {
-            "id": tr.id,
-            "etp_id": tr.etp_id,
-            "plan_id": tr.plan_id,
-            "status": tr.status,
-            "template_id": tr.template_id,
-            "created_at": tr.created_at,
-            "message": "TR criado com sucesso a partir do ETP"
-        }
-    except ValueError as e:
+        tr = build_tr_from_etp(db=db, etp_id=etp_id, tipo=tipo, user_id=user_id)
+        return {"id": tr.id}
+    except HTTPException as e:
+        raise e
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail=str(e),
         )
 
 
@@ -419,6 +406,22 @@ async def atualizar_tr(
 # ============================================================================
 # EXCLUIR TR
 # ============================================================================
+
+from app.utils.pdf_utils import generate_pdf_response
+
+@router.get("/{id}/pdf", response_model=None)
+def download_tr_pdf(
+    id: uuid.UUID,
+    db: Session = Depends(get_db),
+) -> Any:
+    """
+    Generate and download TR as PDF.
+    """
+    tr = crud_tr.tr.get(db=db, id=id)
+    if not tr:
+        raise HTTPException(status_code=404, detail="TR not found")
+    return generate_pdf_response(doc_id=id, doc_type="tr", db=db)
+
 
 @router.delete("/tr/{documento_id}")
 async def excluir_tr(
