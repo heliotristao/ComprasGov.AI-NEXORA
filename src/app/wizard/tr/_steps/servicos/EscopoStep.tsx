@@ -10,6 +10,12 @@ interface EscopoStepProps {
   getContext: () => TrFormValues
 }
 
+const TEST_IDS = {
+  descricaoServico: "descricao-servico",
+  objetivos: "objetivos-estrategicos",
+  requisitosTecnicos: "requisitos-tecnicos",
+} as const
+
 export function EscopoStep({ trId, getContext }: EscopoStepProps) {
   const { control } = useFormContext<TrFormValues>()
 
@@ -32,6 +38,7 @@ export function EscopoStep({ trId, getContext }: EscopoStepProps) {
             fieldKey="escopo-descricao"
             getContext={() => ({ ...getContext(), step: "escopo" })}
             rows={6}
+            testId={TEST_IDS.descricaoServico}
           />
         )}
       />
@@ -53,6 +60,7 @@ export function EscopoStep({ trId, getContext }: EscopoStepProps) {
             fieldKey="escopo-objetivos"
             getContext={() => ({ ...getContext(), step: "escopo" })}
             rows={5}
+            testId={TEST_IDS.objetivos}
           />
         )}
       />
@@ -74,6 +82,7 @@ export function EscopoStep({ trId, getContext }: EscopoStepProps) {
             fieldKey="escopo-requisitos"
             getContext={() => ({ ...getContext(), step: "escopo" })}
             rows={5}
+            testId={TEST_IDS.requisitosTecnicos}
           />
         )}
       />

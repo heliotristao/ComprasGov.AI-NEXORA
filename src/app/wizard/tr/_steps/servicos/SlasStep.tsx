@@ -10,6 +10,12 @@ interface SlasStepProps {
   getContext: () => TrFormValues
 }
 
+const TEST_IDS = {
+  niveisServico: "slas-niveis-servico",
+  indicadoresDesempenho: "indicadores-desempenho",
+  penalidades: "penalidades-aplicaveis",
+} as const
+
 export function SlasStep({ trId, getContext }: SlasStepProps) {
   const { control } = useFormContext<TrFormValues>()
 
@@ -32,6 +38,7 @@ export function SlasStep({ trId, getContext }: SlasStepProps) {
             fieldKey="slas-niveis"
             getContext={() => ({ ...getContext(), step: "slas" })}
             rows={5}
+            testId={TEST_IDS.niveisServico}
           />
         )}
       />
@@ -53,6 +60,7 @@ export function SlasStep({ trId, getContext }: SlasStepProps) {
             fieldKey="slas-indicadores"
             getContext={() => ({ ...getContext(), step: "slas" })}
             rows={5}
+            testId={TEST_IDS.indicadoresDesempenho}
           />
         )}
       />
@@ -74,6 +82,7 @@ export function SlasStep({ trId, getContext }: SlasStepProps) {
             fieldKey="slas-penalidades"
             getContext={() => ({ ...getContext(), step: "slas" })}
             rows={5}
+            testId={TEST_IDS.penalidades}
           />
         )}
       />

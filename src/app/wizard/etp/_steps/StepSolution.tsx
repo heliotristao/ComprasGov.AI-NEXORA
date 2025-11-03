@@ -10,6 +10,12 @@ interface StepSolutionProps {
   getContext: () => EtpFormValues
 }
 
+const TEST_IDS = {
+  evaluatedAlternatives: "alternativas-avaliadas",
+  recommendedSolution: "solucao-recomendada",
+  expectedBenefits: "beneficios-esperados",
+} as const
+
 export function StepSolution({ etpId, getContext }: StepSolutionProps) {
   const { control } = useFormContext<EtpFormValues>()
 
@@ -32,6 +38,7 @@ export function StepSolution({ etpId, getContext }: StepSolutionProps) {
             fieldKey="solution-alternatives"
             getContext={() => ({ ...getContext(), step: "solution" })}
             rows={6}
+            testId={TEST_IDS.evaluatedAlternatives}
           />
         )}
       />
@@ -53,6 +60,7 @@ export function StepSolution({ etpId, getContext }: StepSolutionProps) {
             fieldKey="solution-recommended"
             getContext={() => ({ ...getContext(), step: "solution" })}
             rows={5}
+            testId={TEST_IDS.recommendedSolution}
           />
         )}
       />
@@ -74,6 +82,7 @@ export function StepSolution({ etpId, getContext }: StepSolutionProps) {
             fieldKey="solution-benefits"
             getContext={() => ({ ...getContext(), step: "solution" })}
             rows={5}
+            testId={TEST_IDS.expectedBenefits}
           />
         )}
       />

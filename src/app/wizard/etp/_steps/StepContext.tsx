@@ -10,6 +10,12 @@ interface StepContextProps {
   getContext: () => EtpFormValues
 }
 
+const TEST_IDS = {
+  problemDescription: "problema-necessidade",
+  objectives: "objetivos-projeto",
+  legalBasis: "fundamentacao-legal",
+} as const
+
 export function StepContext({ etpId, getContext }: StepContextProps) {
   const { control } = useFormContext<EtpFormValues>()
 
@@ -32,6 +38,7 @@ export function StepContext({ etpId, getContext }: StepContextProps) {
             fieldKey="context-problem"
             getContext={() => ({ ...getContext(), step: "context" })}
             rows={6}
+            testId={TEST_IDS.problemDescription}
           />
         )}
       />
@@ -53,6 +60,7 @@ export function StepContext({ etpId, getContext }: StepContextProps) {
             fieldKey="context-objectives"
             getContext={() => ({ ...getContext(), step: "context" })}
             rows={5}
+            testId={TEST_IDS.objectives}
           />
         )}
       />
@@ -74,6 +82,7 @@ export function StepContext({ etpId, getContext }: StepContextProps) {
             fieldKey="context-legal"
             getContext={() => ({ ...getContext(), step: "context" })}
             rows={5}
+            testId={TEST_IDS.legalBasis}
           />
         )}
       />

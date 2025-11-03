@@ -13,6 +13,13 @@ interface StepViabilityProps {
   getContext: () => EtpFormValues
 }
 
+const TEST_IDS = {
+  marketAnalysis: "analise-mercado",
+  estimatedBudget: "estimativa-investimento",
+  executionSchedule: "cronograma-previsto",
+  risks: "riscos-mitigacao",
+} as const
+
 export function StepViability({ etpId, getContext }: StepViabilityProps) {
   const {
     register,
@@ -39,6 +46,7 @@ export function StepViability({ etpId, getContext }: StepViabilityProps) {
             fieldKey="viability-market"
             getContext={() => ({ ...getContext(), step: "viability" })}
             rows={6}
+            testId={TEST_IDS.marketAnalysis}
           />
         )}
       />
@@ -55,6 +63,7 @@ export function StepViability({ etpId, getContext }: StepViabilityProps) {
           placeholder="0,00"
           inputMode="decimal"
           {...register("viability.estimatedBudget", { valueAsNumber: true })}
+          data-testid={TEST_IDS.estimatedBudget}
         />
         {errors.viability?.estimatedBudget ? (
           <p className="text-xs font-medium text-error-600">{errors.viability.estimatedBudget.message}</p>
@@ -80,6 +89,7 @@ export function StepViability({ etpId, getContext }: StepViabilityProps) {
             fieldKey="viability-schedule"
             getContext={() => ({ ...getContext(), step: "viability" })}
             rows={5}
+            testId={TEST_IDS.executionSchedule}
           />
         )}
       />
@@ -101,6 +111,7 @@ export function StepViability({ etpId, getContext }: StepViabilityProps) {
             fieldKey="viability-risks"
             getContext={() => ({ ...getContext(), step: "viability" })}
             rows={5}
+            testId={TEST_IDS.risks}
           />
         )}
       />

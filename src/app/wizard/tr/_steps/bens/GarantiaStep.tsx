@@ -10,6 +10,12 @@ interface GarantiaStepProps {
   getContext: () => TrFormValues
 }
 
+const TEST_IDS = {
+  tipoGarantia: "tipo-garantia",
+  prazoGarantia: "prazo-garantia",
+  assistenciaTecnica: "assistencia-tecnica",
+} as const
+
 export function GarantiaStep({ trId, getContext }: GarantiaStepProps) {
   const { control } = useFormContext<TrFormValues>()
 
@@ -32,6 +38,7 @@ export function GarantiaStep({ trId, getContext }: GarantiaStepProps) {
             fieldKey="garantia-tipo"
             getContext={() => ({ ...getContext(), step: "garantia" })}
             rows={4}
+            testId={TEST_IDS.tipoGarantia}
           />
         )}
       />
@@ -53,6 +60,7 @@ export function GarantiaStep({ trId, getContext }: GarantiaStepProps) {
             fieldKey="garantia-prazo"
             getContext={() => ({ ...getContext(), step: "garantia" })}
             rows={4}
+            testId={TEST_IDS.prazoGarantia}
           />
         )}
       />
@@ -74,6 +82,7 @@ export function GarantiaStep({ trId, getContext }: GarantiaStepProps) {
             fieldKey="garantia-assistencia"
             getContext={() => ({ ...getContext(), step: "garantia" })}
             rows={5}
+            testId={TEST_IDS.assistenciaTecnica}
           />
         )}
       />
