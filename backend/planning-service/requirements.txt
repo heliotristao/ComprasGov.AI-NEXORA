@@ -2,8 +2,9 @@
 fastapi==0.110.0
 uvicorn[standard]==0.29.0
 python-dotenv==1.0.1
-pydantic==2.7.4
+pydantic[email]==2.7.4
 pydantic-settings==2.3.4
+email-validator==2.1.0
 
 # Database
 sqlalchemy==2.0.29
@@ -48,3 +49,9 @@ redis==5.0.4
 
 # Business Rules
 business-rules==1.1.1
+
+# Monitoring
+prometheus-client==0.20.0
+
+# Testing
+pytest-httpx==0.25.0
