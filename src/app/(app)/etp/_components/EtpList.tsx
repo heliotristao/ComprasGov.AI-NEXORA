@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Plus, Search } from "lucide-react"
+import { MoreHorizontal, Plus, Search, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -10,6 +10,14 @@ import { toast } from "sonner"
 
 import { DataTable, type DataTableColumn } from "@/components/data-display/data-table"
 import { StatusBadge, type StatusVariant } from "@/components/data-display/status-badge"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -206,6 +214,7 @@ export function EtpList() {
   const [searchTerm, setSearchTerm] = React.useState("")
   const [debouncedSearch, setDebouncedSearch] = React.useState("")
   const [isModalOpen, setIsModalOpen] = React.useState(false)
+  const [isCreatingTr, setIsCreatingTr] = React.useState<Record<string, boolean>>({})
 
   React.useEffect(() => {
     const handler = setTimeout(() => {
@@ -256,6 +265,26 @@ export function EtpList() {
   React.useEffect(() => {
     void fetchEtps()
   }, [fetchEtps])
+
+  const handleCreateTr = React.useCallback(
+    async (etpId: string) => {
+      setIsCreatingTr((prev) => ({ ...prev, [etpId]: true }))
+      try {
+        const response = await api.post(`/api/v1/tr/criar-de-etp/${etpId}`)
+        const newTrId = response.data?.id
+        if (!newTrId) {
+          throw new Error("ID do TR não encontrado na resposta da API.")
+        }
+        toast.success("TR criado com sucesso! Redirecionando para o wizard...")
+        router.push(`/tr/${newTrId}/wizard`)
+      } catch (error) {
+        console.error("Falha ao criar TR a partir do ETP:", error)
+        toast.error("Falha ao criar TR a partir do ETP. Tente novamente.")
+        setIsCreatingTr((prev) => ({ ...prev, [etpId]: false }))
+      }
+    },
+    [router],
+  )
 
   const columns = React.useMemo<DataTableColumn<EtpListItem>[]>(
     () => [
@@ -314,16 +343,35 @@ export function EtpList() {
       {
         id: "actions",
         label: "",
-        accessor: (row) => (
-          <Button size="sm" variant="outline" onClick={() => router.push(`/etp/${row.id}`)}>
-            Abrir
-          </Button>
-        ),
+        accessor: (row) => {
+          const isLoading = isCreatingTr[row.id]
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Abrir menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push(`/etp/${row.id}`)}>
+                  Abrir ETP
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleCreateTr(row.id)} disabled={isLoading}>
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Criar TR
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )
+        },
         width: "w-[120px] text-right",
         align: "right",
       },
     ],
-    [router]
+    [router, handleCreateTr, isCreatingTr],
   )
 
   return (
