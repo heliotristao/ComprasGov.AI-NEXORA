@@ -21,6 +21,7 @@ A API de ETPs fornece endpoints para gerenciar o ciclo de vida dos Estudos Técn
 | `/api/v1/etp/{id}/validar` | `GET` | Executa a validação de conformidade de um ETP. |
 | `/api/v1/etp/{id}` | `PUT` | Atualiza um ETP existente. |
 | `/api/v1/etp/{id}` | `DELETE` | Realiza o soft delete de um ETP. |
+| `/api/v1/tr/criar-de-etp/{etp_id}` | `POST` | Cria um novo Termo de Referência (TR) a partir de um ETP. |
 
 ### Endpoints de IA
 

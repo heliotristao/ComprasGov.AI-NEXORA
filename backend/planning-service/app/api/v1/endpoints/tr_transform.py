@@ -26,3 +26,24 @@ def create_tr_from_etp(
         raise HTTPException(status_code=403, detail="Could not validate credentials")
     tr = build_tr_from_etp(db=db, etp_id=etp_id, tipo=tipo, user_id=user_id)
     return tr
+
+
+@router.post("/tr/criar-de-etp/{etp_id}", response_model=Dict[str, uuid.UUID], status_code=201)
+def criar_tr_de_etp(
+    etp_id: uuid.UUID,
+    db: Session = Depends(deps.get_db),
+    current_user: Dict[str, Any] = Depends(deps.get_current_user),
+):
+    """
+    Cria um novo Termo de Referência (TR) a partir de um Estudo Técnico Preliminar (ETP).
+    """
+    user_id = current_user.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=403, detail="Could not validate credentials")
+
+    # Por padrão, o tipo de TR criado a partir de um ETP será 'BEM'
+    # TODO: Permitir que o tipo seja especificado na requisição
+    tipo_tr = TRType.BEM
+
+    tr = build_tr_from_etp(db=db, etp_id=etp_id, tipo=tipo_tr, user_id=user_id)
+    return {"id": tr.id}
