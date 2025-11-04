@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-03] - Tarefa C5 (Correção):** Implementada a interface de usuário para iniciar a criação de um TR a partir de um ETP.
 * **[2025-11-03] - Tarefa C4 (Correção):** Implementado o endpoint de backend para criar um Termo de Referência (TR) a partir de um ETP.
 * **[2025-11-02] - Tarefa B5:** Implementada a funcionalidade de aceite para sugestões de IA, com histórico de edições e rastreabilidade.
 * **[2025-11-02] - Tarefa B4:** Implementada a funcionalidade de geração de conteúdo por IA para campos do ETP no `planning-service`, incluindo rastreabilidade de cada execução e suporte a múltiplos provedores.
