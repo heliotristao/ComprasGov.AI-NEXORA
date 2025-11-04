@@ -5,16 +5,17 @@ from fastapi import HTTPException
 from app.crud import crud_etp, crud_tr
 from app.core.mapping.etp_tr_matrix import BEM_ETP_TO_TR_MATRIX, SERVICO_ETP_TO_TR_MATRIX
 from app.core.normalizers.text import normalize_text
+from app.db.models.etp import ETPStatus
 from app.db.models.tr import TR, TRType
 from app.schemas.tr import TRCreate
 
 
 def build_tr_from_etp(db: Session, *, etp_id: uuid.UUID, tipo: TRType, user_id: str) -> TR:
-    etp = crud_etp.get_etp(db, etp_id=etp_id)
+    etp = crud_etp.get_etp(db, id=etp_id)
     if not etp:
         raise HTTPException(status_code=404, detail="ETP not found")
 
-    if etp.status != "published":
+    if etp.status != ETPStatus.published:
         raise HTTPException(status_code=400, detail="ETP must be published before transforming to TR")
 
     matrix = BEM_ETP_TO_TR_MATRIX if tipo == TRType.BEM else SERVICO_ETP_TO_TR_MATRIX
