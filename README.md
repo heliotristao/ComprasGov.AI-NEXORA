@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-05] - Tarefa F1-E0-MT10:** Padronizado o gerenciamento de variáveis de ambiente com templates `.env.example` e documentação operacional.
 * **[2025-11-03] - Tarefa C5 (Correção):** Implementada a interface de usuário para iniciar a criação de um TR a partir de um ETP.
 * **[2025-11-03] - Tarefa C4 (Correção):** Implementado o endpoint de backend para criar um Termo de Referência (TR) a partir de um ETP.
 * **[2025-11-02] - Tarefa B5:** Implementada a funcionalidade de aceite para sugestões de IA, com histórico de edições e rastreabilidade.
