@@ -102,6 +102,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-07] - Tarefa F2-E1-MT_DevOps_Fix_SQLAlchemy_Mapper:** Centralizada a importação dos modelos do `planning-service`, eliminando o erro de mapeamento do SQLAlchemy que não localizava o modelo `ETP` no deploy.
 * **[2025-11-06] - Tarefa F1-E0-MT11:** Implementada a geração automatizada do cliente TypeScript via OpenAPI e distribuída em pacote compartilhado.
 * **[2025-11-05] - Tarefa F1-E0-MT10:** Padronizado o gerenciamento de variáveis de ambiente com templates `.env.example` e documentação operacional.
 * **[2025-11-03] - Tarefa C5 (Correção):** Implementada a interface de usuário para iniciar a criação de um TR a partir de um ETP.
