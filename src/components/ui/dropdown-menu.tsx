@@ -49,12 +49,15 @@ const DropdownMenuContent = ({
 const DropdownMenuItem = ({
   className,
   inset,
+  disabled,
   ...props
 }: React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitiveItem> & {
   inset?: boolean
+  disabled?: boolean
 }) => (
   <DropdownMenuPrimitiveItem
     {...props}
+    disabled={disabled}
     className={cn(
       "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-slate-100 hover:text-slate-900 focus:bg-slate-100 focus:text-slate-900 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       inset && "pl-8",
