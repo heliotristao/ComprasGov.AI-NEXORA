@@ -25,6 +25,14 @@ Ao importar o blueprint da Render, o campo de repositório não é preenchido au
 
 > Caso esteja usando um fork, confirme que a URL informada corresponde ao fork desejado antes de concluir a importação.
 
+### ✅ Pós-importação: padronize a variável `DATABASE_URL`
+Para evitar o erro `ValueError: DATABASE_URL environment variable not set` durante o deploy do backend na Render, execute a atualização manual abaixo assim que o serviço for criado ou importado:
+
+1. Acesse o serviço **`comprasgov-ai-backend`** no painel da Render.
+2. Abra a aba **Environment**.
+3. Renomeie o secret `POSTGRES_URL` existente para **`DATABASE_URL`** (mantendo o mesmo valor).
+4. Salve as alterações para que o próximo deploy utilize o nome padronizado.
+
 ## 5. Documentação do Sistema ETP e TR
 
 ### **📋 Relatórios Completos**
@@ -102,6 +110,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-07] - Tarefa F2-E1-MT_DevOps_Fix_Env_Var_Consistency:** Padronizado o uso da variável `DATABASE_URL` nas configurações e documentação de deploy, eliminando a divergência com o ambiente da Render.
 * **[2025-11-07] - Tarefa F2-E1-MT_DevOps_Fix_SQLAlchemy_Mapper:** Centralizada a importação dos modelos do `planning-service`, eliminando o erro de mapeamento do SQLAlchemy que não localizava o modelo `ETP` no deploy.
 * **[2025-11-06] - Tarefa F1-E0-MT11:** Implementada a geração automatizada do cliente TypeScript via OpenAPI e distribuída em pacote compartilhado.
 * **[2025-11-05] - Tarefa F1-E0-MT10:** Padronizado o gerenciamento de variáveis de ambiente com templates `.env.example` e documentação operacional.
