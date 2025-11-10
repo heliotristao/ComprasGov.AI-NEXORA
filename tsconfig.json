@@ -16,7 +16,8 @@
     "plugins": [{ "name": "next" }],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@comprasgov/api-client": ["./packages/api-client/src"]
     },
     "types": ["node", "@playwright/test", "jest"]
   },
