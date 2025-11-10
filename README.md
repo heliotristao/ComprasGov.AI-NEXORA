@@ -110,6 +110,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-08] - Tarefa F2-E2-MT3_NLP_ClauseExtractor:** Implementado o serviço de extração automática de cláusulas contratuais com spaCy e PyMuPDF, incluindo endpoint para upload de contratos e persistência das cláusulas classificadas.
 * **[2025-11-07] - Tarefa F2-E1-MT_DevOps_Fix_Env_Var_Consistency:** Padronizado o uso da variável `DATABASE_URL` nas configurações e documentação de deploy, eliminando a divergência com o ambiente da Render.
 * **[2025-11-07] - Tarefa F2-E1-MT_DevOps_Fix_SQLAlchemy_Mapper:** Centralizada a importação dos modelos do `planning-service`, eliminando o erro de mapeamento do SQLAlchemy que não localizava o modelo `ETP` no deploy.
 * **[2025-11-06] - Tarefa F1-E0-MT11:** Implementada a geração automatizada do cliente TypeScript via OpenAPI e distribuída em pacote compartilhado.
