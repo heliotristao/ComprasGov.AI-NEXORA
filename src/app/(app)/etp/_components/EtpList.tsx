@@ -359,7 +359,18 @@ export function EtpList() {
                 <DropdownMenuItem onClick={() => router.push(`/etp/${row.id}`)}>
                   Abrir ETP
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleCreateTr(row.id)} disabled={isLoading}>
+                <DropdownMenuItem
+                  onSelect={(event) => {
+                    if (isLoading) {
+                      event.preventDefault()
+                      return
+                    }
+                    void handleCreateTr(row.id)
+                  }}
+                  data-disabled={isLoading}
+                  aria-disabled={isLoading}
+                  className={cn(isLoading && "cursor-not-allowed")}
+                >
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Criar TR
                 </DropdownMenuItem>
