@@ -5,3 +5,6 @@
 - Gerenciamento de Ambiente via .env
 ### Qualidade de Código
 - Geração de Cliente de API via OpenAPI
+
+### Mensageria
+- Apache Kafka

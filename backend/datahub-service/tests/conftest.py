@@ -1,4 +1,5 @@
 import pytest
+import sys
 from unittest.mock import patch, MagicMock
 
 # --- Pre-emptive Mocking for Import-Time Side Effects ---
@@ -8,14 +9,19 @@ from unittest.mock import patch, MagicMock
 # clients *before* any application modules are imported.
 
 mock_collection_instance = MagicMock()
+mock_magic_module = MagicMock()
+mock_magic_module.Magic.return_value = MagicMock()
+sys.modules.setdefault("magic", mock_magic_module)
 patcher_milvus_check = patch("app.db.milvus.check_and_create_collection", return_value=None)
 patcher_milvus_collection = patch("pymilvus.orm.collection.Collection", return_value=mock_collection_instance)
+patcher_milvus_collection_root = patch("pymilvus.Collection", return_value=mock_collection_instance)
 
 mock_s3_client = MagicMock()
 patcher_boto3 = patch("boto3.client", return_value=mock_s3_client)
 
 patcher_milvus_check.start()
 patcher_milvus_collection.start()
+patcher_milvus_collection_root.start()
 patcher_boto3.start()
 
 
@@ -31,6 +37,7 @@ from app.db.base import Base
 def pytest_unconfigure(config):
     patcher_milvus_check.stop()
     patcher_milvus_collection.stop()
+    patcher_milvus_collection_root.stop()
     patcher_boto3.stop()
 
 # --- Fixtures ---

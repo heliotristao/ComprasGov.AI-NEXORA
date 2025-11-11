@@ -9,6 +9,7 @@ alembic
 boto3
 celery
 redis
+aiokafka
 langchain-milvus
 python-magic
 passlib[bcrypt]

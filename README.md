@@ -13,6 +13,9 @@ Plataforma SaaS B2G que utiliza IA para revolucionar o ciclo de contratações p
 * **Infraestrutura:** Terraform, Kubernetes (EKS), Docker
 * **CI/CD:** GitHub Actions
 
+### Eventos de Mensageria (Kafka)
+* `planejamento.tr.criado` — publicado pelo Planeja.AI sempre que um TR é consolidado a partir de um ETP. Consumido pelo DataHub (Núcleo) para sincronizar snapshots e disponibilizar dados atualizados aos módulos de fiscalização.
+
 ## 3. Diretrizes de Desenvolvimento
 * **Backend e Infraestrutura:** Consulte JULES.MD.
 * **Frontend:** Consulte CODEX.MD.
@@ -110,6 +113,7 @@ curl http://localhost:8000/api/v1/tr/1
 ---
 
 ## 6. Histórico Técnico de Alterações
+* **[2025-11-08] - Tarefa FX-E2-MT2_Data:** Implementada sincronização de dados entre Planeja.AI e DataHub via Apache Kafka, com publicação de eventos de criação de TR, consumo idempotente e testes automatizados.
 * **[2025-11-07] - Tarefa F2-E1-MT_DevOps_Fix_Env_Var_Consistency:** Padronizado o uso da variável `DATABASE_URL` nas configurações e documentação de deploy, eliminando a divergência com o ambiente da Render.
 * **[2025-11-07] - Tarefa F2-E1-MT_DevOps_Fix_SQLAlchemy_Mapper:** Centralizada a importação dos modelos do `planning-service`, eliminando o erro de mapeamento do SQLAlchemy que não localizava o modelo `ETP` no deploy.
 * **[2025-11-06] - Tarefa F1-E0-MT11:** Implementada a geração automatizada do cliente TypeScript via OpenAPI e distribuída em pacote compartilhado.

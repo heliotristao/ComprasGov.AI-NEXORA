@@ -4,9 +4,18 @@ from app.api.v1.endpoints import artifacts, search
 from nexora_auth.middlewares import TraceMiddleware, TrustedHeaderMiddleware
 from app.core.logging_config import setup_logging
 from app.db.milvus import get_milvus_connection, close_milvus_connection
+from app.core.kafka import configure_consumer, get_consumer_manager
+from app.consumers.tr_sync_consumer import tr_sync_consumer
+from app.schemas.events import PLANEJAMENTO_TR_CRIADO_TOPIC
 
 # Setup structured logging
 setup_logging()
+
+configure_consumer(
+    topics=[PLANEJAMENTO_TR_CRIADO_TOPIC],
+    handler=tr_sync_consumer.handle,
+    group_id="datahub-tr-sync",
+)
 
 # --- OpenAPI Security Scheme Definition ---
 security_schemes = {
@@ -43,9 +52,16 @@ app.openapi = custom_openapi
 @app.on_event("startup")
 async def startup_event():
     get_milvus_connection()
+    manager = get_consumer_manager()
+    if manager:
+        await manager.start()
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
+    manager = get_consumer_manager()
+    if manager:
+        await manager.stop()
     close_milvus_connection()
 
 # --- Middlewares ---

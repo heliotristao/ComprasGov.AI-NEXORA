@@ -8,6 +8,7 @@ from app.api.v1.endpoints import (
 )
 from nexora_auth.middlewares import TraceMiddleware, TrustedHeaderMiddleware
 from app.core.logging_config import setup_logging
+from app.core.kafka import kafka_manager
 
 # Setup structured logging
 setup_logging()
@@ -60,6 +61,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+async def startup_event() -> None:
+    await kafka_manager.start()
+
+
+@app.on_event("shutdown")
+async def shutdown_event() -> None:
+    await kafka_manager.stop()
 
 # --- API Routers ---
 app.include_router(health.router, prefix="/api/v1", tags=["Health"])

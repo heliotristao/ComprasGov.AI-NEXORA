@@ -46,6 +46,7 @@ python-json-logger==2.0.7
 apscheduler==3.10.4
 celery==5.4.0
 redis==5.0.4
+aiokafka==0.10.0
 
 # Business Rules
 business-rules==1.1.1

@@ -6,13 +6,14 @@ from app import schemas
 from app.api import deps
 from app.db.models.tr import TRType
 from app.services.etp_to_tr_transformer import build_tr_from_etp
+from app.services.event_publisher import publish_tr_created
 from typing import Dict, Any
 
 router = APIRouter()
 
 
 @router.post("/from-etp/{etp_id}", response_model=schemas.tr.TR)
-def create_tr_from_etp(
+async def create_tr_from_etp(
     etp_id: uuid.UUID,
     tipo: TRType,
     db: Session = Depends(deps.get_db),
@@ -25,11 +26,12 @@ def create_tr_from_etp(
     if not user_id:
         raise HTTPException(status_code=403, detail="Could not validate credentials")
     tr = build_tr_from_etp(db=db, etp_id=etp_id, tipo=tipo, user_id=user_id)
+    await publish_tr_created(tr)
     return tr
 
 
 @router.post("/tr/criar-de-etp/{etp_id}", response_model=Dict[str, uuid.UUID], status_code=201)
-def criar_tr_de_etp(
+async def criar_tr_de_etp(
     etp_id: uuid.UUID,
     db: Session = Depends(deps.get_db),
     current_user: Dict[str, Any] = Depends(deps.get_current_user),
@@ -46,4 +48,5 @@ def criar_tr_de_etp(
     tipo_tr = TRType.BEM
 
     tr = build_tr_from_etp(db=db, etp_id=etp_id, tipo=tipo_tr, user_id=user_id)
+    await publish_tr_created(tr)
     return {"id": tr.id}

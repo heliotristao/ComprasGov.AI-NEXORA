@@ -1,6 +1,9 @@
 import uuid
+from unittest.mock import AsyncMock
+
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
+
 from app.db.models.etp import ETP, ETPStatus
 from app.db.models.user import User
 from app.schemas.etp import ETPCreate
@@ -49,3 +52,24 @@ def test_create_tr_from_etp_not_published(client: TestClient, db: Session) -> No
     response = client.post(f"/api/v1/tr/criar-de-etp/{etp.id}")
     assert response.status_code == 400
     assert "ETP must be published" in response.json()["detail"]
+
+
+def test_create_tr_from_etp_publishes_event(
+    client: TestClient,
+    db: Session,
+    monkeypatch,
+) -> None:
+    etp = create_test_etp(db, status=ETPStatus.published)
+    async_mock = AsyncMock()
+
+    monkeypatch.setattr(
+        "app.api.v1.endpoints.tr_transform.publish_tr_created",
+        async_mock,
+    )
+
+    response = client.post(f"/api/v1/tr/criar-de-etp/{etp.id}")
+
+    assert response.status_code == 201
+    assert async_mock.await_count == 1
+    tr_arg = async_mock.await_args.args[0]
+    assert str(tr_arg.id) == response.json()["id"]
