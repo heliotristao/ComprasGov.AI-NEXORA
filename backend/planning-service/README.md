@@ -51,6 +51,21 @@ O serviço estará disponível na porta `8001` do localhost.
 | `MILVUS_HOST` | Host da base de vetores Milvus | `milvus` |
 | `MILVUS_PORT`| Porta da base de vetores Milvus | `19530`|
 
+## Módulo Risco.AI
+
+O módulo **Risco.AI** realiza análises preditivas de risco para cada ETP com base em dados históricos e no modelo de Machine Learning (XGBoost). Após o cálculo é gerada uma matriz 5x5 (probabilidade x impacto) e os resultados ficam disponíveis nos endpoints `/api/v1/risco/*`.
+
+### Interpretação dos Scores
+
+| Faixa de Score | Categoria  | Probabilidade | Impacto | Interpretação |
+| :--- | :--- | :--- | :--- | :--- |
+| `0 - 24`  | **Baixo**   | 1 | 2 | Projeto com baixa chance de problemas relevantes. Monitoramento padrão é suficiente. |
+| `25 - 49` | **Médio**   | 2 | 3 | Há sinais de atenção. Recomenda-se acompanhar cronograma e custos com mais rigor. |
+| `50 - 74` | **Alto**    | 4 | 4 | Probabilidade elevada de atrasos ou aditivos. Deve-se aplicar plano de mitigação dedicado. |
+| `75 - 100`| **Crítico** | 5 | 5 | Alto risco de insucesso. Projetos nessa faixa exigem revisão executiva imediata e contingências. |
+
+Cada análise retorna os cinco fatores de maior impacto (via SHAP), recomendações automáticas e publica o evento `planejamento.risco.calculado` para integração com outros serviços.
+
 
 ## Como Rodar os Testes
 
