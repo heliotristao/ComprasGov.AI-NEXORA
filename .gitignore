@@ -64,3 +64,7 @@ npm_output.log
 # Coverage reports
 .coverage
 coverage.xml
+
+# Model artifacts
+backend/planning-service/ml_models/*
+!backend/planning-service/ml_models/.gitkeep

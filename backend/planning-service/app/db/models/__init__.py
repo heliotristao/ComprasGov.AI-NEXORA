@@ -2,6 +2,7 @@
 
 from .ai_execution import AIExecution
 from .audit_log import AuditLog
+from .contracts import Contract
 from .dashboard import DashboardSummary
 from .etp import ETP, ETPStatus
 from .etp_ai_trace import ETPAITrace
@@ -22,6 +23,7 @@ from .etp_workflow_history import ETPWorkflowHistory
 from .ia_acceptance_history import IAAcceptanceHistory
 from .market_price import MarketPrice
 from .planning import Planning
+from .risco import RiskAnalysis
 from .signed_document import DocumentType, SignedDocument
 from .sla import SLASetting, SLAState, SLAStatus
 from .template import Template
@@ -44,6 +46,7 @@ __all__ = [
     "AIExecution",
     "AuditLog",
     "CampoObrigatorioLei",
+    "Contract",
     "DashboardSummary",
     "DocumentType",
     "DocumentoETP",
@@ -64,6 +67,7 @@ __all__ = [
     "ModeloSuperior",
     "PermissaoTemplate",
     "Planning",
+    "RiskAnalysis",
     "Severity",
     "SignedDocument",
     "SLASetting",

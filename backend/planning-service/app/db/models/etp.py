@@ -58,6 +58,8 @@ class ETP(Base):
         "ETPValidation", back_populates="etp", cascade="all, delete-orphan"
     )
     consolidation_jobs = relationship("ETPConsolidationJob", back_populates="etp")
+    contract = relationship("Contract", back_populates="etp", uselist=False)
+    risk_analysis = relationship("RiskAnalysis", back_populates="etp", uselist=False)
 
     __table_args__ = (
         Index("ix_etps_edocs_number", "edocs_number", unique=True),
