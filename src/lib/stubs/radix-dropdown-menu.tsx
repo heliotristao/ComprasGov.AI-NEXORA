@@ -132,7 +132,7 @@ const DropdownMenuItem = React.forwardRef<HTMLDivElement, DropdownMenuItemProps>
         tabIndex={disabled ? -1 : 0}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
-        className=[
+        className={[
           "flex select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
           inset ? "pl-8" : null,
           disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
@@ -203,7 +203,11 @@ const DropdownMenuSubTrigger: React.FC<
   <div
     role="menuitem"
     tabIndex={0}
-    className={["flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none", inset ? "pl-8" : null, className]
+    className={[
+      "flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
+      inset ? "pl-8" : null,
+      className,
+    ]
       .filter(Boolean)
       .join(" ")}
     {...props}
