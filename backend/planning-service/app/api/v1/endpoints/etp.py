@@ -1,15 +1,16 @@
 import uuid
 from typing import List, Any
-from fastapi import APIRouter, Depends, HTTPException, status, Header, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Header, Query, Body
 from sqlalchemy.orm import Session
 
 from app.crud import crud_etp
 from app.api.deps import get_db
-from app.api.v1.dependencies import get_current_user
 import json
 from app.core.rule_engine_wrapper import RuleEngineWrapper
-from app.schemas.etp import ETPCreate, ETPSchema, ETPUpdate, ETPPatch
+from app.services import etp_auto_save_service
+from app.schemas.etp import ETPCreate, ETPSchema, ETPUpdate
 from nexora_auth.audit import audited
+from app.api.v1.dependencies import get_current_user
 
 router = APIRouter()
 
@@ -62,22 +63,30 @@ def read_etps(
 
 @router.patch("/{id}", response_model=ETPSchema)
 @audited(action="ETP_AUTOSAVED")
-def patch_etp(
+async def patch_etp(
     id: uuid.UUID,
-    etp_in: ETPPatch,
-    if_match: int = Header(...),
+    patch_body: dict[str, Any] = Body(...),
+    if_match: str = Header(..., alias="If-Match"),
+    validate_step: str | None = Query(None),
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ) -> Any:
     """
-    Patch an ETP for auto-save functionality.
+    Patch an ETP for auto-save functionality with validation and optimistic locking.
     """
-    etp = crud_etp.etp.get(db=db, id=id)
-    if not etp:
-        raise HTTPException(status_code=404, detail="ETP not found")
+    scopes = current_user.get("scopes", []) if isinstance(current_user, dict) else []
+    if "etp:write" not in scopes:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
 
-    etp = crud_etp.etp.patch(db=db, db_obj=etp, obj_in=etp_in, version=if_match)
-    return etp
+    updated_etp = etp_auto_save_service.orchestrate_etp_auto_save(
+        db=db,
+        etp_id=id,
+        patch_data=patch_body,
+        if_match=if_match,
+        validate_step=validate_step,
+    )
+
+    return ETPSchema.model_validate(updated_etp)
 
 
 @router.put("/{id}", response_model=ETPSchema)

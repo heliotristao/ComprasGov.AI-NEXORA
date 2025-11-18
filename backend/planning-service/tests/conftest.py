@@ -1,6 +1,17 @@
 import sys
 import os
 import pytest
+
+# Add the project root to the Python path to allow absolute imports
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+REPO_ROOT = os.path.abspath(os.path.join(PROJECT_ROOT, "..", ".."))
+NEXORA_AUTH_PATH = os.path.join(REPO_ROOT, "libs", "nexora-auth")
+NEXORA_CORE_PATH = os.path.join(REPO_ROOT, "libs", "nexora-core")
+
+sys.path.insert(0, PROJECT_ROOT)
+sys.path.insert(0, NEXORA_AUTH_PATH)
+sys.path.insert(0, NEXORA_CORE_PATH)
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.db.base import Base
@@ -9,9 +20,6 @@ from app.main import app
 from fastapi.testclient import TestClient
 from sqlalchemy.exc import OperationalError
 from app.api.v1.dependencies import get_current_user
-
-# Add the project root to the Python path to allow absolute imports
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 

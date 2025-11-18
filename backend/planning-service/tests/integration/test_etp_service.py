@@ -4,14 +4,16 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.db.models.etp import ETP
+from tests.utils.user import create_random_user
 from app.services.etp_service import perform_merge_patch
 
 # Helper to create a test ETP
 def create_test_etp(db: Session, initial_data: dict) -> ETP:
+    user = create_random_user(db)
     etp = ETP(
         title="Test ETP",
         data=initial_data,
-        created_by="test_user"
+        created_by=user
     )
     db.add(etp)
     db.commit()

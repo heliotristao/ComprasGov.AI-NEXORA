@@ -3,6 +3,7 @@ import random
 import string
 
 from app.db.models.etp import ETP, ETPStatus
+from tests.utils.user import create_random_user
 
 
 def random_lower_string(length: int = 32) -> str:
@@ -20,10 +21,12 @@ def create_random_etp(db: Session, *, status: ETPStatus = ETPStatus.draft, data:
             "estimativa_valor_contratacao": "Test value",
             "forma_pagamento": "Test payment",
         }
+    user = create_random_user(db)
+
     etp = ETP(
         title=title,
         status=status,
-        created_by="test",
+        created_by=user,
         data=data,
     )
     db.add(etp)

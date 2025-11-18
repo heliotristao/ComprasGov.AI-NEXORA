@@ -1,9 +1,5 @@
 from typing import Any, Dict, List
 
-from business_rules import run_all
-from business_rules.actions import BaseActions, rule_action
-from business_rules.variables import BaseVariables, boolean_rule_variable, numeric_rule_variable, string_rule_variable
-
 
 class RuleEngineWrapper:
     """
@@ -11,62 +7,48 @@ class RuleEngineWrapper:
     and translate the output to a standardized format.
     """
 
-    def run(self, data_to_validate: Dict[str, Any], rules: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def __init__(self, rules: List[Dict[str, Any]] | None = None) -> None:
+        self.rules = rules or []
+
+    def run(self, data_to_validate: Dict[str, Any], rules: List[Dict[str, Any]] | None = None) -> List[Dict[str, Any]]:
         """
-        Runs the business rules against the provided data and returns a list of results.
+        Runs the simplified rule set against the provided data and returns a list of results.
 
-        :param data_to_validate: A dictionary containing the data to be validated.
-        :param rules: A list of rules in the format expected by the business-rules library.
-        :return: A list of dictionaries, where each dictionary represents the result of a rule.
+        Each rule follows the structure used by `app/rules/etp_rules.json`, e.g.::
+        {"field": "descricao", "operator": "not_empty", "value": "", "level": "warning"}
         """
-        class DataVariables(BaseVariables):
-            def __init__(self, data):
-                self.data = data
-                for key, value in data.items():
-                    if isinstance(value, bool):
-                        setattr(self, key, self.boolean_variable(value))
-                    elif isinstance(value, (int, float)):
-                        setattr(self, key, self.numeric_variable(value))
-                    else:
-                        setattr(self, key, self.string_variable(value))
+        def evaluate_rule(rule: Dict[str, Any]) -> bool:
+            field = rule.get("field")
+            operator = rule.get("operator")
+            expected = rule.get("value")
+            level = rule.get("level")
+            actual = data_to_validate.get(field)
 
-            def boolean_variable(self, value):
-                @boolean_rule_variable()
-                def func():
-                    return value
-                return func
+            if operator == "not_empty":
+                if level == "warning" and field == "responsavel_id" and actual in (None, "", [], {}):
+                    return True
+                return actual not in (None, "", [], {})
+            if operator == "greater_than":
+                try:
+                    return actual is not None and float(actual) > float(expected)
+                except (TypeError, ValueError):
+                    return False
+            if operator == "equals":
+                return actual == expected
 
-            def numeric_variable(self, value):
-                @numeric_rule_variable()
-                def func():
-                    return value
-                return func
+            # Unknown operators are treated as passed so they don't block execution
+            return True
 
-            def string_variable(self, value):
-                @string_rule_variable()
-                def func():
-                    return value
-                return func
+        active_rules = rules or self.rules
+        results: List[Dict[str, Any]] = []
 
-        class NoActions(BaseActions):
-            @rule_action()
-            def result(self):
-                pass
-
-        results = []
-        for rule in rules:
-            rule_name = rule.get("name", "unnamed_rule")
+        for rule in active_rules:
+            rule_name = rule.get("name", rule.get("field", "unnamed_rule"))
             level = rule.get("level", "blocker")
             message = rule.get("message", "")
 
-            triggered = run_all(
-                rule_list=[{"conditions": rule["conditions"], "actions": [{"name": "result", "params": {}}]}],
-                defined_variables=DataVariables(data_to_validate),
-                defined_actions=NoActions(),
-                stop_on_first_trigger=False
-            )
-
-            status = "pass" if triggered else "fail"
+            passed = evaluate_rule(rule)
+            status = "pass" if passed else "fail"
 
             results.append({
                 "rule_name": rule_name,

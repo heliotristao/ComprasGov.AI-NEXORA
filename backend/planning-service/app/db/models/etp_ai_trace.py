@@ -13,7 +13,10 @@ class ETPAITrace(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     etp_id = Column(Integer, ForeignKey("documentos_etp.id"), nullable=False, index=True)
-    field = Column(String(255), nullable=False)
+    # "section" is the public-facing name expected by the API/tests; keep
+    # the legacy "field" naming for backward compatibility with existing
+    # records and migrations.
+    section = Column("field", String(255), nullable=False)
     prompt = Column(Text, nullable=False)
     response = Column(Text, nullable=False)
     confidence = Column(Float, nullable=True)
@@ -24,4 +27,4 @@ class ETPAITrace(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     def __repr__(self):
-        return f"<ETPAITrace(id={self.id}, etp_id={self.etp_id}, field='{self.field}')>"
+        return f"<ETPAITrace(id={self.id}, etp_id={self.etp_id}, section='{self.section}')>"

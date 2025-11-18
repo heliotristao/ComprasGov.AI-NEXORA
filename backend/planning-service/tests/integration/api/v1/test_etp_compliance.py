@@ -2,10 +2,12 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 from app.db.models.etp import ETP
 from app.core import config
+from tests.utils.user import create_random_user
 import uuid
 
 def create_test_etp(db: Session, data: dict) -> ETP:
-    etp = ETP(id=uuid.uuid4(), title="Test ETP", data=data, created_by="test_user")
+    user = create_random_user(db)
+    etp = ETP(id=uuid.uuid4(), title="Test ETP", data=data, created_by=user)
     db.add(etp)
     db.commit()
     db.refresh(etp)

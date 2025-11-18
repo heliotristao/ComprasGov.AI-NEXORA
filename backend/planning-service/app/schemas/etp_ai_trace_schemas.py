@@ -4,7 +4,7 @@ from typing import Optional
 
 class ETPAITraceCreate(BaseModel):
     etp_id: int
-    field: str
+    section: str
     prompt: str
     response: str
     confidence: Optional[float] = None
