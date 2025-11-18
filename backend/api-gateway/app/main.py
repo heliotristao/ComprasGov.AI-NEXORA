@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.openapi.utils import get_openapi
+from starlette.middleware.base import BaseHTTPMiddleware
 import os
 import json
 
@@ -40,6 +41,25 @@ def custom_openapi():
 app = FastAPI(title="NEXORA API Gateway")
 app.openapi = custom_openapi
 
+# --- Security Headers Middleware ---
+
+SECURITY_HEADERS = {
+    "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+    "Content-Security-Policy": "default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:8000 http://127.0.0.1:8000 https://*;",
+}
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        for header, value in SECURITY_HEADERS.items():
+            response.headers.setdefault(header, value)
+        return response
+
 # --- Configuration ---
 GOVERNANCE_JWKS_URL = os.getenv("GOVERNANCE_JWKS_URL", "http://governance-service:8000/.well-known/jwks.json")
 AUDIENCE = "nexora-platform"
@@ -61,6 +81,7 @@ app.add_middleware(
     validator=jwt_validator,
     public_paths={"/health", "/openapi.json"}
 )
+app.add_middleware(SecurityHeadersMiddleware)
 
 # --- Endpoints ---
 
