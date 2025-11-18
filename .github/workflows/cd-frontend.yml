@@ -1,5 +1,10 @@
 name: CD Frontend
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 on:
   push:
     branches: [ "main" ]
