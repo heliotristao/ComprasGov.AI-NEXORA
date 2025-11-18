@@ -5,10 +5,12 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 import diff_match_patch as dmp_module
 
+from datetime import datetime, timezone
+
 from app import crud, schemas
 from app.api.deps import get_db
-from app.api.v1.dependencies import get_current_user
 from nexora_auth.audit import audited
+from app.api.v1.dependencies import get_current_user
 
 router = APIRouter()
 
@@ -60,7 +62,7 @@ def accept_ai_suggestion(
         diff=diff_text,
         # Fields below are just for schema creation, they are not used in CRUD
         id=uuid.uuid4(),
-        accepted_at=None,
+        accepted_at=datetime.now(timezone.utc),
     )
 
     history = crud.ia_acceptance_history.create(db=db, obj_in=history_create)

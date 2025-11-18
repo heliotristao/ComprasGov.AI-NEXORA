@@ -14,7 +14,7 @@ class IAAcceptanceHistorySchema(BaseModel):
     section_name: str
     execution_id: uuid.UUID
     accepted_by_id: uuid.UUID
-    accepted_at: datetime
+    accepted_at: datetime | None = None
     diff: str | None
 
     class Config:

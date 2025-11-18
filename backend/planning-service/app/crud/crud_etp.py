@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 
 from app.crud.base import CRUDBase
-from app.db.models.etp import ETP
+from app.db.models.etp import ETP, ETPStatus
 from app.schemas.etp import ETPCreate, ETPUpdate, ETPPatch
 
 
@@ -37,6 +37,9 @@ class CRUDETP(CRUDBase[ETP, ETPCreate, ETPUpdate]):
 
     def get(self, db: Session, id: UUID) -> Optional[ETP]:
         return db.query(self.model).filter(self.model.id == id, self.model.deleted_at.is_(None)).first()
+
+    def get_etp(self, db: Session, etp_id: UUID) -> Optional[ETP]:
+        return self.get(db=db, id=etp_id)
 
     def get_multi(self, db: Session, *, skip: int = 0, limit: int = 100) -> List[ETP]:
         return db.query(self.model).filter(self.model.deleted_at.is_(None)).offset(skip).limit(limit).all()
@@ -94,7 +97,68 @@ class CRUDETP(CRUDBase[ETP, ETPCreate, ETPUpdate]):
         db.refresh(db_obj)
         return db_obj
 
+    def update_status(self, db: Session, *, etp_id: UUID, new_status: ETPStatus, comments: str | None = None) -> ETP:
+        etp_obj = self.get(db=db, id=etp_id)
+        if not etp_obj:
+            raise HTTPException(status_code=404, detail="ETP not found")
+
+        etp_obj.status = new_status
+        if comments:
+            etp_obj.updated_by = comments
+
+        db.add(etp_obj)
+        db.commit()
+        db.refresh(etp_obj)
+        return etp_obj
+
+    def increment_version(self, db: Session, *, etp_id: UUID) -> ETP:
+        etp_obj = self.get(db=db, id=etp_id)
+        if not etp_obj:
+            raise HTTPException(status_code=404, detail="ETP not found")
+
+        etp_obj.version += 1
+        db.add(etp_obj)
+        db.commit()
+        db.refresh(etp_obj)
+        return etp_obj
+
 etp = CRUDETP(ETP)
 
 def get_etp(db: Session, id: UUID) -> Optional[ETP]:
     return etp.get(db, id=id)
+
+# Compatibility wrappers so consumers can access CRUD operations via the module alias
+def create(db: Session, *, obj_in: ETPCreate, created_by: UUID | str | None = None) -> ETP:
+    return etp.create(db=db, obj_in=obj_in, created_by=created_by)
+
+
+def create_with_owner(db: Session, *, obj_in: ETPCreate, created_by_id: UUID) -> ETP:
+    return etp.create_with_owner(db=db, obj_in=obj_in, created_by_id=created_by_id)
+
+
+def get(db: Session, id: UUID) -> Optional[ETP]:
+    return etp.get(db=db, id=id)
+
+
+def get_multi(db: Session, *, skip: int = 0, limit: int = 100) -> List[ETP]:
+    return etp.get_multi(db=db, skip=skip, limit=limit)
+
+
+def patch(db: Session, *, db_obj: ETP, obj_in: ETPPatch, version: int) -> ETP:
+    return etp.patch(db=db, db_obj=db_obj, obj_in=obj_in, version=version)
+
+
+def update(db: Session, *, db_obj: ETP, obj_in: ETPUpdate) -> ETP:
+    return etp.update(db=db, db_obj=db_obj, obj_in=obj_in)
+
+
+def remove(db: Session, *, id: UUID) -> ETP:
+    return etp.remove(db=db, id=id)
+
+
+def increment_version(db: Session, *, etp_id: UUID) -> ETP:
+    return etp.increment_version(db=db, etp_id=etp_id)
+
+
+def update_status(db: Session, *, etp_id: UUID, new_status: ETPStatus, comments: str | None = None) -> ETP:
+    return etp.update_status(db=db, etp_id=etp_id, new_status=new_status, comments=comments)
