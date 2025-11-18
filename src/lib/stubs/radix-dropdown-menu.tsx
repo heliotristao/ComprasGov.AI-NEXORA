@@ -105,16 +105,19 @@ interface DropdownMenuItemProps extends Omit<React.HTMLAttributes<HTMLDivElement
   inset?: boolean
   onSelect?: (event: Event) => void
   closeMenu?: () => void
+  disabled?: boolean
 }
 
 const DropdownMenuItem = React.forwardRef<HTMLDivElement, DropdownMenuItemProps>(
-  ({ className, inset, onSelect, closeMenu, children, ...props }, ref) => {
+  ({ className, inset, onSelect, closeMenu, children, disabled, ...props }, ref) => {
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+      if (disabled) return
       onSelect?.(event.nativeEvent)
       closeMenu?.()
     }
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (disabled) return
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault()
         onSelect?.(event.nativeEvent)
@@ -126,12 +129,18 @@ const DropdownMenuItem = React.forwardRef<HTMLDivElement, DropdownMenuItemProps>
       <div
         ref={ref}
         role="menuitem"
-        tabIndex={0}
+        tabIndex={disabled ? -1 : 0}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
-        className={["flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none", inset ? "pl-8" : null, className]
+        className=[
+          "flex select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
+          inset ? "pl-8" : null,
+          disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
+          className,
+        ]
           .filter(Boolean)
           .join(" ")}
+        aria-disabled={disabled}
         {...props}
       >
         {children}
