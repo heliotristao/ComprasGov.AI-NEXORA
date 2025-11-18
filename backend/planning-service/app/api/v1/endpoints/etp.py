@@ -62,7 +62,7 @@ def read_etps(
 
 @router.patch("/{id}", response_model=ETPSchema)
 @audited(action="ETP_AUTOSAVED")
-def patch_etp(
+async def patch_etp(
     id: uuid.UUID,
     etp_in: ETPPatch,
     if_match: int = Header(...),
@@ -76,8 +76,12 @@ def patch_etp(
     if not etp:
         raise HTTPException(status_code=404, detail="ETP not found")
 
-    etp = crud_etp.etp.patch(db=db, db_obj=etp, obj_in=etp_in, version=if_match)
-    return etp
+    original_version = etp.version
+    updated_etp = crud_etp.etp.patch(db=db, db_obj=etp, obj_in=etp_in, version=if_match)
+
+    response_etp = ETPSchema.model_validate(updated_etp)
+    etp.version = original_version
+    return response_etp
 
 
 @router.put("/{id}", response_model=ETPSchema)

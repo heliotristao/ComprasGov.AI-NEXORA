@@ -1,3 +1,4 @@
+import re
 from unittest.mock import MagicMock, ANY, patch
 from fastapi.testclient import TestClient
 from httpx import Response
@@ -12,7 +13,7 @@ def test_consolidate_etp_propagates_trace_id(
 ):
     # Arrange
     httpx_mock.add_response(
-        url__regex=r"http://.*/api/v1/artifacts",
+        url=re.compile(r"http://.*/api/v1/artifacts"),
         method="POST",
         json={"id": "artifact-id"},
         status_code=200,

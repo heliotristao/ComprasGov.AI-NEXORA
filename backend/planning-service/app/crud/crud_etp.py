@@ -63,6 +63,7 @@ class CRUDETP(CRUDBase[ETP, ETPCreate, ETPUpdate]):
         """
         Patch an ETP with optimistic concurrency control.
         """
+        original_version = db_obj.version
         if db_obj.version != version:
             raise HTTPException(
                 status_code=409,
@@ -82,6 +83,7 @@ class CRUDETP(CRUDBase[ETP, ETPCreate, ETPUpdate]):
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
+
         return db_obj
 
     def remove(self, db: Session, *, id: UUID) -> ETP:

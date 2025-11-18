@@ -23,7 +23,7 @@ def create_etp_for_signing(db: Session, status: ETPStatus) -> ETPSchema:
     etp = ETP(
         title="Test ETP for Signing",
         status=status,
-        created_by=user.email,
+        created_by=user,
     )
     db.add(etp)
     db.commit()
