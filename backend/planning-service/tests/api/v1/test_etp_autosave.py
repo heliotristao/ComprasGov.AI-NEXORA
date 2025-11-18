@@ -6,18 +6,21 @@ from sqlalchemy.orm import Session
 
 from app import crud
 from app.schemas.etp import ETPCreate
+from tests.utils.user import create_random_user
 
 # Fictional user data for tests
 MOCK_USER = {"sub": "test@user.com", "scopes": ["etp:read", "etp:write"]}
 
 
 def create_test_etp(db: Session) -> uuid.UUID:
+    user = create_random_user(db)
     etp_in = ETPCreate(
+        title="ETP Autosave",
         process_id="12345",
         edocs="2025-123456",
         data={"initial": "data"},
     )
-    etp = crud.etp.create(db=db, obj_in=etp_in, created_by=MOCK_USER["sub"])
+    etp = crud.etp.create(db=db, obj_in=etp_in, created_by=user.id)
     return etp.id
 
 

@@ -11,7 +11,10 @@ class RuleEngineWrapper:
     and translate the output to a standardized format.
     """
 
-    def run(self, data_to_validate: Dict[str, Any], rules: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def __init__(self, rules: List[Dict[str, Any]] | None = None) -> None:
+        self.rules = rules or []
+
+    def run(self, data_to_validate: Dict[str, Any], rules: List[Dict[str, Any]] | None = None) -> List[Dict[str, Any]]:
         """
         Runs the business rules against the provided data and returns a list of results.
 
@@ -53,8 +56,9 @@ class RuleEngineWrapper:
             def result(self):
                 pass
 
+        active_rules = rules or self.rules
         results = []
-        for rule in rules:
+        for rule in active_rules:
             rule_name = rule.get("name", "unnamed_rule")
             level = rule.get("level", "blocker")
             message = rule.get("message", "")

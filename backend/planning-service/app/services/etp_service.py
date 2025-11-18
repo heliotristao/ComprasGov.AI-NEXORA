@@ -44,7 +44,7 @@ def perform_merge_patch(db: Session, *, etp_id: uuid.UUID, patch_data: Dict[str,
     Raises:
         HTTPException: If the ETP with the given ID is not found.
     """
-    etp = crud_etp.get_etp(db=db, etp_id=etp_id)
+    etp = crud_etp.get_etp(db=db, id=etp_id)
     if not etp:
         raise HTTPException(status_code=404, detail="ETP not found")
 

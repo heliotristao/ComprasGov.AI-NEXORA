@@ -12,6 +12,22 @@ from app.schemas.etp import ETPCreate, ETPUpdate, ETPPatch
 
 
 class CRUDETP(CRUDBase[ETP, ETPCreate, ETPUpdate]):
+    def create(self, db: Session, *, obj_in: ETPCreate, created_by: UUID | str | None = None) -> ETP:
+        created_by_id = None
+        if created_by is not None:
+            created_by_id = created_by if isinstance(created_by, UUID) else UUID(str(created_by))
+        elif hasattr(obj_in, "created_by_id"):
+            created_by_id = getattr(obj_in, "created_by_id")
+
+        if created_by_id is None:
+            return super().create(db=db, obj_in=obj_in)
+
+        db_obj = self.model(**obj_in.dict(), created_by_id=created_by_id)
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
     def create_with_owner(self, db: Session, *, obj_in: ETPCreate, created_by_id: UUID) -> ETP:
         db_obj = self.model(**obj_in.dict(), created_by_id=created_by_id)
         db.add(db_obj)

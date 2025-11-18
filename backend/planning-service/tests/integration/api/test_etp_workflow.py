@@ -5,15 +5,17 @@ from sqlalchemy.orm import Session
 from app.db.models.etp import ETP, ETPStatus
 from app.db.models.etp_workflow_history import ETPWorkflowHistory
 from app.db.models.audit_log import AuditLog
+from tests.utils.user import create_random_user
 
 @pytest.fixture(scope="function")
 def etp_in_draft(db: Session) -> ETP:
     """Create an ETP in draft status."""
+    user = create_random_user(db)
     etp = ETP(
         title="Test ETP for Workflow",
         data={"description": "Test ETP"},
         status=ETPStatus.draft,
-        created_by="testuser",
+        created_by=user,
     )
     db.add(etp)
     db.commit()
