@@ -32,7 +32,7 @@ def accept_ai_suggestion(
     Accept an AI suggestion for a specific section of an ETP,
     optionally with user edits.
     """
-    etp = crud.etp.etp.get(db=db, id=id)
+    etp = crud.etp.get(db=db, id=id)
     if not etp:
         raise HTTPException(status_code=404, detail="ETP not found")
 
